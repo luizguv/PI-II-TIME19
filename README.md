@@ -15,4 +15,4 @@
   ## Vinicius Davi Zorzetto de Matos
 
 # Professora Orientadora:
-  Renata Arantes
+  ## Renata Arantes
