@@ -1,24 +1,18 @@
 # Sistema De Acompanhamento De Demandas De Desenvolvimento
 ## PI-II-TIME19
 
-# Integrantes: 
-# Caio Peccinato
-# João Pedro Silveira de Souza
-# Luiz Gustavo Urias Vieira
-# Vinicius Davi Zorzetto de Matos
-
 # Engenharia de Software
 
 # Componente Curricular: 
+  ## Mobiliza e integra as competências para desenvolvimento de projeto, empregando em equipe um método de desenvolvimento sistematizado, visando abranger a definição de requisitos, as bases da programação de sistemas de         software na Internet e aplicando estruturas e bancos de dados.
 
 # 2 Semestre de 2026
 
-# Renata Arantes
+# Equipe de Desenvolvimento:
+  ## Caio Peccinato
+  ## João Pedro Silveira de Souza
+  ## Luiz Gustavo Urias Vieira
+  ## Vinicius Davi Zorzetto de Matos
 
-# Introdução e Descrição do Projeto:
-
-
-# Equipe de Desenvolvimento
-
-
-# Tecnologias e Ferramentas Utilizadas
+# Professora Orientadora:
+  Renata Arantes
