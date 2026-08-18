@@ -11,6 +11,7 @@
 # Equipe de Desenvolvimento:
   ## Caio Peccinato
   ## João Pedro Silveira de Souza
+  ## Leonardo Gambaroni Alves
   ## Luiz Gustavo Urias Vieira
   ## Vinicius Davi Zorzetto de Matos
 
