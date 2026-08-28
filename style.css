@@ -5,6 +5,10 @@ body {
   color: white;
 }
 
+main {
+  color: white;
+}
+
 .cabecalho {
   display: flex;
   padding: 30px;
@@ -16,8 +20,12 @@ body {
   font-size: 150%;
 }
 
-main {
-  color: white;
+.rodape {
+  display: flex;
+  background-color: #0b132b;
+  padding: 30px;
+  justify-content: center;
+  gap: 50px;
 }
 
 .links a {
