@@ -1,0 +1,32 @@
+body {
+  background-color: #3a506b;
+  font-family: Arial, Helvetica, sans-serif;
+  margin: 0px;
+  color: white;
+}
+
+.cabecalho {
+  display: flex;
+  padding: 30px;
+  background-color: #0b132b;
+  justify-content: space-between;
+}
+
+.cabecalho h1 {
+  font-size: 150%;
+}
+
+main {
+  color: white;
+}
+
+.links a {
+  color: #81f8f6;
+}
+
+.classificacao-demanda {
+  display: flex;
+  gap: 50px;
+
+  flex-wrap: wrap;
+}
