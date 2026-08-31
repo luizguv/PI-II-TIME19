@@ -1,0 +1,365 @@
+<!--
+  Autor: Leonardo Gambaroni Alves
+  Componente: Projeto Integrador II - PUC-Campinas
+  Descrição: Tela de Dashboard do Sistema de Atendimento de Pronto Socorro
+-->
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Dashboard - Sistema de Atendimentos</title>
+
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+</head>
+
+<body>
+
+    <!-- Menu Superior -->
+    <header class="topo-site">
+
+        <div class="container menu-container">
+
+            <h1>Sistema de Atendimentos</h1>
+
+            <nav>
+                <a href="dashboard.html" class="ativo">Dashboard</a>
+                <a href="listagem-demandas.html">Atendimentos</a>
+                <a href="login.html">Sair</a>
+            </nav>
+
+        </div>
+
+    </header>
+
+
+    <!-- Conteúdo Principal -->
+    <main class="container">
+
+        <!-- Cabeçalho -->
+        <section class="cabecalho-dashboard">
+
+            <div>
+                <h2>Dashboard</h2>
+                <p>Acompanhe os atendimentos do pronto socorro.</p>
+            </div>
+
+            <a href="cadastro-atendimento.html" class="btn btn-primary">
+                + Novo Atendimento
+            </a>
+
+        </section>
+
+
+        <!-- Cards de Resumo -->
+        <section class="cards-resumo">
+
+            <div class="card resumo-card">
+
+                <div class="resumo-icone">
+                    +
+                </div>
+
+                <div>
+                    <span class="resumo-label">Atendimentos hoje</span>
+                    <strong>24</strong>
+                </div>
+
+            </div>
+
+
+            <div class="card resumo-card">
+
+                <div class="resumo-icone">
+                    !
+                </div>
+
+                <div>
+                    <span class="resumo-label">Aguardando triagem</span>
+                    <strong>8</strong>
+                </div>
+
+            </div>
+
+
+            <div class="card resumo-card">
+
+                <div class="resumo-icone">
+                    >
+                </div>
+
+                <div>
+                    <span class="resumo-label">Aguardando médico</span>
+                    <strong>11</strong>
+                </div>
+
+            </div>
+
+
+            <div class="card resumo-card">
+
+                <div class="resumo-icone">
+                    ✓
+                </div>
+
+                <div>
+                    <span class="resumo-label">Atendidos hoje</span>
+                    <strong>5</strong>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- Conteúdo do Dashboard -->
+        <section class="dashboard-grid">
+
+
+            <!-- Painel de Atendimento -->
+            <div class="card painel-atendimento">
+
+                <div class="card-cabecalho">
+
+                    <div>
+                        <h3>Painel de Atendimento</h3>
+                        <p>Pacientes aguardando atendimento médico</p>
+                    </div>
+
+                    <a href="painel-atendimento.html" class="btn btn-secondary btn-pequeno">
+                        Ver painel
+                    </a>
+
+                </div>
+
+
+                <div class="lista-pacientes">
+
+                    <!-- Paciente 1 -->
+                    <div class="paciente">
+
+                        <div class="paciente-info">
+
+                            <strong>AT0008</strong>
+
+                            <span>
+                                João da Silva — 34 anos
+                            </span>
+
+                        </div>
+
+                        <span class="badge emergencia">
+                            Emergência
+                        </span>
+
+                    </div>
+
+
+                    <!-- Paciente 2 -->
+                    <div class="paciente">
+
+                        <div class="paciente-info">
+
+                            <strong>AT0007</strong>
+
+                            <span>
+                                Maria Souza — 52 anos
+                            </span>
+
+                        </div>
+
+                        <span class="badge muito-urgente">
+                            Muito urgente
+                        </span>
+
+                    </div>
+
+
+                    <!-- Paciente 3 -->
+                    <div class="paciente">
+
+                        <div class="paciente-info">
+
+                            <strong>AT0006</strong>
+
+                            <span>
+                                Carlos Oliveira — 27 anos
+                            </span>
+
+                        </div>
+
+                        <span class="badge urgente">
+                            Urgente
+                        </span>
+
+                    </div>
+
+
+                    <!-- Paciente 4 -->
+                    <div class="paciente">
+
+                        <div class="paciente-info">
+
+                            <strong>AT0005</strong>
+
+                            <span>
+                                Ana Santos — 41 anos
+                            </span>
+
+                        </div>
+
+                        <span class="badge pouco-urgente">
+                            Pouco urgente
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Status dos Atendimentos -->
+            <div class="card status-card">
+
+                <div class="card-cabecalho">
+
+                    <div>
+                        <h3>Status dos Atendimentos</h3>
+                        <p>Situação atual</p>
+                    </div>
+
+                </div>
+
+
+                <div class="status-lista">
+
+                    <div class="status-item">
+
+                        <div class="status-texto">
+                            <span class="ponto recepcao"></span>
+                            Recepção
+                        </div>
+
+                        <strong>5</strong>
+
+                    </div>
+
+
+                    <div class="status-item">
+
+                        <div class="status-texto">
+                            <span class="ponto triagem"></span>
+                            Triagem
+                        </div>
+
+                        <strong>8</strong>
+
+                    </div>
+
+
+                    <div class="status-item">
+
+                        <div class="status-texto">
+                            <span class="ponto medico"></span>
+                            Aguardando médico
+                        </div>
+
+                        <strong>11</strong>
+
+                    </div>
+
+
+                    <div class="status-item">
+
+                        <div class="status-texto">
+                            <span class="ponto concluido"></span>
+                            Concluídos
+                        </div>
+
+                        <strong>5</strong>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- Acesso Rápido -->
+        <section class="card acesso-rapido">
+
+            <div class="card-cabecalho">
+
+                <div>
+                    <h3>Acesso rápido</h3>
+                    <p>Principais funcionalidades do sistema</p>
+                </div>
+
+            </div>
+
+
+            <div class="acoes-grid">
+
+                <a href="cadastro-atendimento.html" class="acao">
+
+                    <span class="acao-icone">+</span>
+
+                    <div>
+                        <strong>Novo atendimento</strong>
+                        <span>Cadastrar paciente e atendimento</span>
+                    </div>
+
+                </a>
+
+
+                <a href="triagem.html" class="acao">
+
+                    <span class="acao-icone">+</span>
+
+                    <div>
+                        <strong>Triagem</strong>
+                        <span>Registrar dados e classificação</span>
+                    </div>
+
+                </a>
+
+
+                <a href="painel-atendimento.html" class="acao">
+
+                    <span class="acao-icone">></span>
+
+                    <div>
+                        <strong>Painel médico</strong>
+                        <span>Visualizar fila de atendimento</span>
+                    </div>
+
+                </a>
+
+
+                <a href="listagem-atendimentos.html" class="acao">
+
+                    <span class="acao-icone">≡</span>
+
+                    <div>
+                        <strong>Atendimentos</strong>
+                        <span>Consultar atendimentos registrados</span>
+                    </div>
+
+                </a>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</body>
+
+</html>
