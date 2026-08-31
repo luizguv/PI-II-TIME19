@@ -1,0 +1,37 @@
+.cabecalho {
+  display: flex;
+  padding: 15px;
+  background-color: var(--prussian-blue);
+  color: var(--white);
+  justify-content: space-around;
+  align-items: center;
+}
+
+.cabecalho h1 {
+  font-size: 20px;
+}
+
+.navegacao {
+  display: flex;
+  color: var(--gray-300);
+  font-weight: bold;
+  gap: 8px;
+}
+
+.identificacao-demanda {
+  display: flex;
+  padding: 15px;
+  flex-direction: column;
+  align-items: center;
+  flex-wrap: wrap;
+  color: var(--text-primary);
+  margin: 2px;
+  border: 2px solid var(--white);
+  border-radius: var(--radius-sm);
+  background-color: var(--dusk-blue);
+}
+
+.classificacao-demanda {
+  display: flex;
+  gap: 50px;
+}

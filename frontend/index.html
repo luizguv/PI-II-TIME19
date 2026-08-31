@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="Sistema de Gestão de Demandas"
+    >
+
+    <title>Gestão de Demandas | Login</title>
+
+    <!-- CSS global do projeto -->
+    <link rel="stylesheet" href="css/global.css">
+
+    <!-- CSS específico do Login -->
+    <link rel="stylesheet" href="css/login.css">
+
+</head>
+
+
+<body>
+
+    <main class="login-page">
+
+
+        <!-- =================================================
+             LADO ESQUERDO
+        ================================================== -->
+
+        <section class="login-brand">
+
+            <div class="login-brand-content">
+
+                <div class="login-logo">
+                    GD
+                </div>
+
+                <h1>
+                    Gestão de<br>
+                    Demandas
+                </h1>
+
+                <p>
+                    Organize, acompanhe e gerencie
+                    suas demandas de forma simples,
+                    eficiente e centralizada.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             LADO DIREITO
+        ================================================== -->
+
+        <section class="login-form-section">
+
+            <div class="login-card">
+
+
+                <!-- Cabeçalho -->
+
+                <header class="login-header">
+
+                    <h2>
+                        Bem-vindo!
+                    </h2>
+
+                    <p>
+                        Entre na sua conta para continuar.
+                    </p>
+
+                </header>
+
+
+                <!-- Formulário -->
+
+                <form id="loginForm">
+
+
+                    <!-- E-mail -->
+
+                    <div class="login-input-group">
+
+                        <label
+                            class="label"
+                            for="email"
+                        >
+                            E-mail
+                        </label>
+
+                        <input
+                            class="input"
+                            type="email"
+                            id="email"
+                            name="email"
+                            placeholder="Digite seu e-mail"
+                            autocomplete="email"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- Senha -->
+
+                    <div class="login-input-group">
+
+                        <div class="login-password-header">
+
+                            <label
+                                class="label"
+                                for="password"
+                            >
+                                Senha
+                            </label>
+
+                            <a
+                                href="#"
+                                class="login-forgot-password"
+                            >
+                                Esqueci minha senha
+                            </a>
+
+                        </div>
+
+
+                        <input
+                            class="input"
+                            type="password"
+                            id="password"
+                            name="password"
+                            placeholder="Digite sua senha"
+                            autocomplete="current-password"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- Mensagem de erro -->
+
+                    <div
+                        id="loginError"
+                        class="login-error"
+                    >
+                        E-mail ou senha inválidos.
+                    </div>
+
+
+                    <!-- Lembrar -->
+
+                    <div class="login-remember">
+
+                        <label>
+
+                            <input
+                                type="checkbox"
+                                id="remember"
+                                name="remember"
+                            >
+
+                            <span>
+                                Lembrar de mim
+                            </span>
+
+                        </label>
+
+                    </div>
+
+
+                    <!-- Botão -->
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary login-button"
+                    >
+                        Entrar
+                    </button>
+
+
+                </form>
+
+
+                <!-- Rodapé -->
+
+                <footer class="login-footer">
+
+                    <p>
+
+                        Ainda não possui uma conta?
+
+                        <a href="#">
+                            Criar conta
+                        </a>
+
+                    </p>
+
+                </footer>
+
+
+            </div>
+
+        </section>
+
+
+    </main>
+
+
+    <!-- JavaScript -->
+
+    <script src="js/login.js"></script>
+
+</body>
+
+</html>

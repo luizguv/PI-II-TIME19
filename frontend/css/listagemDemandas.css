@@ -1,0 +1,130 @@
+/* 
+  Autor: Leonardo Gambaroni Alves
+  Componente: Projeto Integrador II - PUC-Campinas
+  Descrição: Estilos específicos da tela de listagem 
+*/
+
+/* Estilo do cabeçalho/menu topo */
+.topo-site {
+    background-color: var(--prussian-blue);
+    color: var(--white);
+    padding: 15px 0;
+    margin-bottom: 30px;
+}
+
+.menu-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.topo-site h1 {
+    font-size: 20px;
+}
+
+.topo-site nav a {
+    color: var(--gray-300);
+    margin-left: 15px;
+    font-size: 14px;
+}
+
+.topo-site nav a.ativo, 
+.topo-site nav a:hover {
+    color: var(--tropical-teal);
+    font-weight: bold;
+}
+
+/* Cabeçalho interno da página */
+.cabecalho-pagina {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.cabecalho-pagina h2 {
+    font-size: 24px;
+    color: var(--text-primary);
+}
+
+.cabecalho-pagina p {
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+/* Área de filtros lado a lado */
+.caixa-filtros {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.grupo-filtro {
+    flex: 1;
+}
+
+/* Estilização básica da tabela */
+.tabela-card {
+    padding: 0; 
+    overflow-x: auto; 
+}
+
+.tabela-demandas {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 14px;
+}
+
+.tabela-demandas th, 
+.tabela-demandas td {
+    padding: 12px 15px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.tabela-demandas th {
+    background-color: var(--gray-100);
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
+.tabela-demandas td {
+    color: var(--text-primary);
+}
+
+/* Botão menor usado dentro da tabela */
+.btn-acao {
+    min-height: 32px;
+    padding: 0 10px;
+    font-size: 13px;
+}
+
+/* Badges simples para colorir prioridades e status */
+.badge {
+    padding: 4px 8px;
+    border-radius: var(--radius-sm);
+    font-size: 11px;
+    font-weight: bold;
+    display: inline-block;
+}
+
+/* Cores das Badges */
+.badge.critica {
+    background-color: #FEE2E2;
+    color: #991B1B;
+}
+
+.badge.alta {
+    background-color: #FEF3C7;
+    color: #92400E;
+}
+
+.badge.aberta {
+    background-color: #E0F2FE;
+    color: #0369A1;
+}
+
+.badge.andamento {
+    background-color: #FEF9C3;
+    color: #854D0E;
+}
