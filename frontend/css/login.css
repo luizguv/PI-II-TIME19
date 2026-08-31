@@ -1,0 +1,426 @@
+/* =====================================================
+   TELA DE LOGIN
+===================================================== */
+
+
+/* =====================================================
+   LAYOUT PRINCIPAL
+===================================================== */
+
+.login-page {
+
+    min-height: 100vh;
+
+    display: flex;
+
+}
+
+
+/* =====================================================
+   LADO ESQUERDO
+===================================================== */
+
+.login-brand {
+
+    width: 50%;
+
+    min-height: 100vh;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--prussian-blue),
+            var(--space-indigo)
+        );
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 60px;
+
+}
+
+
+.login-brand-content {
+
+    width: 100%;
+
+    max-width: 480px;
+
+}
+
+
+/* =====================================================
+   LOGO
+===================================================== */
+
+.login-logo {
+
+    width: 72px;
+
+    height: 72px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    margin-bottom: 30px;
+
+    background-color: var(--tropical-teal);
+
+    border-radius: var(--radius-md);
+
+    color: var(--prussian-blue);
+
+    font-size: 24px;
+
+    font-weight: 800;
+
+}
+
+
+/* =====================================================
+   TEXTO DA MARCA
+===================================================== */
+
+.login-brand h1 {
+
+    margin-bottom: 24px;
+
+    color: var(--white);
+
+    font-size: 48px;
+
+    line-height: 1.1;
+
+    font-weight: 700;
+
+}
+
+
+.login-brand p {
+
+    max-width: 420px;
+
+    color: #D9E2EC;
+
+    font-size: 17px;
+
+    line-height: 1.7;
+
+}
+
+
+/* =====================================================
+   LADO DIREITO
+===================================================== */
+
+.login-form-section {
+
+    width: 50%;
+
+    min-height: 100vh;
+
+    background-color: var(--space-indigo);
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 40px;
+
+}
+
+
+/* =====================================================
+   CARD DO LOGIN
+===================================================== */
+
+.login-card {
+
+    width: 100%;
+
+    max-width: 440px;
+
+    padding: 44px;
+
+    background-color: var(--white);
+
+    border-radius: var(--radius-lg);
+
+    box-shadow: var(--shadow-lg);
+
+}
+
+
+/* =====================================================
+   CABEÇALHO
+===================================================== */
+
+.login-header {
+
+    margin-bottom: 32px;
+
+}
+
+
+.login-header h2 {
+
+    margin-bottom: 8px;
+
+    color: var(--prussian-blue);
+
+    font-size: 30px;
+
+    font-weight: 700;
+
+}
+
+
+.login-header p {
+
+    color: var(--text-secondary);
+
+    font-size: 15px;
+
+}
+
+
+/* =====================================================
+   GRUPOS DE INPUT
+===================================================== */
+
+.login-input-group {
+
+    margin-bottom: 20px;
+
+}
+
+
+/* =====================================================
+   SENHA + ESQUECI SENHA
+===================================================== */
+
+.login-password-header {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    margin-bottom: 8px;
+
+}
+
+
+.login-password-header .label {
+
+    margin-bottom: 0;
+
+}
+
+
+.login-forgot-password {
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+}
+
+
+/* =====================================================
+   LEMBRAR DE MIM
+===================================================== */
+
+.login-remember {
+
+    margin-bottom: 24px;
+
+}
+
+
+.login-remember label {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    color: var(--text-secondary);
+
+    font-size: 14px;
+
+    cursor: pointer;
+
+}
+
+
+.login-remember input {
+
+    width: 16px;
+
+    height: 16px;
+
+    accent-color: var(--tropical-teal);
+
+}
+
+
+/* =====================================================
+   BOTÃO ENTRAR
+===================================================== */
+
+.login-button {
+
+    width: 100%;
+
+}
+
+
+/* =====================================================
+   RODAPÉ
+===================================================== */
+
+.login-footer {
+
+    margin-top: 24px;
+
+    padding-top: 22px;
+
+    border-top: 1px solid var(--border-color);
+
+    text-align: center;
+
+}
+
+
+.login-footer p {
+
+    color: var(--text-secondary);
+
+    font-size: 14px;
+
+}
+
+
+.login-footer a {
+
+    font-weight: 700;
+
+}
+
+
+/* =====================================================
+   MENSAGEM DE ERRO
+===================================================== */
+
+.login-error {
+
+    display: none;
+
+    margin-bottom: 20px;
+
+    padding: 12px 14px;
+
+    border-radius: var(--radius-sm);
+
+    background-color: #FEF2F2;
+
+    color: #991B1B;
+
+    font-size: 14px;
+
+}
+
+
+.login-error.active {
+
+    display: block;
+
+}
+
+
+/* =====================================================
+   RESPONSIVIDADE
+===================================================== */
+
+@media (max-width: 900px) {
+
+    .login-page {
+
+        flex-direction: column;
+
+    }
+
+    .login-brand {
+
+        width: 100%;
+
+        min-height: auto;
+
+        padding: 50px 30px;
+
+    }
+
+    .login-brand h1 {
+
+        font-size: 40px;
+
+    }
+
+    .login-form-section {
+
+        width: 100%;
+
+        min-height: auto;
+
+        padding: 40px 24px;
+
+    }
+
+}
+
+
+@media (max-width: 500px) {
+
+    .login-brand {
+
+        padding: 40px 24px;
+
+    }
+
+    .login-brand h1 {
+
+        font-size: 34px;
+
+    }
+
+    .login-brand p {
+
+        font-size: 15px;
+
+    }
+
+    .login-card {
+
+        padding: 30px 24px;
+
+    }
+
+    .login-header h2 {
+
+        font-size: 26px;
+
+    }
+
+}
