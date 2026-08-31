@@ -1,0 +1,103 @@
+<!-- 
+  Autor: Leonardo Gambaroni Alves
+  Componente: Projeto Integrador II - PUC-Campinas
+  Descrição: Tela de Listagem de Demandas
+-->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listagem de Demandas</title>
+    <!-- Importando o CSS global do grupo e o CSS específico da tela -->
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/listagemDemandas.css">
+</head>
+<body>
+
+    <!-- Menu Superior Simples -->
+    <header class="topo-site">
+        <div class="container menu-container">
+            <h1>Sistema de Demandas</h1>
+            <nav>
+                <a href="dashboard.html">Dashboard</a>
+                <a href="listagem-demandas.html" class="ativo">Demandas</a>
+                <a href="login.html">Sair</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Conteúdo Principal -->
+    <main class="container">
+        
+        <!-- Cabeçalho da página com o botão de cadastrar -->
+        <div class="cabecalho-pagina">
+            <div>
+                <h2>Lista de Demandas</h2>
+                <p>Gerencie as tarefas e defeitos do projeto</p>
+            </div>
+            <a href="cadastro-demanda.html" class="btn btn-primary">+ Nova Demanda</a>
+        </div>
+
+        <!-- Área de Filtros Básicos -->
+        <div class="card caixa-filtros">
+            <div class="grupo-filtro">
+                <label class="label" for="busca">Buscar</label>
+                <input type="text" id="busca" class="input" placeholder="Digite o título...">
+            </div>
+            <div class="grupo-filtro">
+                <label class="label" for="filtro-status">Status</label>
+                <select id="filtro-status" class="input">
+                    <option value="">Todos</option>
+                    <option value="aberta">Aberta</option>
+                    <option value="andamento">Em andamento</option>
+                    <option value="revisao">Em revisão</option>
+                    <option value="concluida">Concluída</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Tabela simples de Demandas dentro de um Card -->
+        <div class="card tabela-card">
+            <table class="tabela-demandas">
+                <thead>
+                    <tr>
+                        <th>Título</th>
+                        <th>Tipo</th>
+                        <th>Prioridade</th>
+                        <th>Status</th>
+                        <th>Projeto</th>
+                        <th>Responsável</th>
+                        <th>Prazo</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Corrigir botão de login</td>
+                        <td>Defeito</td>
+                        <td><span class="badge critica">Crítica</span></td>
+                        <td><span class="badge aberta">Aberta</span></td>
+                        <td>Portal Web</td>
+                        <td>João Silva</td>
+                        <td>10/09/2026</td>
+                        <td><a href="detalhes-demanda.html" class="btn btn-secondary btn-acao">Ver</a></td>
+                    </tr>
+                    <tr>
+                        <td>Criar tela de relatórios</td>
+                        <td>Tarefa</td>
+                        <td><span class="badge alta">Alta</span></td>
+                        <td><span class="badge andamento">Em andamento</span></td>
+                        <td>Portal Web</td>
+                        <td>Maria Souza</td>
+                        <td>15/09/2026</td>
+                        <td><a href="detalhes-demanda.html" class="btn btn-secondary btn-acao">Ver</a></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </main>
+
+</body>
+</html>
