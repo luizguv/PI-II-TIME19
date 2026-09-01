@@ -1,29 +1,19 @@
-/* =====================================================
-   TELA DE LOGIN
-===================================================== */
-
-
-/* =====================================================
-   LAYOUT PRINCIPAL
-===================================================== */
+/*
+  Autor: Vinicius Zorzetto
+  Componente: Projeto Integrador II - PUC-Campinas
+  Descrição: Estilos da tela de Login
+*/
 
 .login-page {
-
     min-height: 100vh;
-
     display: flex;
-
 }
 
 
-/* =====================================================
-   LADO ESQUERDO
-===================================================== */
+/* Lado da apresentação */
 
 .login-brand {
-
     width: 50%;
-
     min-height: 100vh;
 
     background:
@@ -34,39 +24,26 @@
         );
 
     display: flex;
-
     align-items: center;
-
     justify-content: center;
 
     padding: 60px;
-
 }
-
 
 .login-brand-content {
-
     width: 100%;
-
     max-width: 480px;
-
 }
 
 
-/* =====================================================
-   LOGO
-===================================================== */
+/* Logo */
 
 .login-logo {
-
     width: 72px;
-
     height: 72px;
 
     display: flex;
-
     align-items: center;
-
     justify-content: center;
 
     margin-bottom: 30px;
@@ -78,75 +55,52 @@
     color: var(--prussian-blue);
 
     font-size: 24px;
-
     font-weight: 800;
-
 }
 
 
-/* =====================================================
-   TEXTO DA MARCA
-===================================================== */
+/* Texto da apresentação */
 
 .login-brand h1 {
-
     margin-bottom: 24px;
 
     color: var(--white);
 
     font-size: 48px;
-
     line-height: 1.1;
-
     font-weight: 700;
-
 }
 
-
 .login-brand p {
-
     max-width: 420px;
 
     color: #D9E2EC;
 
     font-size: 17px;
-
     line-height: 1.7;
-
 }
 
 
-/* =====================================================
-   LADO DIREITO
-===================================================== */
+/* Área do formulário */
 
 .login-form-section {
-
     width: 50%;
-
     min-height: 100vh;
 
     background-color: var(--space-indigo);
 
     display: flex;
-
     align-items: center;
-
     justify-content: center;
 
     padding: 40px;
-
 }
 
 
-/* =====================================================
-   CARD DO LOGIN
-===================================================== */
+/* Card de login */
 
 .login-card {
-
     width: 100%;
-
     max-width: 440px;
 
     padding: 44px;
@@ -156,102 +110,80 @@
     border-radius: var(--radius-lg);
 
     box-shadow: var(--shadow-lg);
-
 }
 
 
-/* =====================================================
-   CABEÇALHO
-===================================================== */
+/* Cabeçalho */
 
 .login-header {
-
     margin-bottom: 32px;
-
 }
 
+.login-welcome {
+    display: block;
+
+    margin-bottom: 8px;
+
+    color: var(--tropical-teal);
+
+    font-size: 13px;
+    font-weight: 700;
+
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
 
 .login-header h2 {
-
     margin-bottom: 8px;
 
     color: var(--prussian-blue);
 
     font-size: 30px;
-
     font-weight: 700;
-
 }
 
-
 .login-header p {
-
     color: var(--text-secondary);
 
     font-size: 15px;
-
 }
 
 
-/* =====================================================
-   GRUPOS DE INPUT
-===================================================== */
+/* Campos */
 
 .login-input-group {
-
     margin-bottom: 20px;
-
 }
 
 
-/* =====================================================
-   SENHA + ESQUECI SENHA
-===================================================== */
+/* Senha e recuperação */
 
 .login-password-header {
-
     display: flex;
-
     align-items: center;
-
     justify-content: space-between;
 
     margin-bottom: 8px;
-
 }
-
 
 .login-password-header .label {
-
     margin-bottom: 0;
-
 }
-
 
 .login-forgot-password {
-
     font-size: 13px;
-
     font-weight: 600;
-
 }
 
 
-/* =====================================================
-   LEMBRAR DE MIM
-===================================================== */
+/* Lembrar de mim */
 
 .login-remember {
-
     margin-bottom: 24px;
-
 }
 
-
 .login-remember label {
-
     display: flex;
-
     align-items: center;
 
     gap: 8px;
@@ -261,71 +193,26 @@
     font-size: 14px;
 
     cursor: pointer;
-
 }
 
-
 .login-remember input {
-
     width: 16px;
-
     height: 16px;
 
     accent-color: var(--tropical-teal);
-
 }
 
 
-/* =====================================================
-   BOTÃO ENTRAR
-===================================================== */
+/* Botão */
 
 .login-button {
-
     width: 100%;
-
 }
 
 
-/* =====================================================
-   RODAPÉ
-===================================================== */
-
-.login-footer {
-
-    margin-top: 24px;
-
-    padding-top: 22px;
-
-    border-top: 1px solid var(--border-color);
-
-    text-align: center;
-
-}
-
-
-.login-footer p {
-
-    color: var(--text-secondary);
-
-    font-size: 14px;
-
-}
-
-
-.login-footer a {
-
-    font-weight: 700;
-
-}
-
-
-/* =====================================================
-   MENSAGEM DE ERRO
-===================================================== */
+/* Mensagem de erro */
 
 .login-error {
-
     display: none;
 
     margin-bottom: 20px;
@@ -339,88 +226,69 @@
     color: #991B1B;
 
     font-size: 14px;
-
 }
-
 
 .login-error.active {
-
     display: block;
-
 }
 
 
-/* =====================================================
-   RESPONSIVIDADE
-===================================================== */
+/* Responsividade */
 
 @media (max-width: 900px) {
 
     .login-page {
-
         flex-direction: column;
-
     }
 
     .login-brand {
-
         width: 100%;
-
         min-height: auto;
 
         padding: 50px 30px;
-
     }
 
     .login-brand h1 {
-
         font-size: 40px;
-
     }
 
     .login-form-section {
-
         width: 100%;
-
         min-height: auto;
 
         padding: 40px 24px;
-
     }
-
 }
 
 
 @media (max-width: 500px) {
 
     .login-brand {
-
         padding: 40px 24px;
-
     }
 
     .login-brand h1 {
-
         font-size: 34px;
-
     }
 
     .login-brand p {
-
         font-size: 15px;
-
     }
 
     .login-card {
-
         padding: 30px 24px;
-
     }
 
     .login-header h2 {
-
         font-size: 26px;
-
     }
 
+    .login-password-header {
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .login-forgot-password {
+        font-size: 12px;
+    }
 }

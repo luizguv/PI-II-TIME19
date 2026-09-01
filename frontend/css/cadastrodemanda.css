@@ -1,0 +1,226 @@
+/*
+  Autor: Vinicius Zorzetto
+  Componente: Projeto Integrador II - PUC-Campinas
+  Descrição: Estilos da tela de Cadastro e Edição de Demandas
+*/
+
+.demand-page {
+    min-height: 100vh;
+    padding: 40px 60px;
+    background-color: var(--gray-100);
+}
+
+.demand-header {
+    max-width: 1100px;
+    margin: 0 auto 28px;
+
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 30px;
+}
+
+.page-overline {
+    display: block;
+    margin-bottom: 6px;
+
+    color: var(--tropical-teal);
+
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.demand-header h1 {
+    margin-bottom: 8px;
+
+    color: var(--prussian-blue);
+
+    font-size: 32px;
+}
+
+.demand-header p {
+    color: var(--text-secondary);
+    font-size: 15px;
+}
+
+.demand-card {
+    width: 100%;
+    max-width: 1100px;
+
+    margin: 0 auto;
+
+    padding: 36px;
+
+    background-color: var(--white);
+
+    border-radius: var(--radius-lg);
+
+    box-shadow: var(--shadow-md);
+}
+
+.form-section {
+    margin-bottom: 28px;
+}
+
+.form-section h2 {
+    margin-bottom: 6px;
+
+    color: var(--prussian-blue);
+
+    font-size: 20px;
+}
+
+.section-description {
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+.form-grid {
+    display: grid;
+
+    grid-template-columns: repeat(2, 1fr);
+
+    gap: 22px;
+}
+
+.form-group {
+    min-width: 0;
+}
+
+.form-group-full {
+    grid-column: 1 / -1;
+}
+
+.textarea {
+    width: 100%;
+
+    padding: 14px;
+
+    border: 1px solid var(--border-color);
+
+    border-radius: var(--radius-sm);
+
+    background-color: var(--white);
+
+    color: var(--text-primary);
+
+    font-family: inherit;
+
+    font-size: 14px;
+
+    line-height: 1.5;
+
+    resize: vertical;
+
+    outline: none;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.textarea::placeholder {
+    color: #94A3B8;
+}
+
+.textarea:focus {
+    border-color: var(--tropical-teal);
+
+    box-shadow:
+        0 0 0 3px rgba(91, 192, 190, 0.15);
+}
+
+.select {
+    cursor: pointer;
+}
+
+.field-hint {
+    display: block;
+
+    margin-top: 6px;
+
+    color: var(--text-secondary);
+
+    font-size: 12px;
+}
+
+.field-error {
+    color: #991B1B;
+}
+
+.form-message {
+    display: none;
+
+    margin-top: 24px;
+
+    padding: 13px 15px;
+
+    border-radius: var(--radius-sm);
+
+    font-size: 14px;
+}
+
+.form-message.active {
+    display: block;
+}
+
+.form-message.error {
+    background-color: #FEF2F2;
+    color: #991B1B;
+}
+
+.form-message.success {
+    background-color: #ECFDF5;
+    color: #166534;
+}
+
+.form-actions {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: flex-end;
+
+    gap: 12px;
+
+    margin-top: 32px;
+
+    padding-top: 24px;
+
+    border-top: 1px solid var(--border-color);
+}
+
+@media (max-width: 768px) {
+
+    .demand-page {
+        padding: 28px 20px;
+    }
+
+    .demand-header {
+        flex-direction: column;
+    }
+
+    .demand-card {
+        padding: 26px 20px;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .form-group-full {
+        grid-column: auto;
+    }
+
+    .form-actions {
+        flex-direction: column-reverse;
+        align-items: stretch;
+    }
+
+    .form-actions .btn {
+        width: 100%;
+    }
+
+}

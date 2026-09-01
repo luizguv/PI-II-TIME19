@@ -1,0 +1,390 @@
+<!--
+  Autor: Vinicius Zorzetto
+  Componente: Projeto Integrador II - PUC-Campinas
+  Descrição: Tela de Cadastro e Edição de Demandas
+-->
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="Cadastro e edição de demandas"
+    >
+
+    <title>Gestão de Demandas | Nova Demanda</title>
+
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/cadastrodemanda.css">
+
+</head>
+
+<body>
+
+    <main class="demand-page">
+
+        <header class="demand-header">
+
+            <div>
+
+                <span class="page-overline">
+                    Gestão de Demandas
+                </span>
+
+                <h1 id="pageTitle">
+                    Nova demanda
+                </h1>
+
+                <p>
+                    Preencha as informações para cadastrar uma nova demanda.
+                </p>
+
+            </div>
+
+            <a
+                href="index.html"
+                class="btn btn-secondary"
+            >
+                Voltar
+            </a>
+
+        </header>
+
+
+        <section class="demand-card">
+
+            <form id="demandForm">
+
+                <div class="form-section">
+
+                    <h2>
+                        Informações da demanda
+                    </h2>
+
+                    <p class="section-description">
+                        Informe os dados principais da atividade.
+                    </p>
+
+                </div>
+
+
+                <div class="form-grid">
+
+                    <div class="form-group form-group-full">
+
+                        <label
+                            class="label"
+                            for="title"
+                        >
+                            Título
+                        </label>
+
+                        <input
+                            class="input"
+                            type="text"
+                            id="title"
+                            name="title"
+                            placeholder="Digite o título da demanda"
+                            maxlength="150"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-group form-group-full">
+
+                        <label
+                            class="label"
+                            for="description"
+                        >
+                            Descrição
+                        </label>
+
+                        <textarea
+                            class="textarea"
+                            id="description"
+                            name="description"
+                            placeholder="Descreva a demanda, seus objetivos e informações relevantes"
+                            rows="6"
+                            required
+                        ></textarea>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label
+                            class="label"
+                            for="type"
+                        >
+                            Tipo da demanda
+                        </label>
+
+                        <select
+                            class="input select"
+                            id="type"
+                            name="type"
+                            required
+                        >
+
+                            <option value="">
+                                Selecione o tipo
+                            </option>
+
+                            <option value="Tarefa">
+                                Tarefa
+                            </option>
+
+                            <option value="Defeito">
+                                Defeito
+                            </option>
+
+                            <option value="Melhoria">
+                                Melhoria
+                            </option>
+
+                            <option value="Documentação">
+                                Documentação
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label
+                            class="label"
+                            for="priority"
+                        >
+                            Prioridade
+                        </label>
+
+                        <select
+                            class="input select"
+                            id="priority"
+                            name="priority"
+                            required
+                        >
+
+                            <option value="">
+                                Selecione a prioridade
+                            </option>
+
+                            <option value="Crítica">
+                                Crítica
+                            </option>
+
+                            <option value="Alta">
+                                Alta
+                            </option>
+
+                            <option value="Média">
+                                Média
+                            </option>
+
+                            <option value="Baixa">
+                                Baixa
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label
+                            class="label"
+                            for="project"
+                        >
+                            Projeto
+                        </label>
+
+                        <select
+                            class="input select"
+                            id="project"
+                            name="project"
+                            required
+                        >
+
+                            <option value="">
+                                Selecione o projeto
+                            </option>
+
+                            <option value="Projeto A">
+                                Projeto A
+                            </option>
+
+                            <option value="Projeto B">
+                                Projeto B
+                            </option>
+
+                            <option value="Projeto C">
+                                Projeto C
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label
+                            class="label"
+                            for="responsible"
+                        >
+                            Responsável
+                        </label>
+
+                        <select
+                            class="input select"
+                            id="responsible"
+                            name="responsible"
+                        >
+
+                            <option value="">
+                                Não atribuído
+                            </option>
+
+                            <option value="Usuário 1">
+                                Usuário 1
+                            </option>
+
+                            <option value="Usuário 2">
+                                Usuário 2
+                            </option>
+
+                            <option value="Usuário 3">
+                                Usuário 3
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div
+                        class="form-group"
+                        id="statusGroup"
+                    >
+
+                        <label
+                            class="label"
+                            for="status"
+                        >
+                            Status
+                        </label>
+
+                        <select
+                            class="input select"
+                            id="status"
+                            name="status"
+                        >
+
+                            <option value="Aberta">
+                                Aberta
+                            </option>
+
+                            <option value="Em andamento">
+                                Em andamento
+                            </option>
+
+                            <option value="Em revisão">
+                                Em revisão
+                            </option>
+
+                            <option value="Concluída">
+                                Concluída
+                            </option>
+
+                            <option value="Cancelada">
+                                Cancelada
+                            </option>
+
+                        </select>
+
+                        <small class="field-hint">
+                            Novas demandas são criadas com o status Aberta.
+                        </small>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label
+                            class="label"
+                            for="deadline"
+                        >
+                            Prazo de finalização
+                        </label>
+
+                        <input
+                            class="input"
+                            type="date"
+                            id="deadline"
+                            name="deadline"
+                            required
+                        >
+
+                        <small
+                            id="holidayMessage"
+                            class="field-hint field-error"
+                        ></small>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="formMessage"
+                    class="form-message"
+                ></div>
+
+
+                <footer class="form-actions">
+
+                    <a
+                        href="index.html"
+                        class="btn btn-secondary"
+                    >
+                        Cancelar
+                    </a>
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary"
+                    >
+                        <span id="submitText">
+                            Cadastrar demanda
+                        </span>
+                    </button>
+
+                </footer>
+
+            </form>
+
+        </section>
+
+    </main>
+
+    <script src="../js/cadastrodemanda.js"></script>
+
+</body>
+
+</html>
