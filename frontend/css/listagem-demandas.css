@@ -128,3 +128,14 @@
     background-color: #FEF9C3;
     color: #854D0E;
 }
+
+/* Mensagem de validação do campo de busca */
+.field-hint {
+    display: block;
+    margin-top: 6px;
+    font-size: 12px;
+}
+
+.field-error {
+    color: #991B1B;
+}
