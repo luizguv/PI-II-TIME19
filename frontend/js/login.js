@@ -1,55 +1,68 @@
-/* =====================================================
-   TELA DE LOGIN
-===================================================== */
+/*
+  Autor: Vinicius Zorzetto
+  Componente: Projeto Integrador II - PUC-Campinas
+  Descrição: Integração da tela de login com o back-end.
+*/
 
 const loginForm = document.getElementById("loginForm");
 const loginError = document.getElementById("loginError");
 
-
-/* =====================================================
-   ENVIO DO FORMULÁRIO
-===================================================== */
-
-loginForm.addEventListener("submit", function (event) {
+loginForm.addEventListener("submit", async function (event) {
 
     event.preventDefault();
 
     const email = document.getElementById("email").value.trim();
     const password = document.getElementById("password").value;
 
-
-    /* Validação básica */
+    // Validação básica
 
     if (!email || !password) {
 
-        loginError.textContent =
-            "Preencha o e-mail e a senha.";
-
+        loginError.textContent = "Preencha o e-mail e a senha.";
         loginError.classList.add("active");
 
         return;
-
     }
-
-
-    /*
-
-       Neste momento o projeto ainda não possui
-       um sistema de autenticação conectado ao
-       back-end.
-
-       A validação real será implementada quando
-       o back-end estiver integrado.
-
-    */
 
     loginError.classList.remove("active");
 
-    console.log("Tentativa de login:", {
-        email: email
-    });
+    try {
 
+        const response = await fetch("http://localhost:3000/api/login", {
 
-    alert("Login recebido! A autenticação será integrada posteriormente.");
+            method: "POST",
 
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+                email: email,
+                senha: password
+            })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+
+            loginError.textContent = data.mensagem || "Erro ao realizar login.";
+            loginError.classList.add("active");
+
+            return;
+        }
+
+        console.log("Login realizado:", data);
+
+        alert(data.mensagem);
+
+    } catch (error) {
+
+        console.error("Erro ao conectar com o servidor:", error);
+
+        loginError.textContent =
+            "Não foi possível conectar ao servidor.";
+
+        loginError.classList.add("active");
+    }
 });
