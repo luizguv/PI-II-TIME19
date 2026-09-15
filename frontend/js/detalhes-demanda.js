@@ -117,6 +117,61 @@ formEdicao.addEventListener("submit", function (event) {
 
   const prazo = campoPrazo.value;
 
+
+  const classificacaoAtual = valorClassificacao.innerText;
+
+  const prioridadeAtual = valorPrioridade.innerText;
+
+  const statusAtual = valorStatus.innerText;
+
+
+  const hoje = new Date();
+
+  const anoAtual = hoje.getFullYear();
+
+  const mesAtual = String(hoje.getMonth() + 1).padStart(2, "0");
+
+  const diaAtual = String(hoje.getDate()).padStart(2, "0");
+
+  const dataAtual = anoAtual + "-" + mesAtual + "-" + diaAtual;
+
+
+  if (classificacao === classificacaoAtual) {
+
+    erroEdicao.innerText =
+      "ERRO! A nova classificação deve ser diferente da classificação atual.";
+
+    erroEdicao.classList.remove("oculto");
+
+    return;
+
+  }
+
+
+  if (prioridade === prioridadeAtual) {
+
+    erroEdicao.innerText =
+      "ERRO! A nova prioridade deve ser diferente da prioridade atual.";
+
+    erroEdicao.classList.remove("oculto");
+
+    return;
+
+  }
+
+
+  if (status === statusAtual) {
+
+    erroEdicao.innerText =
+      "ERRO! O novo status deve ser diferente do status atual.";
+
+    erroEdicao.classList.remove("oculto");
+
+    return;
+
+  }
+
+
   if (prazo === "") {
 
     erroEdicao.innerText =
@@ -128,7 +183,21 @@ formEdicao.addEventListener("submit", function (event) {
 
   }
 
+
+  if (prazo === dataAtual) {
+
+    erroEdicao.innerText =
+      "ERRO! O novo prazo não pode ser igual à data atual.";
+
+    erroEdicao.classList.remove("oculto");
+
+    return;
+
+  }
+
+
   const dataPrazo = new Date(prazo + "T00:00:00");
+
 
   valorClassificacao.innerText = classificacao;
 
@@ -137,6 +206,7 @@ formEdicao.addEventListener("submit", function (event) {
   valorStatus.innerText = status;
 
   valorPrazo.innerText = dataPrazo.toLocaleDateString("pt-BR");
+
 
   campoFormEdicao.classList.add("oculto");
 
