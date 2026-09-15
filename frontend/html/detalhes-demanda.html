@@ -14,6 +14,7 @@
 
     <link rel="stylesheet" href="../css/global.css" />
     <link rel="stylesheet" href="../css/detalhes-demanda.css" />
+    <script src="../js/detalhes-demanda.js" defer></script>
   </head>
 
   <body>
@@ -39,21 +40,20 @@
         <div class="classificacao-demanda">
 
           <h5 class="tipo">
-            Classificação: <span>Tarefa</span>
+            Classificação: <span id="valorClassificacao">Tarefa</span>
           </h5>
 
           <h5 class="prioridade">
-            Prioridade: <span>Crítica</span>
+            Prioridade: <span id="valorPrioridade">Crítica</span>
           </h5>
 
           <h5 class="status">
-            Status: <span>Em andamento</span>
+            Status: <span id="valorStatus">Em andamento</span>
           </h5>
 
         </div>
 
       </div>
-
 
       <div class="secao-descricao">
 
@@ -73,7 +73,6 @@
         </div>
 
       </div>
-
 
       <div class="secao-projeto">
 
@@ -96,7 +95,7 @@
 
           <div class="informacao-projeto">
             <h4>Prazo</h4>
-            <p>04/09/2026</p>
+            <p id="valorPrazo">04/09/2026</p>
           </div>
 
           <div class="informacao-projeto">
@@ -108,15 +107,80 @@
 
       </div>
 
-
       <div class="secao-botao">
 
-        <a href="cadastrodemanda.html" class="botao-editar-demanda">
+        <a class="botao-editar-demanda" id="editarDemanda">
           Editar demanda
         </a>
 
       </div>
 
+      <div id="secao-formulario-edicao-demanda" class="oculto">
+
+        <form id="formEditarDemanda">
+
+          <label for="classificacao" class="escolha-classificacao">
+            Escolha a classificação da demanda:
+          </label>
+
+          <select name="classificacao" id="classificacao">
+            <option value="Tarefa">Tarefa</option>
+            <option value="Defeito">Defeito</option>
+            <option value="Melhoria">Melhoria</option>
+            <option value="Documentação">Documentação</option>
+          </select>
+
+          <label for="prioridade" class="escolha-prioridade">
+            Escolha a prioridade da demanda:
+          </label>
+
+          <select name="prioridade" id="prioridade">
+            <option value="Crítica">Crítica</option>
+            <option value="Alta">Alta</option>
+            <option value="Média">Média</option>
+            <option value="Baixa">Baixa</option>
+          </select>
+
+          <label for="status" class="escolha-status">
+            Escolha o status da demanda:
+          </label>
+
+          <select name="status" id="status">
+            <option value="Aberta">Aberta</option>
+            <option value="Em andamento" selected>Em Andamento</option>
+            <option value="Em revisão">Em Revisão</option>
+            <option value="Concluída">Concluída</option>
+            <option value="Cancelada">Cancelada</option>
+          </select>
+
+          <label for="prazoEdicao" class="escolha-prazo">
+            Escolha o prazo da demanda:
+          </label>
+
+          <input
+            type="date"
+            id="prazoEdicao"
+            name="prazoEdicao"
+            value="2026-09-04"
+          />
+
+          <div id="erroEdicao" class="oculto"></div>
+
+          <div class="botoes-edicao">
+
+            <button type="button" id="cancelarEdicao">
+              Cancelar
+            </button>
+
+            <button type="submit">
+              Salvar alterações
+            </button>
+
+          </div>
+
+        </form>
+
+      </div>
 
       <div class="secao-comentarios">
 
@@ -124,14 +188,35 @@
 
           <h3>Comentários</h3>
 
-          <p>
-            Nenhum comentário adicionado.
-          </p>
+          <form id="formComentarios">
+
+            <label for="comentario"></label>
+
+            <textarea
+              name="comentario"
+              id="comentario"
+              placeholder="Digite seu comentário aqui: "
+            ></textarea>
+
+            <div class="contador">
+              <p id="contador">0/300</p>
+            </div>
+
+            <div id="erroComentario" class="oculto"></div>
+
+            <div class="secao-botao-comentarios">
+
+              <button type="submit" class="botao-comentario">
+                Enviar Comentário
+              </button>
+
+            </div>
+
+          </form>
 
         </div>
 
       </div>
-
 
       <div class="secao-historico">
 
