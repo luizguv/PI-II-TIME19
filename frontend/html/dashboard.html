@@ -1,366 +1,108 @@
-<!--
-  Autor: Leonardo Gambaroni Alves
+<!-- 
   Componente: Projeto Integrador II - PUC-Campinas
-  Descrição: Tela de Dashboard do Sistema de Atendimento de Pronto Socorro
+  Descrição: Tela de Dashboard - Sistema de Acompanhamento de Demandas
 -->
-
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Dashboard - Sistema de Atendimentos</title>
-
+    <title>Dashboard - Sistema de Demandas</title>
+    <!-- Importando o CSS global do grupo e o CSS específico da tela -->
     <link rel="stylesheet" href="../css/global.css">
     <link rel="stylesheet" href="../css/dashboard.css">
-    
 </head>
-
 <body>
 
-    <!-- Menu Superior -->
+    <!-- Menu Superior Simples -->
     <header class="topo-site">
-
         <div class="container menu-container">
-
-            <h1>Sistema de Atendimentos</h1>
-
+            <h1>Sistema de Demandas</h1>
             <nav>
                 <a href="dashboard.html" class="ativo">Dashboard</a>
-                <a href="listagem-demandas.html">Atendimentos</a>
-                <a href="login.html">Sair</a>
+                <a href="listagem-demandas.html">Demandas</a>
+                <a href="index.html">Sair</a>
             </nav>
-
         </div>
-
     </header>
-
 
     <!-- Conteúdo Principal -->
     <main class="container">
-
-        <!-- Cabeçalho -->
-        <section class="cabecalho-dashboard">
-
+        
+        <!-- Cabeçalho da página -->
+        <div class="cabecalho-pagina">
             <div>
-                <h2>Dashboard</h2>
-                <p>Acompanhe os atendimentos do pronto socorro.</p>
+                <h2>Dashboard de Demandas</h2>
+                <p>Visão geral de tarefas, defeitos e melhorias do projeto</p>
+            </div>
+            <a href="cadastro-demanda.html" class="btn btn-primary">+ Nova Demanda</a>
+        </div>
+
+        <!-- Cards de Indicadores (KPIs) -->
+        <div class="grid-kpis">
+            <div class="card kpi-card">
+                <span class="kpi-titulo">Total de Demandas</span>
+                <span class="kpi-valor">24</span>
+                <span class="kpi-descricao">Registradas no projeto</span>
+            </div>
+            <div class="card kpi-card">
+                <span class="kpi-titulo">Demandas Abertas</span>
+                <span class="kpi-valor">8</span>
+                <span class="kpi-descricao">Aguardando início</span>
+            </div>
+            <div class="card kpi-card">
+                <span class="kpi-titulo">Em Andamento</span>
+                <span class="kpi-valor">10</span>
+                <span class="kpi-descricao">Em desenvolvimento</span>
+            </div>
+            <div class="card kpi-card">
+                <span class="kpi-titulo">Defeitos (Bugs)</span>
+                <span class="kpi-valor">6</span>
+                <span class="kpi-descricao">Requerem correção</span>
+            </div>
+        </div>
+
+        <!-- Grid Inferior: Ações Rápidas e Gráfico de Pizza -->
+        <div class="dashboard-grid-inferior">
+            
+            <!-- Ações Rápidas -->
+            <div class="card">
+                <h3 class="card-titulo">Ações Rápidas</h3>
+                <p class="card-texto" style="margin-bottom: 20px; color: var(--text-secondary);">Precisa registrar uma nova tarefa ou verificar o andamento?</p>
+                <div class="botoes-acao-rapida" style="display: flex; flex-direction: column; gap: 12px;">
+                    <a href="cadastro-demanda.html" class="btn btn-primary">Cadastrar Demanda</a>
+                    <a href="listagem-demandas.html" class="btn btn-secondary">Ver Todas as Demandas</a>
+                </div>
             </div>
 
-            <a href="cadastro-atendimento.html" class="btn btn-primary">
-                + Novo Atendimento
-            </a>
+            <!-- Gráfico de Pizza de Status -->
+            <div class="card card-grafico">
+                <h3 class="card-titulo">Distribuição de Status</h3>
+                <p class="card-texto" style="color: var(--text-secondary); margin-bottom: 15px;">Proporção atual das demandas</p>
+                
+                <div class="grafico-container">
+                    <!-- Gráfico em SVG simulando uma pizza limpa e integrada -->
+                    <svg viewBox="0 0 32 32" class="pizza-svg">
+                        <!-- Fatias proporcionais baseadas nas quantidades -->
+                        <circle r="16" cx="16" cy="16" fill="var(--gray-200)"></circle>
+                        <!-- Exemplo visual proporcional das fatias usando stroke-dasharray -->
+                        <circle r="16" cx="16" cy="16" fill="transparent" stroke="var(--tropical-teal)" stroke-width="32" stroke-dasharray="40 100"></circle>
+                        <circle r="16" cx="16" cy="16" fill="transparent" stroke="var(--dusk-blue)" stroke-width="32" stroke-dasharray="30 100" stroke-dashoffset="-40"></circle>
+                        <circle r="16" cx="16" cy="16" fill="transparent" stroke="var(--space-indigo)" stroke-width="32" stroke-dasharray="30 100" stroke-dashoffset="-70"></circle>
+                    </svg>
 
-        </section>
-
-
-        <!-- Cards de Resumo -->
-        <section class="cards-resumo">
-
-            <div class="card resumo-card">
-
-                <div class="resumo-icone">
-                    +
+                    <!-- Legenda do Gráfico -->
+                    <div class="legenda-grafico">
+                        <div class="legenda-item"><span class="cor-bloco" style="background: var(--tropical-teal);"></span> Em Andamento (41%)</div>
+                        <div class="legenda-item"><span class="cor-bloco" style="background: var(--dusk-blue);"></span> Abertas (33%)</div>
+                        <div class="legenda-item"><span class="cor-bloco" style="background: var(--space-indigo);"></span> Defeitos/Bugs (26%)</div>
+                    </div>
                 </div>
-
-                <div>
-                    <span class="resumo-label">Atendimentos hoje</span>
-                    <strong>24</strong>
-                </div>
-
             </div>
 
-
-            <div class="card resumo-card">
-
-                <div class="resumo-icone">
-                    !
-                </div>
-
-                <div>
-                    <span class="resumo-label">Aguardando triagem</span>
-                    <strong>8</strong>
-                </div>
-
-            </div>
-
-
-            <div class="card resumo-card">
-
-                <div class="resumo-icone">
-                    >
-                </div>
-
-                <div>
-                    <span class="resumo-label">Aguardando médico</span>
-                    <strong>11</strong>
-                </div>
-
-            </div>
-
-
-            <div class="card resumo-card">
-
-                <div class="resumo-icone">
-                    ✓
-                </div>
-
-                <div>
-                    <span class="resumo-label">Atendidos hoje</span>
-                    <strong>5</strong>
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <!-- Conteúdo do Dashboard -->
-        <section class="dashboard-grid">
-
-
-            <!-- Painel de Atendimento -->
-            <div class="card painel-atendimento">
-
-                <div class="card-cabecalho">
-
-                    <div>
-                        <h3>Painel de Atendimento</h3>
-                        <p>Pacientes aguardando atendimento médico</p>
-                    </div>
-
-                    <a href="painel-atendimento.html" class="btn btn-secondary btn-pequeno">
-                        Ver painel
-                    </a>
-
-                </div>
-
-
-                <div class="lista-pacientes">
-
-                    <!-- Paciente 1 -->
-                    <div class="paciente">
-
-                        <div class="paciente-info">
-
-                            <strong>AT0008</strong>
-
-                            <span>
-                                João da Silva — 34 anos
-                            </span>
-
-                        </div>
-
-                        <span class="badge emergencia">
-                            Emergência
-                        </span>
-
-                    </div>
-
-
-                    <!-- Paciente 2 -->
-                    <div class="paciente">
-
-                        <div class="paciente-info">
-
-                            <strong>AT0007</strong>
-
-                            <span>
-                                Maria Souza — 52 anos
-                            </span>
-
-                        </div>
-
-                        <span class="badge muito-urgente">
-                            Muito urgente
-                        </span>
-
-                    </div>
-
-
-                    <!-- Paciente 3 -->
-                    <div class="paciente">
-
-                        <div class="paciente-info">
-
-                            <strong>AT0006</strong>
-
-                            <span>
-                                Carlos Oliveira — 27 anos
-                            </span>
-
-                        </div>
-
-                        <span class="badge urgente">
-                            Urgente
-                        </span>
-
-                    </div>
-
-
-                    <!-- Paciente 4 -->
-                    <div class="paciente">
-
-                        <div class="paciente-info">
-
-                            <strong>AT0005</strong>
-
-                            <span>
-                                Ana Santos — 41 anos
-                            </span>
-
-                        </div>
-
-                        <span class="badge pouco-urgente">
-                            Pouco urgente
-                        </span>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- Status dos Atendimentos -->
-            <div class="card status-card">
-
-                <div class="card-cabecalho">
-
-                    <div>
-                        <h3>Status dos Atendimentos</h3>
-                        <p>Situação atual</p>
-                    </div>
-
-                </div>
-
-
-                <div class="status-lista">
-
-                    <div class="status-item">
-
-                        <div class="status-texto">
-                            <span class="ponto recepcao"></span>
-                            Recepção
-                        </div>
-
-                        <strong>5</strong>
-
-                    </div>
-
-
-                    <div class="status-item">
-
-                        <div class="status-texto">
-                            <span class="ponto triagem"></span>
-                            Triagem
-                        </div>
-
-                        <strong>8</strong>
-
-                    </div>
-
-
-                    <div class="status-item">
-
-                        <div class="status-texto">
-                            <span class="ponto medico"></span>
-                            Aguardando médico
-                        </div>
-
-                        <strong>11</strong>
-
-                    </div>
-
-
-                    <div class="status-item">
-
-                        <div class="status-texto">
-                            <span class="ponto concluido"></span>
-                            Concluídos
-                        </div>
-
-                        <strong>5</strong>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <!-- Acesso Rápido -->
-        <section class="card acesso-rapido">
-
-            <div class="card-cabecalho">
-
-                <div>
-                    <h3>Acesso rápido</h3>
-                    <p>Principais funcionalidades do sistema</p>
-                </div>
-
-            </div>
-
-
-            <div class="acoes-grid">
-
-                <a href="cadastro-atendimento.html" class="acao">
-
-                    <span class="acao-icone">+</span>
-
-                    <div>
-                        <strong>Novo atendimento</strong>
-                        <span>Cadastrar paciente e atendimento</span>
-                    </div>
-
-                </a>
-
-
-                <a href="triagem.html" class="acao">
-
-                    <span class="acao-icone">+</span>
-
-                    <div>
-                        <strong>Triagem</strong>
-                        <span>Registrar dados e classificação</span>
-                    </div>
-
-                </a>
-
-
-                <a href="painel-atendimento.html" class="acao">
-
-                    <span class="acao-icone">></span>
-
-                    <div>
-                        <strong>Painel médico</strong>
-                        <span>Visualizar fila de atendimento</span>
-                    </div>
-
-                </a>
-
-
-                <a href="listagem-atendimentos.html" class="acao">
-
-                    <span class="acao-icone">≡</span>
-
-                    <div>
-                        <strong>Atendimentos</strong>
-                        <span>Consultar atendimentos registrados</span>
-                    </div>
-
-                </a>
-
-            </div>
-
-        </section>
+        </div>
 
     </main>
 
 </body>
-
 </html>

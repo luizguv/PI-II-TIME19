@@ -36,14 +36,15 @@
                 <h2>Lista de Demandas</h2>
                 <p>Gerencie as tarefas e defeitos do projeto</p>
             </div>
-            <a href="cadastro-demanda.html" class="btn btn-primary">+ Nova Demanda</a>
+            <a href="cadastrodemanda.html" class="btn btn-primary">+ Nova Demanda</a>   
         </div>
 
         <!-- Área de Filtros Básicos -->
         <div class="card caixa-filtros">
             <div class="grupo-filtro">
                 <label class="label" for="busca">Buscar</label>
-                <input type="text" id="busca" class="input" placeholder="Digite o título...">
+                <input type="text" id="busca" class="input" placeholder="Digite o título..." maxlength="100">
+                <small id="buscaErro" class="field-hint field-error" style="display:none;"></small>
             </div>
             <div class="grupo-filtro">
                 <label class="label" for="filtro-status">Status</label>
@@ -98,6 +99,8 @@
         </div>
 
     </main>
+
+    <script src="../js/listagem-demandas.js"></script>
 
 </body>
 </html>
