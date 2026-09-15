@@ -116,10 +116,36 @@
           Editar demanda
         </a>
 
-        <form id="formEditarDemanda">
+        <div class="secao-formulario-edicao-demanda">
           
+          <form id="editarDemanda">
+            <label for="classificacao">Escolha a classificação da demanda:</label>
+            <select name="classificacao" id="classificacao">
+              <option value="tarefa">Tarefa</option>
+              <option value="defeito">Defeito</option>
+              <option value="melhoria">Melhoria</option>
+              <option value="documentacao">Documentação</option>
+            </select>
+  
+            <label for="prioridadede">Escolha a prioridade da demanda</label>
+            <select name="prioridade" id="prioriade">
+              <option value="critica">Crítica</option>
+              <option value="alta">Alta</option>
+              <option value="media">Média</option>
+              <option value="baixa">Baixa</option>
+            </select>
+  
+            <label for="status">Escolha o status da demanda</label>
+            <select name="status" id="statu">
+              <option value="aberta">Aberta</option>
+              <option value="em-andamento">Em Andamento</option>
+              <option value="em-revisao">Em Revisão</option>
+              <option value="concluida">Concluída</option>
+              <option value="cancelada">Cancelada</option>
+            </select>
+          </form>
 
-        </form>
+        </div>
 
       </div>
 
