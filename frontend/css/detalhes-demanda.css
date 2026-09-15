@@ -202,6 +202,8 @@ main {
   font-weight: bold;
 
   text-decoration: none;
+
+  cursor: pointer;
 }
 
 .botao-editar-demanda:hover {
@@ -212,10 +214,10 @@ main {
   color: #ffffff;
 }
 
-.secao-formulario-edicao-demanda{
-  border: 1px solid #E2E8F0;
+#secao-formulario-edicao-demanda {
+  border: 1px solid #e2e8f0;
   border-radius: var(--radius-md);
-  
+
   padding: 20px;
   margin-top: 5px;
   margin-bottom: 20px;
@@ -224,25 +226,85 @@ main {
   box-shadow: var(--shadow-md);
 }
 
-#editarDemanda{
+#formEditarDemanda {
   display: flex;
   flex-direction: column;
   gap: 5px;
 }
 
-.escolha-prioridade{
+.escolha-prioridade {
   color: #0b132b;
   font-weight: bold;
 }
 
-.escolha-status{
+.escolha-status {
   color: #0b132b;
   font-weight: bold;
 }
 
-.escolha-classificacao{
+.escolha-classificacao {
   color: #0b132b;
   font-weight: bold;
+}
+
+.escolha-prazo {
+  color: #0b132b;
+  font-weight: bold;
+}
+
+#formEditarDemanda select,
+#formEditarDemanda input {
+  padding: 8px;
+
+  border: 1px solid #e2e8f0;
+  border-radius: var(--radius-md);
+
+  font-size: 14px;
+}
+
+.botoes-edicao {
+  display: flex;
+  justify-content: flex-end;
+
+  gap: 10px;
+
+  margin-top: 15px;
+}
+
+.botoes-edicao button {
+  padding: 10px 15px;
+
+  border: 1px solid var(--dusk-blue);
+  border-radius: var(--radius-md);
+
+  background-color: var(--dusk-blue);
+
+  color: white;
+
+  font-size: 14px;
+  font-weight: bold;
+
+  cursor: pointer;
+}
+
+.botoes-edicao button:hover {
+  background-color: #5bc0be;
+  border-color: #5bc0be;
+
+  color: #0b132b;
+}
+
+#erroEdicao {
+  padding: 8px;
+
+  background-color: #b422188e;
+
+  border: 2px solid #b42318;
+  border-radius: var(--radius-md);
+
+  color: black;
+
+  font-size: 14px;
 }
 
 .secao-comentarios {
@@ -276,28 +338,28 @@ main {
   font-size: 14px;
 }
 
-#form-comentarios {
-    display: flex;
-    flex-direction: column;
-    flex-wrap: wrap;
-    gap: 5px;
-    width: 350px;
+#formComentarios {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  gap: 5px;
+  width: 350px;
 }
 
-#form-comentarios textarea {
-    width: 350px;
-    height: 200px;
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-md);
+#formComentarios textarea {
+  width: 350px;
+  height: 200px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
 }
 
-#contador{
+#contador {
   font-size: 14px;
   opacity: 0.8;
 }
 
-.oculto{
+.oculto {
   display: none;
 }
 
@@ -315,31 +377,31 @@ main {
 }
 
 .secao-botao-comentarios {
-    display: flex;
+  display: flex;
 
-    align-self: flex-end;
+  align-self: flex-end;
 
-    margin-bottom: 20px;
+  margin-bottom: 20px;
 }
 
 .botao-comentario {
-    border-width: 1px;
-    border-style: solid;
-    background-color: var(--dusk-blue);
-    border-radius: var(--radius-md);
+  border-width: 1px;
+  border-style: solid;
+  background-color: var(--dusk-blue);
+  border-radius: var(--radius-md);
 
-    padding: 15px;
-    font-size: 14px;
-    font-weight: bold;
-    color: white;
-    
-    cursor: pointer;
+  padding: 15px;
+  font-size: 14px;
+  font-weight: bold;
+  color: white;
+
+  cursor: pointer;
 }
 
 .botao-comentario:hover {
-    background-color: #5bc0be;
-    border-color: #5bc0be;
-    color: #0b132b;
+  background-color: #5bc0be;
+  border-color: #5bc0be;
+  color: #0b132b;
 }
 
 .secao-historico {
