@@ -21,7 +21,7 @@
             <h1>Sistema de Demandas</h1>
             <nav>
                 <a href="dashboard.html">Dashboard</a>
-                <a href="listagem-demandas.html" class="ativo">Demandas</a>
+                <a href="listagemDemandas.html" class="ativo">Demandas</a>
                 <a href="index.html">Sair</a>
             </nav>
         </div>
@@ -43,7 +43,9 @@
         <div class="card caixa-filtros">
             <div class="grupo-filtro">
                 <label class="label" for="busca">Buscar</label>
-                <input type="text" id="busca" class="input" placeholder="Digite o título..." maxlength="100">
+                <!-- Atributo list conectado ao datalist de sugestões -->
+                <input type="text" id="busca" class="input" placeholder="Digite ao menos 3 letras..." maxlength="100" list="sugestoes-demandas">
+                <datalist id="sugestoes-demandas"></datalist>
                 <small id="buscaErro" class="field-hint field-error" style="display:none;"></small>
             </div>
             <div class="grupo-filtro">

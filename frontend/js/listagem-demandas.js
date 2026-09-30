@@ -1,12 +1,13 @@
 /*
   Autor: Leonardo Gambaroni Alves
   Componente: Projeto Integrador II - PUC-Campinas
-  Descrição: Inicio da Implementação do backend da tela de listagem de demandas.
+  Descrição: Implementação do backend e validações da tela de listagem de demandas.
 */
 
 document.addEventListener("DOMContentLoaded", () => {
   const campoBusca = document.getElementById("busca");
   const mensagemErroBusca = document.getElementById("buscaErro");
+  const listaSugestoes = document.getElementById("sugestoes-demandas");
   const campoStatus = document.getElementById("filtro-status");
   const tabela = document.querySelector(".tabela-demandas");
   const corpoTabela = tabela.querySelector("tbody");
@@ -14,29 +15,22 @@ document.addEventListener("DOMContentLoaded", () => {
   // Guarda as linhas originais da tabela para poder filtrar sem perder dados
   const linhasOriginais = Array.from(corpoTabela.querySelectorAll("tr"));
 
-  // Valores de status aceitos pelo sistema (mesmos do <select>)
-  const STATUS_VALIDOS = ["", "aberta", "andamento", "revisao", "concluida"];
+  // Extrai todos os títulos possíveis das linhas da tabela para usar como sugestões
+  const titulosDisponiveis = linhasOriginais.map(linha => linha.children[0].textContent.trim());
 
+  // Valores de status aceitos pelo sistema
+  const STATUS_VALIDOS = ["", "aberta", "andamento", "revisao", "concluida"];
   const TAMANHO_MAXIMO_BUSCA = 100;
 
-  
-    //Converte o texto exibido no badge de status para a mesma "key" usada nas <option> do filtro 
-   
   function normalizarStatus(textoStatus) {
     const texto = textoStatus.trim().toLowerCase();
-
     if (texto === "aberta") return "aberta";
     if (texto === "em andamento") return "andamento";
     if (texto === "em revisão" || texto === "em revisao") return "revisao";
     if (texto === "concluída" || texto === "concluida") return "concluida";
-
     return texto;
   }
 
-  
-    //Valida o texto digitado no campo de busca. 
-    //Regra: não pode ultrapassar o tamanho máximo definido, evitando entradas de busca absurdamente longas.
-   
   function validarBusca(valor) {
     if (valor.length > TAMANHO_MAXIMO_BUSCA) {
       return {
@@ -47,16 +41,10 @@ document.addEventListener("DOMContentLoaded", () => {
     return { valido: true };
   }
 
-  
-    //Valida o status selecionado, garantindo que apenas um dos valores previstos no escopo do sistema seja utilizado no filtro.
-   
   function validarStatus(valor) {
     return STATUS_VALIDOS.includes(valor);
   }
 
-  
-   //Mostra ou esconde a mensagem de erro do campo de busca.
-   
   function exibirErroBusca(mensagem) {
     if (mensagem) {
       mensagemErroBusca.textContent = mensagem;
@@ -69,49 +57,57 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  
-    //Remove a linha de "nenhum resultado" caso já exista na tabela.
-   
   function removerLinhaVazia() {
     const linhaVazia = corpoTabela.querySelector("[data-linha-vazia]");
     if (linhaVazia) linhaVazia.remove();
   }
 
-  
-   //Adiciona uma linha informando que não há demandas para os filtros aplicados, apenas se todas as linhas estiverem escondidas.
-   
   function exibirMensagemSemResultados() {
     removerLinhaVazia();
-
     const linha = document.createElement("tr");
     linha.setAttribute("data-linha-vazia", "true");
     linha.innerHTML = `<td colspan="8" style="text-align:center;">Nenhuma demanda encontrada para os filtros aplicados.</td>`;
     corpoTabela.appendChild(linha);
   }
 
-  
-   //Aplica os filtros de busca (por título) e status nas linhas da tabela, mostrando apenas as que atendem aos critérios.
-   
+  // Atualiza as opções do datalist baseado no que foi digitado (mínimo de 3 letras)
+  function atualizarSugestoes(termo) {
+    listaSugestoes.innerHTML = ""; // Limpa sugestões anteriores
+
+    if (termo.length >= 3) {
+      const sugestoesFiltradas = titulosDisponiveis.filter(titulo => 
+        titulo.toLowerCase().includes(termo)
+      );
+
+      sugestoesFiltradas.forEach(titulo => {
+        const option = document.createElement("option");
+        option.value = titulo;
+        listaSugestoes.appendChild(option);
+      });
+    }
+  }
+
   function filtrarTabela() {
     const valorBuscaBruto = campoBusca.value;
     const resultadoBusca = validarBusca(valorBuscaBruto);
 
     if (!resultadoBusca.valido) {
       exibirErroBusca(resultadoBusca.mensagem);
-      return; // não filtra enquanto o campo estiver inválido
+      return;
     }
-    exibirErroBusca(null);
+    exibirErroBusca(null); // Limpa qualquer erro anterior de tamanho máximo
 
     const termoBusca = valorBuscaBruto.trim().toLowerCase();
 
+    // Atualiza o autocompletar conforme o utilizador digita
+    atualizarSugestoes(termoBusca);
+
     const statusSelecionado = campoStatus.value;
     if (!validarStatus(statusSelecionado)) {
-      // Situação defensiva: só ocorreria com manipulação indevida do <select>
       campoStatus.value = "";
     }
 
     removerLinhaVazia();
-
     let algumaLinhaVisivel = false;
 
     linhasOriginais.forEach((linha) => {
@@ -119,8 +115,10 @@ document.addEventListener("DOMContentLoaded", () => {
       const statusTexto = linha.children[3].textContent;
       const statusLinha = normalizarStatus(statusTexto);
 
-      const atendeBusca = !termoBusca || titulo.includes(termoBusca);
+      // O filtro de texto só é aplicado de verdade se o utilizador digitar 3 ou mais letras
+      const atendeBusca = termoBusca.length < 3 || titulo.includes(termoBusca);
       const atendeStatus = !statusSelecionado || statusLinha === statusSelecionado;
+      
       const visivel = atendeBusca && atendeStatus;
 
       linha.style.display = visivel ? "" : "none";
@@ -135,6 +133,6 @@ document.addEventListener("DOMContentLoaded", () => {
   campoBusca.addEventListener("input", filtrarTabela);
   campoStatus.addEventListener("change", filtrarTabela);
 
-  // Aplica o filtro uma vez ao carregar (garante estado inicial consistente)
+  // Estado inicial
   filtrarTabela();
 });
