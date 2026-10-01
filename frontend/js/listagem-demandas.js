@@ -20,7 +20,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Valores de status aceitos pelo sistema
   const STATUS_VALIDOS = ["", "aberta", "andamento", "revisao", "concluida"];
-  const TAMANHO_MAXIMO_BUSCA = 100;
+  
+  // Limite máximo de caracteres alterado para 60
+  const TAMANHO_MAXIMO_BUSCA = 60;
 
   function normalizarStatus(textoStatus) {
     const texto = textoStatus.trim().toLowerCase();
@@ -31,6 +33,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return texto;
   }
 
+  // Validação do tamanho máximo com mensagem de erro personalizada
   function validarBusca(valor) {
     if (valor.length > TAMANHO_MAXIMO_BUSCA) {
       return {
@@ -91,15 +94,16 @@ document.addEventListener("DOMContentLoaded", () => {
     const valorBuscaBruto = campoBusca.value;
     const resultadoBusca = validarBusca(valorBuscaBruto);
 
+    // Se passar de 60 caracteres, exibe o aviso em vermelho e interrompe o filtro
     if (!resultadoBusca.valido) {
       exibirErroBusca(resultadoBusca.mensagem);
       return;
     }
-    exibirErroBusca(null); // Limpa qualquer erro anterior de tamanho máximo
+    exibirErroBusca(null); // Limpa o aviso quando estiver dentro do limite
 
     const termoBusca = valorBuscaBruto.trim().toLowerCase();
 
-    // Atualiza o autocompletar conforme o utilizador digita
+    // Atualiza o autocompletar conforme o usuário digita
     atualizarSugestoes(termoBusca);
 
     const statusSelecionado = campoStatus.value;
@@ -115,7 +119,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const statusTexto = linha.children[3].textContent;
       const statusLinha = normalizarStatus(statusTexto);
 
-      // O filtro de texto só é aplicado de verdade se o utilizador digitar 3 ou mais letras
       const atendeBusca = termoBusca.length < 3 || titulo.includes(termoBusca);
       const atendeStatus = !statusSelecionado || statusLinha === statusSelecionado;
       
