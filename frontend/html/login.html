@@ -1,23 +1,33 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 
 <head>
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <meta
-        name="description"
-        content="Sistema de Acompanhamento de Demandas de Desenvolvimento"
-    >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Sistema de Acompanhamento de Demandas de Desenvolvimento">
 
     <title>Gestão de Demandas | Login</title>
 
     <link rel="stylesheet" href="../css/global.css">
     <link rel="stylesheet" href="../css/login.css">
+
+    <style>
+        .password-requirements {
+            display: none;
+            margin-top: 10px;
+            font-size: 12px;
+        }
+
+        .password-requirements p {
+            margin: 4px 0;
+            color: #d9534f;
+        }
+
+        .password-requirements p.valid {
+            color: #218838;
+        }
+    </style>
 </head>
 
 <body>
@@ -25,58 +35,32 @@
     <main class="login-page">
 
         <section class="login-brand">
-
             <div class="login-brand-content">
+                <div class="login-logo">GD</div>
 
-                <div class="login-logo">
-                    GD
-                </div>
-
-                <h1>
-                    Gestão de<br>
-                    Demandas
-                </h1>
+                <h1>Gestão de<br>Demandas</h1>
 
                 <p>
                     Acompanhe projetos, organize demandas
                     e gerencie o andamento das atividades
                     de desenvolvimento.
                 </p>
-
             </div>
-
         </section>
 
         <section class="login-form-section">
-
             <div class="login-card">
 
                 <header class="login-header">
-
-                    <span class="login-welcome">
-                        Acesso ao sistema
-                    </span>
-
-                    <h2>
-                        Bem-vindo!
-                    </h2>
-
-                    <p>
-                        Entre com suas credenciais para continuar.
-                    </p>
-
+                    <span class="login-welcome">Acesso ao sistema</span>
+                    <h2>Bem-vindo!</h2>
+                    <p>Entre com suas credenciais para continuar.</p>
                 </header>
 
-                <form id="loginForm">
+                <form id="loginForm" novalidate>
 
                     <div class="login-input-group">
-
-                        <label
-                            class="label"
-                            for="email"
-                        >
-                            E-mail
-                        </label>
+                        <label class="label" for="email">E-mail</label>
 
                         <input
                             class="input"
@@ -87,27 +71,16 @@
                             autocomplete="email"
                             required
                         >
-
                     </div>
 
                     <div class="login-input-group">
 
                         <div class="login-password-header">
+                            <label class="label" for="password">Senha</label>
 
-                            <label
-                                class="label"
-                                for="password"
-                            >
-                                Senha
-                            </label>
-
-                            <a
-                                href="#"
-                                class="login-forgot-password"
-                            >
+                            <a href="#" class="login-forgot-password" id="forgotPasswordLink">
                                 Esqueci minha senha
                             </a>
-
                         </div>
 
                         <input
@@ -117,47 +90,35 @@
                             name="password"
                             placeholder="Digite sua senha"
                             autocomplete="current-password"
+                            aria-describedby="passwordRequirements"
                             required
                         >
 
+                        <div id="passwordRequirements" class="password-requirements">
+                            <p id="reqLength">✗ Pelo menos 8 caracteres</p>
+                            <p id="reqUppercase">✗ Pelo menos 1 letra maiúscula</p>
+                            <p id="reqLowercase">✗ Pelo menos 1 letra minúscula</p>
+                            <p id="reqNumber">✗ Pelo menos 1 número</p>
+                            <p id="reqSpecial">✗ Pelo menos 1 caractere especial</p>
+                        </div>
+
                     </div>
 
-                    <div
-                        id="loginError"
-                        class="login-error"
-                    >
-                        E-mail ou senha inválidos.
-                    </div>
+                    <div id="loginError" class="login-error" role="alert" aria-live="polite"></div>
 
                     <div class="login-remember">
-
                         <label>
-
-                            <input
-                                type="checkbox"
-                                id="remember"
-                                name="remember"
-                            >
-
-                            <span>
-                                Lembrar de mim
-                            </span>
-
+                            <input type="checkbox" id="remember" name="remember">
+                            <span>Lembrar de mim</span>
                         </label>
-
                     </div>
 
-                    <button
-                        type="submit"
-                        class="btn btn-primary login-button"
-                    >
+                    <button type="submit" class="btn btn-primary login-button">
                         Entrar
                     </button>
 
                 </form>
-
             </div>
-
         </section>
 
     </main>
@@ -165,5 +126,4 @@
     <script src="../js/login.js"></script>
 
 </body>
-
 </html>
