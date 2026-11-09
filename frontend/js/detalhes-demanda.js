@@ -4,14 +4,12 @@
   Descrição: JavaScript da tela de Detalhes de Demanda (validações + integração com a API)
 */
 
-const URL_API = "http://localhost:3000/api";
+const URL_API = "/api";
 
-// Pega o id da demanda na URL (ex: detalhes-demanda.html?id=1). Se não tiver, usa "1" para facilitar testes.
+// Pega o id da demanda selecionada na listagem (ex: detalhes-demanda.html?id=1).
 const parametrosUrl = new URLSearchParams(window.location.search);
-const idDemanda = parametrosUrl.get("id") || "1";
+const idDemanda = parametrosUrl.get("id");
 
-// Sem localStorage: usa o usuarioId da URL (se os colegas enviarem) ou 1 (Administrador) por padrão.
-const idUsuarioLogado = parametrosUrl.get("usuarioId") || "1";
 
 // Elementos da tela
 const erroGeral = document.getElementById("erroGeral");
@@ -88,14 +86,7 @@ function formatarData(iso) {
 }
 
 // Converte "AAAA-MM-DDTHH:MM:SS" para "DD/MM/AAAA HH:MM"
-function formatarDataHora(iso) {
-  if (!iso) {
-    return "-";
-  }
-  const partes = iso.split("T");
-  const data = formatarData(partes[0]);
-  const hora = partes[1] ? partes[1].slice(0, 5) : "";
-  return data + " " + hora;
+function formatarDataHora(iso) { return PI2.date(iso);
 }
 
 // Retorna a data de hoje no formato "AAAA-MM-DD"
@@ -151,8 +142,8 @@ function mostrarDemandaNaTela(demanda) {
 
 async function carregarComentarios() {
   try {
-    const resposta = await fetch(URL_API + "/demandas/" + idDemanda + "/comentarios", {
-      headers: { "X-Usuario-Id": idUsuarioLogado }
+    const resposta = await apiFetch(URL_API + "/demandas/" + idDemanda + "/comentarios", {
+      headers: { }
     });
     const dados = await resposta.json();
 
@@ -202,8 +193,8 @@ async function carregarComentarios() {
 
 async function carregarHistorico() {
   try {
-    const resposta = await fetch(URL_API + "/demandas/" + idDemanda + "/historico", {
-      headers: { "X-Usuario-Id": idUsuarioLogado }
+    const resposta = await apiFetch(URL_API + "/demandas/" + idDemanda + "/historico", {
+      headers: { }
     });
     const dados = await resposta.json();
 
@@ -213,7 +204,7 @@ async function carregarHistorico() {
       for (let i = 0; i < dados.historico.length; i++) {
         const h = dados.historico[i];
         const p = document.createElement("p");
-        p.innerText = formatarDataHora(h.dataAlteracao) + " - " + h.descricao;
+        p.innerText = formatarDataHora(h.dataAlteracao) + " - " + h.usuarioNome + " - " + h.descricao;
         listaHistorico.appendChild(p);
       }
     }
@@ -228,12 +219,19 @@ async function carregarHistorico() {
   }
 }
 
+// Compatibilidade com a sessão do login, sem confiar em usuarioId da URL.
+async function apiFetch(url, options = {}) {
+  await PI2.ready;
+  return fetch(url,{...options,credentials:"same-origin",signal:AbortSignal.timeout(25000)});
+}
+
 async function iniciarTela() {
+  if (!/^\d+$/.test(idDemanda || "")) { mostrarErro(erroGeral,"Selecione uma demanda na listagem."); return; }
   limparErro(erroGeral);
 
   try {
-    const resposta = await fetch(URL_API + "/demandas/" + idDemanda, {
-      headers: { "X-Usuario-Id": idUsuarioLogado }
+    const resposta = await apiFetch(URL_API + "/demandas/" + idDemanda, {
+      headers: { }
     });
     const dados = await resposta.json();
 
@@ -280,11 +278,10 @@ formComentario.addEventListener("submit", async function validador(event) {
   botaoComentario.disabled = true;
 
   try {
-    const resposta = await fetch(URL_API + "/demandas/" + idDemanda + "/comentarios", {
+    const resposta = await apiFetch(URL_API + "/demandas/" + idDemanda + "/comentarios", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "X-Usuario-Id": idUsuarioLogado
       },
       body: JSON.stringify({ texto: texto })
     });
@@ -326,11 +323,10 @@ botaoAtualizarStatus.addEventListener("click", async function () {
   botaoAtualizarStatus.disabled = true;
 
   try {
-    const resposta = await fetch(URL_API + "/demandas/" + idDemanda + "/status", {
+    const resposta = await apiFetch(URL_API + "/demandas/" + idDemanda + "/status", {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
-        "X-Usuario-Id": idUsuarioLogado
       },
       body: JSON.stringify({ status: novoStatus })
     });
@@ -354,8 +350,8 @@ botaoAtualizarStatus.addEventListener("click", async function () {
 
 async function carregarResponsaveis() {
   try {
-    const resposta = await fetch(URL_API + "/demandas/" + idDemanda + "/responsaveis", {
-      headers: { "X-Usuario-Id": idUsuarioLogado }
+    const resposta = await apiFetch(URL_API + "/demandas/" + idDemanda + "/responsaveis", {
+      headers: { }
     });
     const dados = await resposta.json();
 
@@ -426,8 +422,8 @@ formEdicao.addEventListener("submit", async function (event) {
     return;
   }
 
-  if (prazo !== demandaAtual.prazoFinalizacao && prazo <= obterDataDeHoje()) {
-    mostrarErro(erroEdicao, "ERRO! O novo prazo deve ser maior que a data atual.");
+  if (prazo !== demandaAtual.prazoFinalizacao && prazo < obterDataDeHoje()) {
+    mostrarErro(erroEdicao, "ERRO! O novo prazo não pode ser anterior à data atual.");
     return;
   }
 
@@ -448,11 +444,10 @@ formEdicao.addEventListener("submit", async function (event) {
   salvarEdicao.disabled = true;
 
   try {
-    const resposta = await fetch(URL_API + "/demandas/" + idDemanda, {
+    const resposta = await apiFetch(URL_API + "/demandas/" + idDemanda, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
-        "X-Usuario-Id": idUsuarioLogado
       },
       body: JSON.stringify({
         titulo: titulo,

@@ -2,12 +2,14 @@
  * Autor: João Pedro Silveira de Souza
  * Componente: Projeto Integrador II - PUC-Campinas
  * Descrição: Controllers simples da tela de detalhes de demanda.
- * A API externa de feriados será adicionada depois. A autenticação deve preencher res.locals.usuario.
+ * A autenticação preenche res.locals.usuario; regras compartilhadas validam feriados e atualizações.
  */
 
 import { Request, Response } from "express";
 import oracledb from "oracledb";
 import { getConn } from "../data/conexao";
+// Adaptação de sessão e regras compartilhadas: Vinicius Zorzetto — RA:24008052.
+import {updateDemand} from "../demand-service";
 
 type Perfil = "Administrador" | "Líder de Projeto" | "Membro da Equipe";
 type Status = "Aberta" | "Em andamento" | "Em revisão" | "Concluída" | "Cancelada";
@@ -24,7 +26,7 @@ function responderErro(res: Response, status: number, mensagem: string) {
 }
 
 function idValido(valor: string) {
-  return /^\d+$/.test(valor) && Number(valor) > 0;
+  return /^\d+$/.test(valor) && Number.isSafeInteger(Number(valor)) && Number(valor) > 0;
 }
 
 function usuarioAtual(res: Response): Usuario | null {
@@ -102,22 +104,16 @@ function respostaDemanda(linha: any, usuario: Usuario) {
     projetoNome: linha.PROJETO_NOME,
     responsavelId: linha.ID_RESPONSAVEL,
     responsavelNome: linha.RESPONSAVEL_NOME,
-    dataCriacao: linha.DATA_CRIACAO,
-    dataUltimaAtualizacao: linha.DATA_ATUALIZACAO,
+    dataCriacao: linha.DATA_CRIACAO + "Z",
+    dataUltimaAtualizacao: linha.DATA_ATUALIZACAO + "Z",
     prazoFinalizacao: linha.PRAZO_FINALIZACAO,
+    podeEditar: usuario.perfil !== "Membro da Equipe" && status !== "Concluída" && status !== "Cancelada",
+    transicoesPermitidas: transicoes(usuario.perfil, status, ehResponsavel),
     permissoes: {
       podeEditar: usuario.perfil !== "Membro da Equipe" && status !== "Concluída" && status !== "Cancelada",
       transicoesPermitidas: transicoes(usuario.perfil, status, ehResponsavel)
     }
   };
-}
-
-async function registrarHistorico(conn: oracledb.Connection, demanda: number, usuario: number, descricao: string) {
-  await conn.execute(
-    `INSERT INTO historico_alteracoes (id_demanda, id_usuario, descricao)
-     VALUES (:demanda, :usuario, :descricao)`,
-    { demanda, usuario, descricao: descricao.slice(0, 500) }
-  );
 }
 
 async function contexto(req: Request, res: Response) {
@@ -128,6 +124,7 @@ async function contexto(req: Request, res: Response) {
   if (!idValido(idTexto)) return { erro: [400, "Id da demanda inválido."] as const };
 
   const conn = await getConn();
+  try {
   const demanda = await demandaPorId(conn, id);
   if (!demanda) {
     await conn.close();
@@ -138,6 +135,7 @@ async function contexto(req: Request, res: Response) {
     return { erro: [403, "Você não tem acesso a esta demanda."] as const };
   }
   return { conn, id, usuario, demanda };
+  } catch(error) { await conn.close(); throw error; }
 }
 
 export async function getDemandaPorId(req: Request, res: Response) {
@@ -157,14 +155,14 @@ export async function listarComentarios(req: Request, res: Response) {
   if (dados.erro) return responderErro(res, dados.erro[0], dados.erro[1]);
   try {
     const resultado = await dados.conn.execute<any>(
-      `SELECT c.id_comentario, c.texto, u.nome usuario_nome,
+      `SELECT c.id_comentario, c.id_usuario, c.texto, u.nome usuario_nome,
               TO_CHAR(c.data_comentario, ${FORMATO_DATA}) data_criacao
          FROM comentarios c JOIN usuarios u ON u.id_usuario = c.id_usuario
         WHERE c.id_demanda = :id ORDER BY c.data_comentario DESC`,
       { id: dados.id }
     );
     return res.json({ comentarios: (resultado.rows || []).map((linha: any) => ({
-      id: linha.ID_COMENTARIO, texto: linha.TEXTO, usuarioNome: linha.USUARIO_NOME, dataCriacao: linha.DATA_CRIACAO
+      id: linha.ID_COMENTARIO, usuarioId: linha.ID_USUARIO, texto: linha.TEXTO, usuarioNome: linha.USUARIO_NOME, dataCriacao: linha.DATA_CRIACAO + "Z"
     })) });
   } catch (erro) {
     return responderErro(res, 500, "Não foi possível listar os comentários.");
@@ -176,7 +174,7 @@ export async function listarComentarios(req: Request, res: Response) {
 export async function criarComentario(req: Request, res: Response) {
   const dados = await contexto(req, res);
   if (dados.erro) return responderErro(res, dados.erro[0], dados.erro[1]);
-  const texto = req.body?.texto?.trim();
+  const texto = typeof req.body?.texto === "string" ? req.body.texto.trim() : "";
   if (!texto || texto.length > 300) {
     await dados.conn.close();
     return responderErro(res, 400, "O comentário deve ter entre 1 e 300 caracteres.");
@@ -201,14 +199,15 @@ export async function listarHistorico(req: Request, res: Response) {
   if (dados.erro) return responderErro(res, dados.erro[0], dados.erro[1]);
   try {
     const resultado = await dados.conn.execute<any>(
-      `SELECT h.id_historico, h.descricao, u.nome usuario_nome,
+      `SELECT h.id_historico, h.campo, h.valor_anterior, h.valor_novo,
+              NVL(h.descricao, h.campo || ': ' || NVL(h.valor_anterior, '—') || ' → ' || NVL(h.valor_novo, '—')) descricao, u.nome usuario_nome,
               TO_CHAR(h.data_alteracao, ${FORMATO_DATA}) data_alteracao
          FROM historico_alteracoes h JOIN usuarios u ON u.id_usuario = h.id_usuario
         WHERE h.id_demanda = :id ORDER BY h.data_alteracao DESC`,
       { id: dados.id }
     );
     return res.json({ historico: (resultado.rows || []).map((linha: any) => ({
-      id: linha.ID_HISTORICO, descricao: linha.DESCRICAO, usuarioNome: linha.USUARIO_NOME, dataAlteracao: linha.DATA_ALTERACAO
+      id: linha.ID_HISTORICO, campo: linha.CAMPO, valorAnterior: linha.VALOR_ANTERIOR, valorNovo: linha.VALOR_NOVO, descricao: linha.DESCRICAO, usuarioNome: linha.USUARIO_NOME, dataAlteracao: linha.DATA_ALTERACAO + "Z"
     })) });
   } catch (erro) {
     return responderErro(res, 500, "Não foi possível listar o histórico.");
@@ -226,13 +225,13 @@ export async function listarResponsaveis(req: Request, res: Response) {
   }
   try {
     const resultado = await dados.conn.execute<any>(
-      `SELECT u.id_usuario, u.nome
+      `SELECT u.id_usuario, u.nome, u.perfil
          FROM usuarios u JOIN projeto_usuarios pu ON pu.id_usuario = u.id_usuario
         WHERE pu.id_projeto = :projeto ORDER BY u.nome`,
       { projeto: dados.demanda.ID_PROJETO }
     );
     return res.json({ responsaveis: (resultado.rows || []).map((linha: any) => ({
-      id: linha.ID_USUARIO, nome: linha.NOME
+      id: linha.ID_USUARIO, nome: linha.NOME, perfil: linha.PERFIL
     })) });
   } catch (erro) {
     return responderErro(res, 500, "Não foi possível listar os responsáveis.");
@@ -241,75 +240,17 @@ export async function listarResponsaveis(req: Request, res: Response) {
   }
 }
 
+// O serviço compartilhado acrescenta validação de feriados e histórico por campo.
 export async function atualizarDemanda(req: Request, res: Response) {
-  const dados = await contexto(req, res);
-  if (dados.erro) return responderErro(res, dados.erro[0], dados.erro[1]);
-  const corpo = req.body || {};
-  const podeEditar = dados.usuario.perfil !== "Membro da Equipe" && !["Concluída", "Cancelada"].includes(statusTela(dados.demanda.STATUS));
-  if (!podeEditar) {
-    await dados.conn.close();
-    return responderErro(res, 403, "Você não pode editar esta demanda.");
-  }
-  if (!corpo.titulo?.trim() || corpo.titulo.trim().length > 150 || !corpo.descricao?.trim() || corpo.descricao.trim().length > 500) {
-    await dados.conn.close();
-    return responderErro(res, 400, "Título ou descrição inválidos.");
-  }
-  if (!TIPOS.includes(corpo.tipo) || !PRIORIDADES.includes(corpo.prioridade) || !/^\d{4}-\d{2}-\d{2}$/.test(corpo.prazoFinalizacao || "")) {
-    await dados.conn.close();
-    return responderErro(res, 400, "Tipo, prioridade ou prazo inválidos.");
-  }
-
-  try {
-    const responsavel = corpo.responsavelId ? Number(corpo.responsavelId) : null;
-    if (responsavel) {
-      const vinculo = await dados.conn.execute(
-        `SELECT 1 FROM projeto_usuarios WHERE id_projeto = :projeto AND id_usuario = :usuario`,
-        { projeto: dados.demanda.ID_PROJETO, usuario: responsavel }
-      );
-      if (!(vinculo.rows?.length || 0)) {
-        return responderErro(res, 400, "O responsável precisa pertencer ao projeto.");
-      }
-    }
-    await dados.conn.execute(
-      `UPDATE demandas SET titulo = :titulo, descricao = :descricao, tipo_demanda = :tipo,
-              prioridade = :prioridade, id_responsavel = :responsavel,
-              prazo_finalizacao = TO_DATE(:prazo, 'YYYY-MM-DD'), data_atualizacao = CURRENT_TIMESTAMP
-        WHERE id_demanda = :id`,
-      { titulo: corpo.titulo.trim(), descricao: corpo.descricao.trim(), tipo: corpo.tipo, prioridade: corpo.prioridade, responsavel, prazo: corpo.prazoFinalizacao, id: dados.id }
-    );
-    await registrarHistorico(dados.conn, dados.id, dados.usuario.id, `${dados.usuario.nome} editou a demanda.`);
-    await dados.conn.commit();
-    return res.json({ mensagem: "Demanda atualizada com sucesso." });
-  } catch (erro) {
-    await dados.conn.rollback();
-    return responderErro(res, 500, "Não foi possível atualizar a demanda.");
-  } finally {
-    await dados.conn.close();
-  }
+  const usuario = usuarioAtual(res);
+  if (!usuario) return responderErro(res,401,"Usuário não autenticado.");
+  const demanda = await updateDemand({...usuario,email:""},req.params.id,req.body);
+  return res.json({...demanda, mensagem:"Demanda atualizada com sucesso.",demanda});
 }
 
 export async function atualizarStatus(req: Request, res: Response) {
-  const dados = await contexto(req, res);
-  if (dados.erro) return responderErro(res, dados.erro[0], dados.erro[1]);
-  const atual = statusTela(dados.demanda.STATUS);
-  const novo = normalizarStatus(req.body?.status);
-  const permitidas = transicoes(dados.usuario.perfil, atual, dados.demanda.ID_RESPONSAVEL === dados.usuario.id);
-  if (!novo || !permitidas.includes(novo)) {
-    await dados.conn.close();
-    return responderErro(res, 400, "Mudança de status não permitida.");
-  }
-  try {
-    await dados.conn.execute(
-      `UPDATE demandas SET status = :status, data_atualizacao = CURRENT_TIMESTAMP WHERE id_demanda = :id`,
-      { status: statusBanco(novo), id: dados.id }
-    );
-    await registrarHistorico(dados.conn, dados.id, dados.usuario.id, `${dados.usuario.nome} alterou o status de ${atual} para ${novo}.`);
-    await dados.conn.commit();
-    return res.json({ mensagem: novo === "Cancelada" ? "Demanda cancelada." : "Status atualizado com sucesso." });
-  } catch (erro) {
-    await dados.conn.rollback();
-    return responderErro(res, 500, "Não foi possível atualizar o status.");
-  } finally {
-    await dados.conn.close();
-  }
+  const usuario = usuarioAtual(res);
+  if (!usuario) return responderErro(res,401,"Usuário não autenticado.");
+  const demanda = await updateDemand({...usuario,email:""},req.params.id,{status:req.body?.status});
+  return res.json({...demanda,mensagem:demanda.status === "Cancelada" ? "Demanda cancelada." : "Status atualizado com sucesso.",demanda});
 }

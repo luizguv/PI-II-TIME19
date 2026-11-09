@@ -1,3 +1,4 @@
+<!-- Integração: Vinicius Zorzetto — RA:24008052; autoria original preservada abaixo. -->
 
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -28,6 +29,8 @@
             color: #218838;
         }
     </style>
+<link rel="stylesheet" href="../css/integracao.css">
+<script src="../js/api.js" defer></script>
 </head>
 
 <body>
@@ -90,17 +93,9 @@
                             name="password"
                             placeholder="Digite sua senha"
                             autocomplete="current-password"
-                            aria-describedby="passwordRequirements"
+                            maxlength="256"
                             required
                         >
-
-                        <div id="passwordRequirements" class="password-requirements">
-                            <p id="reqLength">✗ Pelo menos 8 caracteres</p>
-                            <p id="reqUppercase">✗ Pelo menos 1 letra maiúscula</p>
-                            <p id="reqLowercase">✗ Pelo menos 1 letra minúscula</p>
-                            <p id="reqNumber">✗ Pelo menos 1 número</p>
-                            <p id="reqSpecial">✗ Pelo menos 1 caractere especial</p>
-                        </div>
 
                     </div>
 
@@ -123,7 +118,7 @@
 
     </main>
 
-    <script src="../js/login.js"></script>
+    <script src="../js/login.js" defer></script>
 
 </body>
 </html>

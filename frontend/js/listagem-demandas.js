@@ -1,141 +1,37 @@
-/*
-  Autor: Leonardo Gambaroni Alves
-  Componente: Projeto Integrador II - PUC-Campinas
-  Descrição: Implementação do backend e validações da tela de listagem de demandas.
-*/
-
-document.addEventListener("DOMContentLoaded", () => {
-  const campoBusca = document.getElementById("busca");
-  const mensagemErroBusca = document.getElementById("buscaErro");
-  const listaSugestoes = document.getElementById("sugestoes-demandas");
-  const campoStatus = document.getElementById("filtro-status");
-  const tabela = document.querySelector(".tabela-demandas");
-  const corpoTabela = tabela.querySelector("tbody");
-
-  // Guarda as linhas originais da tabela para poder filtrar sem perder dados
-  const linhasOriginais = Array.from(corpoTabela.querySelectorAll("tr"));
-
-  // Extrai todos os títulos possíveis das linhas da tabela para usar como sugestões
-  const titulosDisponiveis = linhasOriginais.map(linha => linha.children[0].textContent.trim());
-
-  // Valores de status aceitos pelo sistema
-  const STATUS_VALIDOS = ["", "aberta", "andamento", "revisao", "concluida"];
-  
-  // Limite máximo de caracteres alterado para 60
-  const TAMANHO_MAXIMO_BUSCA = 60;
-
-  function normalizarStatus(textoStatus) {
-    const texto = textoStatus.trim().toLowerCase();
-    if (texto === "aberta") return "aberta";
-    if (texto === "em andamento") return "andamento";
-    if (texto === "em revisão" || texto === "em revisao") return "revisao";
-    if (texto === "concluída" || texto === "concluida") return "concluida";
-    return texto;
-  }
-
-  // Validação do tamanho máximo com mensagem de erro personalizada
-  function validarBusca(valor) {
-    if (valor.length > TAMANHO_MAXIMO_BUSCA) {
-      return {
-        valido: false,
-        mensagem: `A busca deve ter no máximo ${TAMANHO_MAXIMO_BUSCA} caracteres.`,
-      };
+/* Autor original: Leonardo Gambaroni Alves
+ * Os filtros são enviados à API; nenhuma demanda é extraída de HTML fixo.
+ */
+const {request,element,message,date,ready} = PI2;
+const feedback = document.getElementById('apiMessage');
+const tbody = document.querySelector('.tabela-demandas tbody');
+const search = document.getElementById('busca');
+const controls = {status:'filtro-status',prioridade:'filtro-prioridade',tipo:'filtro-tipo',projetoId:'filtro-projeto',ordenarPor:'ordenarPor'};
+let version = 0, timer;
+async function load() {
+  const current = ++version;
+  if (search.value.length > 60) {message(feedback,'A busca deve ter no máximo 60 caracteres.'); return;}
+  const params = new URLSearchParams();
+  if (search.value.trim()) params.set('busca',search.value.trim());
+  for (const [name,id] of Object.entries(controls)) if(document.getElementById(id).value) params.set(name,document.getElementById(id).value);
+  message(feedback,'Carregando demandas…',false);
+  try {
+    const {demandas} = await request('/demandas?'+params);
+    if (current !== version) return;
+    tbody.replaceChildren();
+    for(const d of demandas) {
+      const row = element('tr');
+      for(const value of [d.titulo,d.tipo,d.prioridade,d.status,d.projetoNome,d.responsavelNome || 'Não atribuído',date(d.prazoFinalizacao)]) row.append(element('td',value));
+      const cell = element('td'), link = element('a','Ver','btn btn-secondary btn-acao');
+      link.href = `detalhes-demanda.html?id=${d.id}`;cell.append(link);row.append(cell);tbody.append(row);
     }
-    return { valido: true };
-  }
-
-  function validarStatus(valor) {
-    return STATUS_VALIDOS.includes(valor);
-  }
-
-  function exibirErroBusca(mensagem) {
-    if (mensagem) {
-      mensagemErroBusca.textContent = mensagem;
-      mensagemErroBusca.style.display = "block";
-      campoBusca.setAttribute("aria-invalid", "true");
-    } else {
-      mensagemErroBusca.textContent = "";
-      mensagemErroBusca.style.display = "none";
-      campoBusca.removeAttribute("aria-invalid");
-    }
-  }
-
-  function removerLinhaVazia() {
-    const linhaVazia = corpoTabela.querySelector("[data-linha-vazia]");
-    if (linhaVazia) linhaVazia.remove();
-  }
-
-  function exibirMensagemSemResultados() {
-    removerLinhaVazia();
-    const linha = document.createElement("tr");
-    linha.setAttribute("data-linha-vazia", "true");
-    linha.innerHTML = `<td colspan="8" style="text-align:center;">Nenhuma demanda encontrada para os filtros aplicados.</td>`;
-    corpoTabela.appendChild(linha);
-  }
-
-  // Atualiza as opções do datalist baseado no que foi digitado (mínimo de 3 letras)
-  function atualizarSugestoes(termo) {
-    listaSugestoes.innerHTML = ""; // Limpa sugestões anteriores
-
-    if (termo.length >= 3) {
-      const sugestoesFiltradas = titulosDisponiveis.filter(titulo => 
-        titulo.toLowerCase().includes(termo)
-      );
-
-      sugestoesFiltradas.forEach(titulo => {
-        const option = document.createElement("option");
-        option.value = titulo;
-        listaSugestoes.appendChild(option);
-      });
-    }
-  }
-
-  function filtrarTabela() {
-    const valorBuscaBruto = campoBusca.value;
-    const resultadoBusca = validarBusca(valorBuscaBruto);
-
-    // Se passar de 60 caracteres, exibe o aviso em vermelho e interrompe o filtro
-    if (!resultadoBusca.valido) {
-      exibirErroBusca(resultadoBusca.mensagem);
-      return;
-    }
-    exibirErroBusca(null); // Limpa o aviso quando estiver dentro do limite
-
-    const termoBusca = valorBuscaBruto.trim().toLowerCase();
-
-    // Atualiza o autocompletar conforme o usuário digita
-    atualizarSugestoes(termoBusca);
-
-    const statusSelecionado = campoStatus.value;
-    if (!validarStatus(statusSelecionado)) {
-      campoStatus.value = "";
-    }
-
-    removerLinhaVazia();
-    let algumaLinhaVisivel = false;
-
-    linhasOriginais.forEach((linha) => {
-      const titulo = linha.children[0].textContent.trim().toLowerCase();
-      const statusTexto = linha.children[3].textContent;
-      const statusLinha = normalizarStatus(statusTexto);
-
-      const atendeBusca = termoBusca.length < 3 || titulo.includes(termoBusca);
-      const atendeStatus = !statusSelecionado || statusLinha === statusSelecionado;
-      
-      const visivel = atendeBusca && atendeStatus;
-
-      linha.style.display = visivel ? "" : "none";
-      if (visivel) algumaLinhaVisivel = true;
-    });
-
-    if (!algumaLinhaVisivel) {
-      exibirMensagemSemResultados();
-    }
-  }
-
-  campoBusca.addEventListener("input", filtrarTabela);
-  campoStatus.addEventListener("change", filtrarTabela);
-
-  // Estado inicial
-  filtrarTabela();
-});
+    if(!demandas.length) { const row=element('tr'),cell=element('td','Nenhuma demanda encontrada.');cell.colSpan=8;row.append(cell);tbody.append(row); }
+    message(feedback,`${demandas.length} demanda(s) encontrada(s).`,false);
+  } catch(error) {if(current === version) {tbody.replaceChildren();message(feedback,error.message);}}
+}
+ready.then(async()=>{
+  const {projetos} = await request('/projetos');
+  projetos.forEach(p=>{const option=element('option',p.nome);option.value=p.id;document.getElementById('filtro-projeto').append(option);});
+  await load();
+  search.addEventListener('input',()=>{clearTimeout(timer);timer=setTimeout(load,250);});
+  Object.values(controls).forEach(id=>document.getElementById(id).addEventListener('change',load));
+}).catch(error=>message(feedback,error.message));

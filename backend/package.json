@@ -6,7 +6,10 @@
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "build": "tsc",
-    "start": "node dist/server.js"
+    "start": "node dist/server.js",
+    "db:init": "npm run build && node dist/init-db.js",
+    "test": "npm run build && node --test tests/rules.cjs",
+    "test:integration": "node tests/integration.cjs"
   },
   "keywords": [],
   "author": "",
