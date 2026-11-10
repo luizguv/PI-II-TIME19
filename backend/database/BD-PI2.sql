@@ -41,6 +41,7 @@ CREATE TABLE projeto_usuarios (
 CREATE TABLE demandas (
     id_demanda NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     titulo VARCHAR2(150) NOT NULL,
+    descricao VARCHAR2(500) NOT NULL,
     tipo_demanda VARCHAR2(30) NOT NULL,
     id_responsavel NUMBER DEFAULT NULL,
     id_projeto NUMBER NOT NULL,
@@ -52,7 +53,7 @@ CREATE TABLE demandas (
     
     -- chaves estrangeiras
     CONSTRAINT fk_projeto_demanda FOREIGN KEY (id_projeto) REFERENCES
-    projeto (id_projeto),
+    projetos (id_projeto),
     CONSTRAINT fk_responsavel_demanda FOREIGN KEY (id_responsavel) REFERENCES
     usuarios (id_usuario),
     
@@ -81,7 +82,7 @@ CREATE TABLE comentarios (
     
     -- chaves estrangeiras
     CONSTRAINT fk_comentario_demanda FOREIGN KEY (id_demanda) REFERENCES
-    demanda (id_demanda),
+    demandas (id_demanda),
     CONSTRAINT fk_comentario_usuario FOREIGN KEY (id_usuario) REFERENCES
     usuarios (id_usuario)
 );
