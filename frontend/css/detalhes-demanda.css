@@ -436,3 +436,155 @@ main {
 
   margin-bottom: 8px;
 }
+
+#erroGeral {
+  margin-bottom: 20px;
+  padding: 14px 16px;
+
+  background-color: #fddddd;
+
+  border: 2px solid #b42318;
+  border-radius: var(--radius-md);
+
+  color: #7a1a12;
+
+  font-size: 15px;
+  font-weight: bold;
+}
+
+#mensagemSucesso {
+  margin-bottom: 20px;
+  padding: 14px 16px;
+
+  background-color: #dcf5e4;
+
+  border: 2px solid #1f7a3d;
+  border-radius: var(--radius-md);
+
+  color: #14532d;
+
+  font-size: 15px;
+  font-weight: bold;
+}
+
+.secao-status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+
+  gap: 10px;
+
+  background-color: #ffffff;
+
+  border: 1px solid #e2e8f0;
+  border-radius: var(--radius-md);
+
+  padding: 16px 20px;
+  margin-bottom: 20px;
+
+  box-shadow: var(--shadow-md);
+}
+
+.secao-status select {
+  padding: 8px;
+
+  border: 1px solid #e2e8f0;
+  border-radius: var(--radius-md);
+
+  font-size: 14px;
+}
+
+.botao-status {
+  padding: 10px 15px;
+
+  border: 1px solid var(--dusk-blue);
+  border-radius: var(--radius-md);
+
+  background-color: var(--dusk-blue);
+
+  color: white;
+
+  font-size: 14px;
+  font-weight: bold;
+
+  cursor: pointer;
+}
+
+.botao-status:hover {
+  background-color: #5bc0be;
+  border-color: #5bc0be;
+
+  color: #0b132b;
+}
+
+#erroStatus {
+  width: 100%;
+
+  padding: 8px;
+
+  background-color: #b422188e;
+
+  border: 2px solid #b42318;
+  border-radius: var(--radius-md);
+
+  color: black;
+
+  font-size: 14px;
+}
+
+.rotulo-edicao {
+  color: #0b132b;
+  font-weight: bold;
+}
+
+#formEditarDemanda textarea {
+  padding: 8px;
+
+  border: 1px solid #e2e8f0;
+  border-radius: var(--radius-md);
+
+  font-family: inherit;
+  font-size: 14px;
+
+  resize: vertical;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+#listaComentarios {
+  margin-top: 10px;
+}
+
+.comentario-item {
+  padding: 12px 0;
+
+  border-top: 1px solid #e2e8f0;
+}
+
+.comentario-item .comentario-autor {
+  color: #0b132b;
+
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.comentario-item .comentario-data {
+  color: #64748b;
+
+  font-size: 12px;
+  font-weight: normal;
+
+  margin-left: 8px;
+}
+
+.comentario-item .comentario-texto {
+  margin-top: 4px;
+
+  color: #334155;
+
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
