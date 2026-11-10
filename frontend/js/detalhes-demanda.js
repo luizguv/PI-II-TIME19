@@ -4,11 +4,14 @@
   Descrição: JavaScript da tela de Detalhes de Demanda (validações + integração com a API)
 */
 
-// Endereço da API (o mesmo usado pela tela de login).
 const URL_API = "http://localhost:3000/api";
 
-// O id da demanda vem na URL: detalhes-demanda.html?id=3
-const idDemanda = new URLSearchParams(window.location.search).get("id");
+// Pega o id da demanda na URL (ex: detalhes-demanda.html?id=1). Se não tiver, usa "1" para facilitar testes.
+const parametrosUrl = new URLSearchParams(window.location.search);
+const idDemanda = parametrosUrl.get("id") || "1";
+
+// Sem localStorage: usa o usuarioId da URL (se os colegas enviarem) ou 1 (Administrador) por padrão.
+const idUsuarioLogado = parametrosUrl.get("usuarioId") || "1";
 
 // Elementos da tela
 const erroGeral = document.getElementById("erroGeral");
@@ -53,281 +56,223 @@ const listaComentarios = document.getElementById("listaComentarios");
 
 const listaHistorico = document.getElementById("listaHistorico");
 
-// Guarda a demanda que está na tela (resposta mais recente da API)
+// Guarda os dados atuais da demanda carregada
 let demandaAtual = null;
 
-
-/* ------------------------------------------------------------------ */
-/* Funções de apoio                                                    */
-/* ------------------------------------------------------------------ */
-
-// Lê o usuário logado. A tela de login precisa gravar no navegador:
-//   localStorage.setItem("usuarioLogado", JSON.stringify({ id: 1, nome: "Admin Geral" }))
-// Só o "id" é usado: o perfil é sempre conferido pelo servidor, no banco.
-function obterUsuarioLogado() {
-  try {
-    const usuario = JSON.parse(localStorage.getItem("usuarioLogado"));
-
-    if (usuario && Number(usuario.id) > 0) {
-      return usuario;
-    }
-  } catch (erro) {
-    // JSON inválido: tratamos como "ninguém logado"
-  }
-
-  return null;
-}
-
-// Faz a chamada à API, envia quem está logado e transforma erros em mensagens para o usuário.
-async function chamarApi(caminho, opcoes = {}) {
-  const usuario = obterUsuarioLogado();
-
-  const cabecalhos = { "X-Usuario-Id": usuario ? String(usuario.id) : "" };
-
-  if (opcoes.body) {
-    cabecalhos["Content-Type"] = "application/json";
-  }
-
-  let resposta;
-
-  try {
-    resposta = await fetch(URL_API + caminho, { ...opcoes, headers: cabecalhos });
-  } catch (erro) {
-    throw new Error(
-      "Não foi possível conectar ao servidor. Verifique se o backend está rodando."
-    );
-  }
-
-  let dados = {};
-
-  try {
-    dados = await resposta.json();
-  } catch (erro) {
-    // resposta sem JSON: seguimos com objeto vazio
-  }
-
-  if (!resposta.ok) {
-    // Mostra a mensagem que a API mandou (400, 401, 403, 404, 409...)
-    throw new Error(dados.mensagem || "Erro " + resposta.status + " ao falar com o servidor.");
-  }
-
-  return dados;
-}
-
-// Converte "AAAA-MM-DD" em "DD/MM/AAAA"
-function formatarData(iso) {
-  if (!iso) {
-    return "Sem prazo";
-  }
-
-  const partes = iso.split("-");
-  return partes[2] + "/" + partes[1] + "/" + partes[0];
-}
-
-// Converte "AAAA-MM-DDTHH:MM:SS" em "DD/MM/AAAA HH:MM"
-function formatarDataHora(iso) {
-  if (!iso) {
-    return "-";
-  }
-
-  const [data, hora] = iso.split("T");
-  return formatarData(data) + " " + hora.slice(0, 5);
-}
-
-// Data de hoje no mesmo formato do campo <input type="date"> (AAAA-MM-DD)
-function dataDeHoje() {
-  const hoje = new Date();
-  const mes = String(hoje.getMonth() + 1).padStart(2, "0");
-  const dia = String(hoje.getDate()).padStart(2, "0");
-
-  return hoje.getFullYear() + "-" + mes + "-" + dia;
-}
-
 function mostrarErro(elemento, texto) {
-  elemento.textContent = texto;
+  elemento.innerText = texto;
   elemento.classList.remove("oculto");
 }
 
 function limparErro(elemento) {
-  elemento.textContent = "";
+  elemento.innerText = "";
   elemento.classList.add("oculto");
 }
 
 function mostrarSucesso(texto) {
-  mensagemSucesso.textContent = texto;
+  mensagemSucesso.innerText = texto;
   mensagemSucesso.classList.remove("oculto");
 
   setTimeout(function () {
     mensagemSucesso.classList.add("oculto");
-  }, 5000);
+  }, 4000);
 }
 
-// Cria um <p> com texto (textContent evita que um comentário com HTML quebre a página)
-function criarParagrafo(texto) {
-  const p = document.createElement("p");
-  p.textContent = texto;
-  return p;
+// Converte "AAAA-MM-DD" para "DD/MM/AAAA"
+function formatarData(iso) {
+  if (!iso) {
+    return "Sem prazo";
+  }
+  const partes = iso.split("-");
+  return partes[2] + "/" + partes[1] + "/" + partes[0];
 }
 
+// Converte "AAAA-MM-DDTHH:MM:SS" para "DD/MM/AAAA HH:MM"
+function formatarDataHora(iso) {
+  if (!iso) {
+    return "-";
+  }
+  const partes = iso.split("T");
+  const data = formatarData(partes[0]);
+  const hora = partes[1] ? partes[1].slice(0, 5) : "";
+  return data + " " + hora;
+}
 
-/* ------------------------------------------------------------------ */
-/* Carregar e mostrar a demanda                                        */
-/* ------------------------------------------------------------------ */
+// Retorna a data de hoje no formato "AAAA-MM-DD"
+function obterDataDeHoje() {
+  const hoje = new Date();
+  const ano = hoje.getFullYear();
+  const mes = String(hoje.getMonth() + 1).padStart(2, "0");
+  const dia = String(hoje.getDate()).padStart(2, "0");
+  return ano + "-" + mes + "-" + dia;
+}
 
-function mostrarDemanda(demanda) {
+function mostrarDemandaNaTela(demanda) {
   demandaAtual = demanda;
 
-  tituloDemanda.textContent = "Demanda #" + demanda.id + " - " + demanda.titulo;
-  valorClassificacao.textContent = demanda.tipo;
-  valorPrioridade.textContent = demanda.prioridade;
-  valorStatus.textContent = demanda.status;
-  valorDescricao.textContent = demanda.descricao;
-  valorProjeto.textContent = demanda.projetoNome;
-  valorResponsavel.textContent = demanda.responsavelNome || "Sem responsável";
-  valorCriadoEm.textContent = formatarDataHora(demanda.dataCriacao);
-  valorPrazo.textContent = formatarData(demanda.prazoFinalizacao);
-  valorAtualizacao.textContent = formatarDataHora(demanda.dataUltimaAtualizacao);
+  tituloDemanda.innerText = "Demanda #" + demanda.id + " - " + demanda.titulo;
+  valorClassificacao.innerText = demanda.tipo;
+  valorPrioridade.innerText = demanda.prioridade;
+  valorStatus.innerText = demanda.status;
+  valorDescricao.innerText = demanda.descricao;
+  valorProjeto.innerText = demanda.projetoNome;
+  valorResponsavel.innerText = demanda.responsavelNome || "Sem responsável";
+  valorCriadoEm.innerText = formatarDataHora(demanda.dataCriacao);
+  valorPrazo.innerText = formatarData(demanda.prazoFinalizacao);
+  valorAtualizacao.innerText = formatarDataHora(demanda.dataUltimaAtualizacao);
 
-  // O botão de editar só aparece para quem tem permissão (a API decide)
-  if (demanda.permissoes.podeEditar) {
+  // Mostra ou esconde o botão de editar conforme a permissão retornada pela API
+  if (demanda.permissoes && demanda.permissoes.podeEditar) {
     editarDemanda.classList.remove("oculto");
   } else {
     editarDemanda.classList.add("oculto");
     campoFormEdicao.classList.add("oculto");
   }
 
-  montarOpcoesDeStatus(demanda.permissoes.transicoesPermitidas);
-}
-
-// Mostra só os status para os quais o usuário pode mover a demanda
-function montarOpcoesDeStatus(opcoes) {
+  // Preenche o select de mudança de status
   campoNovoStatus.innerHTML = "";
   limparErro(erroStatus);
 
-  if (opcoes.length === 0) {
+  const opcoesStatus = demanda.permissoes ? demanda.permissoes.transicoesPermitidas : [];
+
+  if (opcoesStatus.length === 0) {
     secaoStatus.classList.add("oculto");
-    return;
+  } else {
+    for (let i = 0; i < opcoesStatus.length; i++) {
+      const statusOpcao = opcoesStatus[i];
+      const option = document.createElement("option");
+      option.value = statusOpcao;
+      option.innerText = statusOpcao === "Cancelada" ? "Cancelar demanda" : statusOpcao;
+      campoNovoStatus.appendChild(option);
+    }
+    secaoStatus.classList.remove("oculto");
   }
-
-  for (const status of opcoes) {
-    const opcao = document.createElement("option");
-    opcao.value = status;
-    opcao.textContent = status === "Cancelada" ? "Cancelar demanda" : status;
-    campoNovoStatus.appendChild(opcao);
-  }
-
-  secaoStatus.classList.remove("oculto");
 }
 
 async function carregarComentarios() {
   try {
-    const dados = await chamarApi("/demandas/" + idDemanda + "/comentarios");
+    const resposta = await fetch(URL_API + "/demandas/" + idDemanda + "/comentarios", {
+      headers: { "X-Usuario-Id": idUsuarioLogado }
+    });
+    const dados = await resposta.json();
 
     listaComentarios.innerHTML = "";
 
-    if (dados.comentarios.length === 0) {
-      listaComentarios.appendChild(criarParagrafo("Nenhum comentário ainda."));
+    if (!resposta.ok) {
+      const pErro = document.createElement("p");
+      pErro.innerText = dados.mensagem || "Erro ao carregar comentários.";
+      listaComentarios.appendChild(pErro);
       return;
     }
 
-    for (const c of dados.comentarios) {
+    if (dados.comentarios.length === 0) {
+      const pVazio = document.createElement("p");
+      pVazio.innerText = "Nenhum comentário ainda.";
+      listaComentarios.appendChild(pVazio);
+      return;
+    }
+
+    for (let i = 0; i < dados.comentarios.length; i++) {
+      const c = dados.comentarios[i];
+
       const item = document.createElement("div");
       item.className = "comentario-item";
 
       const autor = document.createElement("p");
       autor.className = "comentario-autor";
-      autor.textContent = c.usuarioNome;
+      autor.innerText = c.usuarioNome;
 
       const data = document.createElement("span");
       data.className = "comentario-data";
-      data.textContent = formatarDataHora(c.dataCriacao);
+      data.innerText = formatarDataHora(c.dataCriacao);
       autor.appendChild(data);
 
-      const texto = criarParagrafo(c.texto);
+      const texto = document.createElement("p");
       texto.className = "comentario-texto";
+      texto.innerText = c.texto;
 
       item.appendChild(autor);
       item.appendChild(texto);
       listaComentarios.appendChild(item);
     }
   } catch (erro) {
-    listaComentarios.innerHTML = "";
-    listaComentarios.appendChild(criarParagrafo("Não foi possível carregar os comentários: " + erro.message));
+    listaComentarios.innerHTML = "<p>Não foi possível carregar os comentários.</p>";
   }
 }
 
 async function carregarHistorico() {
   try {
-    const dados = await chamarApi("/demandas/" + idDemanda + "/historico");
+    const resposta = await fetch(URL_API + "/demandas/" + idDemanda + "/historico", {
+      headers: { "X-Usuario-Id": idUsuarioLogado }
+    });
+    const dados = await resposta.json();
 
     listaHistorico.innerHTML = "";
 
-    for (const h of dados.historico) {
-      listaHistorico.appendChild(criarParagrafo(formatarDataHora(h.dataAlteracao) + " - " + h.descricao));
+    if (resposta.ok && dados.historico) {
+      for (let i = 0; i < dados.historico.length; i++) {
+        const h = dados.historico[i];
+        const p = document.createElement("p");
+        p.innerText = formatarDataHora(h.dataAlteracao) + " - " + h.descricao;
+        listaHistorico.appendChild(p);
+      }
     }
 
-    // A criação da demanda não gera linha no histórico do banco, então mostramos a partir da data de criação.
     if (demandaAtual) {
-      listaHistorico.appendChild(criarParagrafo(formatarDataHora(demandaAtual.dataCriacao) + " - Demanda criada."));
+      const pCriacao = document.createElement("p");
+      pCriacao.innerText = formatarDataHora(demandaAtual.dataCriacao) + " - Demanda criada.";
+      listaHistorico.appendChild(pCriacao);
     }
   } catch (erro) {
-    listaHistorico.innerHTML = "";
-    listaHistorico.appendChild(criarParagrafo("Não foi possível carregar o histórico: " + erro.message));
+    listaHistorico.innerHTML = "<p>Não foi possível carregar o histórico.</p>";
   }
 }
 
 async function iniciarTela() {
-  if (!idDemanda || !/^\d+$/.test(idDemanda)) {
-    mostrarErro(erroGeral, "Nenhuma demanda foi selecionada. Abra os detalhes pela listagem de demandas.");
-    return;
-  }
-
-  if (!obterUsuarioLogado()) {
-    mostrarErro(erroGeral, "Você precisa estar logado para ver esta demanda. Volte para a tela de login.");
-    return;
-  }
+  limparErro(erroGeral);
 
   try {
-    const demanda = await chamarApi("/demandas/" + idDemanda);
+    const resposta = await fetch(URL_API + "/demandas/" + idDemanda, {
+      headers: { "X-Usuario-Id": idUsuarioLogado }
+    });
+    const dados = await resposta.json();
 
-    mostrarDemanda(demanda);
+    if (!resposta.ok) {
+      mostrarErro(erroGeral, dados.mensagem || "Erro ao carregar a demanda.");
+      return;
+    }
+
+    mostrarDemandaNaTela(dados);
     conteudoDemanda.classList.remove("oculto");
 
-    await Promise.all([carregarComentarios(), carregarHistorico()]);
+    await carregarComentarios();
+    await carregarHistorico();
   } catch (erro) {
-    mostrarErro(erroGeral, erro.message);
+    mostrarErro(
+      erroGeral,
+      "Não foi possível conectar ao servidor. Verifique se o backend está rodando."
+    );
   }
 }
 
-
-/* ------------------------------------------------------------------ */
-/* Comentários                                                         */
-/* ------------------------------------------------------------------ */
-
 comentario.addEventListener("input", function somarCaractere() {
-
-  let tamanho = comentario.value.length;
-
-  contador.textContent = tamanho + "/300";
-
+  const tamanho = comentario.value.length;
+  contador.innerText = tamanho + "/300";
 });
 
-
 formComentario.addEventListener("submit", async function validador(event) {
-
   event.preventDefault();
-
   limparErro(erroComentario);
 
   const texto = comentario.value.trim();
+  const tamanho = comentario.value.length;
 
-  // Validações do navegador (o servidor valida de novo)
   if (texto === "") {
     mostrarErro(erroComentario, "ERRO! Digite um comentário antes de enviar.");
     return;
   }
 
-  if (texto.length > 300) {
+  if (tamanho > 300) {
     mostrarErro(erroComentario, "ERRO! O comentário não pode ter mais que 300 caracteres.");
     return;
   }
@@ -335,30 +280,33 @@ formComentario.addEventListener("submit", async function validador(event) {
   botaoComentario.disabled = true;
 
   try {
-    await chamarApi("/demandas/" + idDemanda + "/comentarios", {
+    const resposta = await fetch(URL_API + "/demandas/" + idDemanda + "/comentarios", {
       method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Usuario-Id": idUsuarioLogado
+      },
       body: JSON.stringify({ texto: texto })
     });
 
-    comentario.value = "";
-    contador.textContent = "0/300";
+    const dados = await resposta.json();
 
+    if (!resposta.ok) {
+      mostrarErro(erroComentario, "ERRO! " + (dados.mensagem || "Falha ao salvar comentário."));
+      return;
+    }
+
+    comentario.value = "";
+    contador.innerText = "0/300";
     await carregarComentarios();
   } catch (erro) {
-    mostrarErro(erroComentario, "ERRO! " + erro.message);
+    mostrarErro(erroComentario, "ERRO! Não foi possível conectar ao servidor.");
   } finally {
     botaoComentario.disabled = false;
   }
-
 });
 
-
-/* ------------------------------------------------------------------ */
-/* Mudança de status e cancelamento                                    */
-/* ------------------------------------------------------------------ */
-
 botaoAtualizarStatus.addEventListener("click", async function () {
-
   limparErro(erroStatus);
 
   const novoStatus = campoNovoStatus.value;
@@ -368,66 +316,75 @@ botaoAtualizarStatus.addEventListener("click", async function () {
     return;
   }
 
-  // Cancelar não tem volta, então pedimos confirmação
-  if (novoStatus === "Cancelada" && !confirm("Deseja realmente cancelar esta demanda? Essa ação não pode ser desfeita.")) {
-    return;
+  if (novoStatus === "Cancelada") {
+    const confirmou = confirm("Deseja realmente cancelar esta demanda?");
+    if (!confirmou) {
+      return;
+    }
   }
 
   botaoAtualizarStatus.disabled = true;
 
   try {
-    const dados = await chamarApi("/demandas/" + idDemanda + "/status", {
+    const resposta = await fetch(URL_API + "/demandas/" + idDemanda + "/status", {
       method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Usuario-Id": idUsuarioLogado
+      },
       body: JSON.stringify({ status: novoStatus })
     });
 
-    mostrarDemanda(dados.demanda);
-    mostrarSucesso(dados.mensagem);
+    const dados = await resposta.json();
 
+    if (!resposta.ok) {
+      mostrarErro(erroStatus, "ERRO! " + (dados.mensagem || "Não foi possível alterar o status."));
+      return;
+    }
+
+    mostrarDemandaNaTela(dados.demanda);
+    mostrarSucesso(dados.mensagem);
     await carregarHistorico();
   } catch (erro) {
-    mostrarErro(erroStatus, "ERRO! " + erro.message);
+    mostrarErro(erroStatus, "ERRO! Falha de conexão com o servidor.");
   } finally {
     botaoAtualizarStatus.disabled = false;
   }
-
 });
 
-
-/* ------------------------------------------------------------------ */
-/* Edição da demanda                                                   */
-/* ------------------------------------------------------------------ */
-
-// Busca os usuários vinculados ao projeto para preencher a lista de responsáveis
 async function carregarResponsaveis() {
-  const dados = await chamarApi("/demandas/" + idDemanda + "/responsaveis");
+  try {
+    const resposta = await fetch(URL_API + "/demandas/" + idDemanda + "/responsaveis", {
+      headers: { "X-Usuario-Id": idUsuarioLogado }
+    });
+    const dados = await resposta.json();
 
-  campoResponsavel.innerHTML = "";
+    campoResponsavel.innerHTML = "";
 
-  const semResponsavel = document.createElement("option");
-  semResponsavel.value = "";
-  semResponsavel.textContent = "Sem responsável";
-  campoResponsavel.appendChild(semResponsavel);
+    const opcaoSemResponsavel = document.createElement("option");
+    opcaoSemResponsavel.value = "";
+    opcaoSemResponsavel.innerText = "Sem responsável";
+    campoResponsavel.appendChild(opcaoSemResponsavel);
 
-  for (const usuario of dados.responsaveis) {
-    const opcao = document.createElement("option");
-    opcao.value = String(usuario.id);
-    opcao.textContent = usuario.nome + " (" + usuario.perfil + ")";
-    campoResponsavel.appendChild(opcao);
+    if (resposta.ok && dados.responsaveis) {
+      for (let i = 0; i < dados.responsaveis.length; i++) {
+        const u = dados.responsaveis[i];
+        const opcao = document.createElement("option");
+        opcao.value = String(u.id);
+        opcao.innerText = u.nome + " (" + u.perfil + ")";
+        campoResponsavel.appendChild(opcao);
+      }
+    }
+  } catch (erro) {
+    mostrarErro(erroEdicao, "ERRO! Não foi possível carregar a lista de responsáveis.");
   }
 }
 
 editarDemanda.addEventListener("click", async function () {
-
   limparErro(erroEdicao);
 
-  try {
-    await carregarResponsaveis();
-  } catch (erro) {
-    mostrarErro(erroEdicao, "ERRO! " + erro.message);
-  }
+  await carregarResponsaveis();
 
-  // Preenche o formulário com os valores atuais da demanda
   campoTitulo.value = demandaAtual.titulo;
   campoDescricao.value = demandaAtual.descricao;
   campoClassificacao.value = demandaAtual.tipo;
@@ -436,23 +393,15 @@ editarDemanda.addEventListener("click", async function () {
   campoPrazo.value = demandaAtual.prazoFinalizacao || "";
 
   campoFormEdicao.classList.remove("oculto");
-
 });
-
 
 cancelarEdicao.addEventListener("click", function () {
-
   campoFormEdicao.classList.add("oculto");
-
   limparErro(erroEdicao);
-
 });
 
-
 formEdicao.addEventListener("submit", async function (event) {
-
   event.preventDefault();
-
   limparErro(erroEdicao);
 
   const titulo = campoTitulo.value.trim();
@@ -462,14 +411,8 @@ formEdicao.addEventListener("submit", async function (event) {
   const responsavel = campoResponsavel.value;
   const prazo = campoPrazo.value;
 
-  // Validações do navegador (o servidor valida de novo)
   if (titulo === "") {
     mostrarErro(erroEdicao, "ERRO! O título não pode ficar vazio.");
-    return;
-  }
-
-  if (titulo.length > 150) {
-    mostrarErro(erroEdicao, "ERRO! O título pode ter no máximo 150 caracteres.");
     return;
   }
 
@@ -478,34 +421,26 @@ formEdicao.addEventListener("submit", async function (event) {
     return;
   }
 
-  if (descricao.length > 500) {
-    mostrarErro(erroEdicao, "ERRO! A descrição pode ter no máximo 500 caracteres.");
-    return;
-  }
-
   if (prazo === "") {
     mostrarErro(erroEdicao, "ERRO! Escolha um prazo para a demanda.");
     return;
   }
 
-  // Só reclama de data passada se o prazo foi alterado
-  if (prazo !== demandaAtual.prazoFinalizacao && prazo < dataDeHoje()) {
-    mostrarErro(erroEdicao, "ERRO! O novo prazo não pode ser anterior à data atual.");
+  if (prazo !== demandaAtual.prazoFinalizacao && prazo <= obterDataDeHoje()) {
+    mostrarErro(erroEdicao, "ERRO! O novo prazo deve ser maior que a data atual.");
     return;
   }
 
-  // Evita chamar a API quando nada mudou
   const responsavelAtual = demandaAtual.responsavelId ? String(demandaAtual.responsavelId) : "";
 
-  const nadaMudou =
+  if (
     titulo === demandaAtual.titulo &&
     descricao === demandaAtual.descricao &&
     classificacao === demandaAtual.tipo &&
     prioridade === demandaAtual.prioridade &&
     responsavel === responsavelAtual &&
-    prazo === demandaAtual.prazoFinalizacao;
-
-  if (nadaMudou) {
+    prazo === demandaAtual.prazoFinalizacao
+  ) {
     mostrarErro(erroEdicao, "ERRO! Altere pelo menos um campo antes de salvar.");
     return;
   }
@@ -513,9 +448,12 @@ formEdicao.addEventListener("submit", async function (event) {
   salvarEdicao.disabled = true;
 
   try {
-    // O servidor confere permissão, feriado nacional (API externa) e grava o histórico
-    const dados = await chamarApi("/demandas/" + idDemanda, {
+    const resposta = await fetch(URL_API + "/demandas/" + idDemanda, {
       method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Usuario-Id": idUsuarioLogado
+      },
       body: JSON.stringify({
         titulo: titulo,
         descricao: descricao,
@@ -526,19 +464,24 @@ formEdicao.addEventListener("submit", async function (event) {
       })
     });
 
-    mostrarDemanda(dados.demanda);
+    const dados = await resposta.json();
+
+    if (!resposta.ok) {
+      mostrarErro(erroEdicao, "ERRO! " + (dados.mensagem || "Erro ao salvar alterações."));
+      return;
+    }
+
+    mostrarDemandaNaTela(dados.demanda);
     campoFormEdicao.classList.add("oculto");
     mostrarSucesso(dados.mensagem);
 
     await carregarHistorico();
   } catch (erro) {
-    mostrarErro(erroEdicao, "ERRO! " + erro.message);
+    mostrarErro(erroEdicao, "ERRO! Falha ao conectar com o servidor.");
   } finally {
     salvarEdicao.disabled = false;
   }
-
 });
 
-
-// Começa carregando os dados da demanda
+// Inicializa a página carregando a demanda
 iniciarTela();
