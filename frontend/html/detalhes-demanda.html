@@ -1,7 +1,7 @@
 <!--
   Autor: João Pedro Silveira de Souza
   Componente: Projeto Integrador II - PUC-Campinas
-  Descrição: Tela de Detalhes de Demanda
+  Descrição: Tela de Detalhes de Demanda (os dados são carregados da API pelo JavaScript)
 -->
 
 <!doctype html>
@@ -32,181 +32,179 @@
 
     <main class="container">
 
-      <div class="identificacao-demanda">
+      <!-- Mensagens da tela inteira: erros ao carregar (401, 403, 404...) e avisos de sucesso -->
+      <div id="erroGeral" class="oculto"></div>
+      <div id="mensagemSucesso" class="oculto"></div>
 
-        <h2>Demanda #01 - Desenvolvimento Tela de Login</h2>
+      <!-- Todo o conteúdo fica escondido até a demanda ser carregada da API -->
+      <div id="conteudoDemanda" class="oculto">
 
-        <div class="classificacao-demanda">
+        <div class="identificacao-demanda">
 
-          <h5 class="tipo">
-            Classificação: <span id="valorClassificacao">Tarefa</span>
-          </h5>
+          <h2 id="tituloDemanda">Carregando...</h2>
 
-          <h5 class="prioridade">
-            Prioridade: <span id="valorPrioridade">Crítica</span>
-          </h5>
+          <div class="classificacao-demanda">
 
-          <h5 class="status">
-            Status: <span id="valorStatus">Em andamento</span>
-          </h5>
+            <h5 class="tipo">
+              Classificação: <span id="valorClassificacao">-</span>
+            </h5>
 
-        </div>
+            <h5 class="prioridade">
+              Prioridade: <span id="valorPrioridade">-</span>
+            </h5>
 
-      </div>
+            <h5 class="status">
+              Status: <span id="valorStatus">-</span>
+            </h5>
 
-      <div class="secao-descricao">
-
-        <div class="descricao">
-
-          <h3>Descrição</h3>
-
-          <p>
-            Implementar a tela de login responsiva do sistema de demandas
-            utilizando React e Tailwind CSS para o front-end, conectada a uma
-            API Node.js/Express. O componente deve realizar a validação de
-            e-mail e senha no cliente e autenticar o usuário via tokens JWT
-            integrados ao banco PostgreSQL. É necessário exibir mensagens de
-            erro em tempo real para campos inválidos.
-          </p>
-
-        </div>
-
-      </div>
-
-      <div class="secao-projeto">
-
-        <div class="projeto">
-
-          <div class="informacao-projeto">
-            <h4>Projeto</h4>
-            <p>Sistema financeiro</p>
-          </div>
-
-          <div class="informacao-projeto">
-            <h4>Responsável</h4>
-            <p>João Pedro</p>
-          </div>
-
-          <div class="informacao-projeto">
-            <h4>Criado em</h4>
-            <p>28/08/2026</p>
-          </div>
-
-          <div class="informacao-projeto">
-            <h4>Prazo</h4>
-            <p id="valorPrazo">04/09/2026</p>
-          </div>
-
-          <div class="informacao-projeto">
-            <h4>Última atualização</h4>
-            <p>29/08/2026</p>
           </div>
 
         </div>
 
-      </div>
+        <div class="secao-descricao">
 
-      <div class="secao-botao">
+          <div class="descricao">
 
-        <a class="botao-editar-demanda" id="editarDemanda">
-          Editar demanda
-        </a>
+            <h3>Descrição</h3>
 
-      </div>
-
-      <div id="secao-formulario-edicao-demanda" class="oculto">
-
-        <form id="formEditarDemanda">
-
-          <label for="classificacao" class="escolha-classificacao">
-            Escolha a classificação da demanda:
-          </label>
-
-          <select name="classificacao" id="classificacao">
-            <option value="Tarefa">Tarefa</option>
-            <option value="Defeito">Defeito</option>
-            <option value="Melhoria">Melhoria</option>
-            <option value="Documentação">Documentação</option>
-          </select>
-
-          <label for="prioridade" class="escolha-prioridade">
-            Escolha a prioridade da demanda:
-          </label>
-
-          <select name="prioridade" id="prioridade">
-            <option value="Crítica">Crítica</option>
-            <option value="Alta">Alta</option>
-            <option value="Média">Média</option>
-            <option value="Baixa">Baixa</option>
-          </select>
-
-          <label for="status" class="escolha-status">
-            Escolha o status da demanda:
-          </label>
-
-          <select name="status" id="status">
-            <option value="Aberta">Aberta</option>
-            <option value="Em andamento" selected>Em Andamento</option>
-            <option value="Em revisão">Em Revisão</option>
-            <option value="Concluída">Concluída</option>
-            <option value="Cancelada">Cancelada</option>
-          </select>
-
-          <label for="prazoEdicao" class="escolha-prazo">
-            Escolha o prazo da demanda:
-          </label>
-
-          <input
-            type="date"
-            id="prazoEdicao"
-            name="prazoEdicao"
-            value="2026-09-04"
-          />
-
-          <div id="erroEdicao" class="oculto"></div>
-
-          <div class="botoes-edicao">
-
-            <button type="button" id="cancelarEdicao">
-              Cancelar
-            </button>
-
-            <button type="submit">
-              Salvar alterações
-            </button>
+            <p id="valorDescricao"></p>
 
           </div>
 
-        </form>
+        </div>
 
-      </div>
+        <div class="secao-projeto">
 
-      <div class="secao-comentarios">
+          <div class="projeto">
 
-        <div class="comentarios">
-
-          <h3>Comentários</h3>
-
-          <form id="formComentarios">
-
-            <label for="comentario"></label>
-
-            <textarea
-              name="comentario"
-              id="comentario"
-              placeholder="Digite seu comentário aqui: "
-            ></textarea>
-
-            <div class="contador">
-              <p id="contador">0/300</p>
+            <div class="informacao-projeto">
+              <h4>Projeto</h4>
+              <p id="valorProjeto">-</p>
             </div>
 
-            <div id="erroComentario" class="oculto"></div>
+            <div class="informacao-projeto">
+              <h4>Responsável</h4>
+              <p id="valorResponsavel">-</p>
+            </div>
 
-            <div class="secao-botao-comentarios">
+            <div class="informacao-projeto">
+              <h4>Criado em</h4>
+              <p id="valorCriadoEm">-</p>
+            </div>
 
-              <button type="submit" class="botao-comentario">
-                Enviar Comentário
+            <div class="informacao-projeto">
+              <h4>Prazo</h4>
+              <p id="valorPrazo">-</p>
+            </div>
+
+            <div class="informacao-projeto">
+              <h4>Última atualização</h4>
+              <p id="valorAtualizacao">-</p>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- Mudança de status: só mostra as opções que o perfil do usuário pode usar (vêm da API) -->
+        <div id="secaoStatus" class="secao-status oculto">
+
+          <label for="novoStatus" class="rotulo-edicao">Alterar status:</label>
+
+          <select id="novoStatus" name="novoStatus"></select>
+
+          <button type="button" id="botaoAtualizarStatus" class="botao-status">
+            Atualizar status
+          </button>
+
+          <div id="erroStatus" class="oculto"></div>
+
+        </div>
+
+        <div class="secao-botao">
+
+          <a class="botao-editar-demanda oculto" id="editarDemanda">
+            Editar demanda
+          </a>
+
+        </div>
+
+        <div id="secao-formulario-edicao-demanda" class="oculto">
+
+          <form id="formEditarDemanda">
+
+            <label for="tituloEdicao" class="rotulo-edicao">
+              Título da demanda:
+            </label>
+
+            <input
+              type="text"
+              id="tituloEdicao"
+              name="tituloEdicao"
+              maxlength="150"
+            />
+
+            <label for="descricaoEdicao" class="rotulo-edicao">
+              Descrição da demanda:
+            </label>
+
+            <textarea
+              id="descricaoEdicao"
+              name="descricaoEdicao"
+              maxlength="500"
+              rows="5"
+            ></textarea>
+
+            <label for="classificacao" class="escolha-classificacao">
+              Escolha a classificação da demanda:
+            </label>
+
+            <select name="classificacao" id="classificacao">
+              <option value="Tarefa">Tarefa</option>
+              <option value="Defeito">Defeito</option>
+              <option value="Melhoria">Melhoria</option>
+              <option value="Documentação">Documentação</option>
+            </select>
+
+            <label for="prioridade" class="escolha-prioridade">
+              Escolha a prioridade da demanda:
+            </label>
+
+            <select name="prioridade" id="prioridade">
+              <option value="Crítica">Crítica</option>
+              <option value="Alta">Alta</option>
+              <option value="Média">Média</option>
+              <option value="Baixa">Baixa</option>
+            </select>
+
+            <label for="responsavelEdicao" class="rotulo-edicao">
+              Escolha o responsável pela demanda:
+            </label>
+
+            <select name="responsavelEdicao" id="responsavelEdicao">
+              <option value="">Sem responsável</option>
+            </select>
+
+            <label for="prazoEdicao" class="escolha-prazo">
+              Escolha o prazo da demanda:
+            </label>
+
+            <input
+              type="date"
+              id="prazoEdicao"
+              name="prazoEdicao"
+            />
+
+            <div id="erroEdicao" class="oculto"></div>
+
+            <div class="botoes-edicao">
+
+              <button type="button" id="cancelarEdicao">
+                Cancelar
+              </button>
+
+              <button type="submit" id="salvarEdicao">
+                Salvar alterações
               </button>
 
             </div>
@@ -215,21 +213,55 @@
 
         </div>
 
-      </div>
+        <div class="secao-comentarios">
 
-      <div class="secao-historico">
+          <div class="comentarios">
 
-        <div class="historico">
+            <h3>Comentários</h3>
 
-          <h3>Histórico</h3>
+            <form id="formComentarios">
 
-          <p>
-            29/08/2026 - Demanda atualizada.
-          </p>
+              <label for="comentario"></label>
 
-          <p>
-            28/08/2026 - Demanda criada.
-          </p>
+              <textarea
+                name="comentario"
+                id="comentario"
+                placeholder="Digite seu comentário aqui: "
+              ></textarea>
+
+              <div class="contador">
+                <p id="contador">0/300</p>
+              </div>
+
+              <div id="erroComentario" class="oculto"></div>
+
+              <div class="secao-botao-comentarios">
+
+                <button type="submit" id="botaoComentario" class="botao-comentario">
+                  Enviar Comentário
+                </button>
+
+              </div>
+
+            </form>
+
+            <!-- Lista de comentários vinda do banco (mais recentes primeiro) -->
+            <div id="listaComentarios"></div>
+
+          </div>
+
+        </div>
+
+        <div class="secao-historico">
+
+          <div class="historico">
+
+            <h3>Histórico</h3>
+
+            <!-- Histórico vindo do banco (mais recentes primeiro) -->
+            <div id="listaHistorico"></div>
+
+          </div>
 
         </div>
 
