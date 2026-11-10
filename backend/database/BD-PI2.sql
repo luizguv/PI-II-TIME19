@@ -77,7 +77,7 @@ CREATE TABLE comentarios (
     id_comentario NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     id_demanda NUMBER NOT NULL,
     id_usuario NUMBER NOT NULL,
-    texto VARCHAR2(3000) NOT NULL,
+    texto VARCHAR2(300) NOT NULL,
     data_comentario TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     
     -- chaves estrangeiras
