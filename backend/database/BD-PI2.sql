@@ -14,6 +14,7 @@ CREATE TABLE usuarios (
         perfil IN ('administrador', 'lider de projeto', 'membro da equipe')
     )
 );
+/
 
 -- criação da tabela projetos
 -- armazena os projetos nos quais as demandas serão vinculadas
@@ -21,6 +22,7 @@ CREATE TABLE projetos(
     id_projeto NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     nome VARCHAR2(100) NOT NULL
 );
+/
 
 -- criação da tabela associativa necessária para atender às permissões de Líder de Projeto e Membro da Equipe 
 -- que só podem visualizar projetos aos quais estão vinculados
@@ -31,6 +33,7 @@ CREATE TABLE projeto_usuarios (
   CONSTRAINT pk_projeto_usuarios PRIMARY KEY (id_projeto,id_usuario)
 )
 /
+
 CREATE TABLE demandas (
     id_demanda NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     titulo VARCHAR2(150) NOT NULL,
@@ -66,6 +69,7 @@ CREATE TABLE demandas (
         status IN ('aberta', 'em andamento', 'em revisão', 'concluida', 'cancelada')
     )
 );
+/
 
 -- Criação da tabela Comentarios
 -- Armazena os comentário vinculadas a uma demanda e um usuário
@@ -106,5 +110,44 @@ CREATE OR REPLACE TRIGGER pi2_demanda_sem_exclusao
 BEFORE DELETE ON demandas
 BEGIN
   RAISE_APPLICATION_ERROR(-20002, 'Use cancelamento; demandas não podem ser excluídas.');
+END;
+/
+
+-- trigger que impede a inserção de uma demanda com o prazo de finalização da demanda ser anterior a data atual
+CREATE OR REPLACE TRIGGER TRG_VALIDA_PRAZO_DEMANDA
+BEFORE INSERT ON demandas
+FOR EACH ROW
+BEGIN
+    IF :NEW.prazo_finalizacao < SYSDATE THEN
+        RAISE_APPLICATION_ERROR(-20003, 'O prazo de finalização da demanda não pode ser inferior a hoje.');
+    END IF;
+END;
+/
+
+-- trigger que valida o ciclo de vida do status da demanda
+CREATE OR REPLACE TRIGGER TRG_DEMANDAS_REGRAS_CICLO
+BEFORE INSERT OR UPDATE OR DELETE ON demandas
+FOR EACH ROW
+BEGIN
+    IF INSERTING THEN 
+        :NEW.status := 'aberta';
+        :NEW.data_criacao := SYSTIMESTAMP;
+        :NEW.data_atualizacao := SYSTIMESTAMP;
+    END IF;
+
+    IF UPDATING THEN
+        :NEW.data_atualizacao := SYSTIMESTAMP;
+        IF :OLD.status != :NEW.status THEN
+            IF :OLD.status IN ('concluida', 'cancelada') then
+                RAISE_APPLICATION_ERROR(-20004, 'Demandas concluídas ou canceladas não podem mudar de status.');
+            end if;
+            if :old.status IN ('em andamento', 'em revisão') and :new.status = 'aberta' then
+                RAISE_APPLICATION_ERROR(-20005, 'Uma demanda "Em andamento" ou "Em revisão" não pode retornar para "Aberta".');
+            end if;
+            if :new.status = 'concluida' and :old.status != 'em revisão' then
+                RAISE_APPLICATION_ERROR(-20006, 'Para a demanda ser concluída, ela DEVE estar no status "Em revisão".');
+            end if;
+        END IF;
+    END IF;
 END;
 /
