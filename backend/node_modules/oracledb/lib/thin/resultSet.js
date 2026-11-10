@@ -1,0 +1,136 @@
+// Copyright (c) 2022, 2026, Oracle and/or its affiliates.
+
+//-----------------------------------------------------------------------------
+//
+// This software is dual-licensed to you under the Universal Permissive License
+// (UPL) 1.0 as shown at https://oss.oracle.com/licenses/upl and Apache License
+// 2.0 as shown at http://www.apache.org/licenses/LICENSE-2.0. You may choose
+// either license.
+//
+// If you elect to accept the software under the Apache License, Version 2.0,
+// the following applies:
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+//-----------------------------------------------------------------------------
+
+'use strict';
+
+const ResultSetImpl = require('../impl/resultset.js');
+const ExecuteMessage = require('./protocol/messages/execute.js');
+const FetchMessage = require('./protocol/messages/fetch.js');
+
+class ThinResultSetImpl extends ResultSetImpl {
+
+  //---------------------------------------------------------------------------
+  // _fetchMoreRows()
+  //
+  // Fetches more rows from the database. This is done by means of the full
+  // OAL8 RPC if needed; otherwise, the simpler OFETCH RPC is used.
+  //---------------------------------------------------------------------------
+  async _fetchMoreRows(options) {
+    // prepare the prefetch value for execute
+    options.prefetchRows = this.options.prefetchRows;
+
+    // execute/fetch
+    const cls = (this.statement.requiresFullExecute) ?
+      ExecuteMessage : FetchMessage;
+    const message = new cls(this.connection, this.statement, options, this);
+    await this.connection._protocol._processMessage(message);
+    this.statement.requiresFullExecute = false;
+  }
+
+  //---------------------------------------------------------------------------
+  // Set the metadata info for a new resultSet object
+  //---------------------------------------------------------------------------
+  _resultSetNew(connection, statement, options) {
+    this.connection = connection;
+    this.statement = statement;
+    this._nestedCursorIndices = [];
+    this.options = options;
+    this.prefetchRowsProcessed = false;
+    this.statement.bufferRowIndex = 0;
+  }
+
+  //---------------------------------------------------------------------------
+  // Returns rows fetched to the common layer in array format. The caller
+  // guarantees that numRowsFetched does not exceed the rows remaining in the
+  // statement buffer. This method consumes those rows by advancing
+  // bufferRowIndex.
+  //---------------------------------------------------------------------------
+  _processRows(numRowsFetched) {
+    const rows = [];
+
+    // Index of the first unconsumed row in the statement buffer
+    const bufferRowIndex = this.statement.bufferRowIndex;
+
+    // Get the rows
+    for (let row = bufferRowIndex; row < bufferRowIndex + numRowsFetched; row++) {
+      const rowObj = [];
+      for (let col = 0; col < this.statement.numQueryVars; col++) {
+        rowObj.push(this.statement.queryVars[col].values[row]);
+      }
+      rows.push(rowObj);
+    }
+
+    // Consume the rows returned above; numRowsFetched is never greater than
+    // (bufferRowCount - bufferRowIndex) when this method is called
+    this.statement.bufferRowIndex += numRowsFetched;
+
+    // An empty buffer is reset so that the next fetch starts at index zero
+    if (this.statement.bufferRowIndex === this.statement.bufferRowCount) {
+      this.statement.bufferRowCount = 0;
+      this.statement.bufferRowIndex = 0;
+    }
+    return rows;
+  }
+
+  //---------------------------------------------------------------------------
+  // Returns the statement to cache so that it can be used later
+  //---------------------------------------------------------------------------
+  close() {
+    this.connection._returnStatement(this.statement);
+  }
+
+  //---------------------------------------------------------------------------
+  // getRows()
+  //
+  // Fetches the specified number of rows from the database and returns them to
+  // the common layer for processing.
+  //---------------------------------------------------------------------------
+  async getRows(numRows, options) {
+    const numRowsRequested = numRows || this.options.fetchArraySize;
+
+    // Number of rows currently available, starting at bufferRowIndex
+    const rowsInBuffer = this.statement.bufferRowCount -
+      this.statement.bufferRowIndex;
+    if (rowsInBuffer >= numRowsRequested)
+      return this._processRows(numRowsRequested);
+
+    // We fetch for the required number of rows
+    if (this.statement.moreRowsToFetch) {
+      options.fetchArraySize = numRowsRequested - rowsInBuffer;
+      await this._fetchMoreRows(options);
+    }
+
+    // All rows currently remaining in the buffer are returned in this path
+    const numRowsFetched = this.statement.bufferRowCount -
+      this.statement.bufferRowIndex;
+
+    // process the rows fetched
+    return this._processRows(numRowsFetched);
+  }
+
+}
+
+module.exports = ThinResultSetImpl;

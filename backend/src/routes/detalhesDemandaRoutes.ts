@@ -2,7 +2,7 @@
  * Autor: João Pedro Silveira de Souza
  * Componente: Projeto Integrador II - PUC-Campinas
  * Descrição: Registro das rotas da tela de Detalhes de Demanda
- */
+*/
 
 import { Router } from "express";
 import {
