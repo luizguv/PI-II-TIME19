@@ -13,7 +13,7 @@ CREATE TABLE usuarios (
     
     -- Checa se o tipo do perfil está entre Administrador, Lider de projeto ou Membro da Equipe
     CONSTRAINT check_usuario_perfil CHECK (
-        perfil IN ('Administrador', 'Líder de Projeto', 'Membro da Equipe')
+        perfil IN ('administrador', 'lider de projeto', 'membro da equipe')
     )
 );
 
@@ -45,8 +45,9 @@ CREATE TABLE demandas (
     tipo_demanda VARCHAR2(30) NOT NULL,
     id_responsavel NUMBER DEFAULT NULL,
     id_projeto NUMBER NOT NULL,
+    id_criador NUMBER NOT NULL,
     prioridade VARCHAR2(20) NOT NULL,
-    status VARCHAR2(50) DEFAULT 'Aberta' NOT NULL,
+    status VARCHAR2(50) DEFAULT 'aberta' NOT NULL,
     data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     data_atualizacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     prazo_finalizacao DATE,
@@ -56,18 +57,20 @@ CREATE TABLE demandas (
     projetos (id_projeto),
     CONSTRAINT fk_responsavel_demanda FOREIGN KEY (id_responsavel) REFERENCES
     usuarios (id_usuario),
+    CONSTRAINT fk_criador_demanda FOREIGN KEY (id_criador) REFERENCES
+    usuarios (id_usuario),
     
     -- Checa se o tipo da demanda está entre tarefa, defeito, melhoria ou documentação
     CONSTRAINT check_tipo_demanda CHECK (
-        tipo_demanda IN ('Tarefa', 'Defeito', 'Melhoria', 'Documentação')
+        tipo_demanda IN ('tarefa', 'defeito', 'melhoria', 'documentacao')
     ),
     -- Checa se a prioridade da demanda está entre crítica, alta, média ou baixa
     CONSTRAINT check_prioridade CHECK (
-        prioridade IN ('Crítica', 'Alta', 'Média', 'Baixa')
+        prioridade IN ('critica', 'alta', 'media', 'baixa')
     ),
     -- Checa se o status da demanda está entre aberta, em andamento, em revisao, concluida ou cancelada
     CONSTRAINT check_status CHECK (
-        status IN ('Aberta', 'Em Andamento', 'Em Revisão', 'Concluída', 'Cancelada')
+        status IN ('aberta', 'em andamento', 'em revisão', 'concluida', 'cancelada')
     )
 );
 
@@ -99,3 +102,41 @@ CREATE TABLE historico_alteracoes (
     CONSTRAINT fk_historico_demanda FOREIGN KEY (id_demanda) REFERENCES demandas (id_demanda),
     CONSTRAINT fk_historico_usuario FOREIGN KEY (id_usuario) REFERENCES usuarios (id_usuario)
 );
+
+-- trigger que impede a inserção de uma demanda com o prazo de finalização da demanda ser anterior a data atual
+CREATE OR REPLACE TRIGGER TRG_VALIDA_PRAZO_DEMANDA
+BEFORE INSERT ON demandas
+FOR EACH ROW
+BEGIN
+    IF :NEW.prazo_finalizacao < SYSDATE THEN
+        RAISE_APPLICATION_ERROR(-20003, 'O prazo de finalização da demanda não pode ser inferior a hoje.');
+    END IF;
+END;
+/
+
+-- trigger que valida o ciclo de vida do status da demanda
+CREATE OR REPLACE TRIGGER TRG_DEMANDAS_REGRAS_CICLO
+BEFORE INSERT OR UPDATE OR DELETE ON demandas
+FOR EACH ROW
+BEGIN
+    IF INSERTING THEN 
+        :NEW.status := 'aberta';
+        :NEW.data_criacao := SYSTIMESTAMP;
+        :NEW.data_atualizacao := SYSTIMESTAMP;
+    END IF;
+
+    IF UPDATING THEN
+        :NEW.data_atualizacao := SYSTIMESTAMP;
+        IF :OLD.status != :NEW.status THEN
+            IF :OLD.status IN ('concluida', 'cancelada') then
+                RAISE_APPLICATION_ERROR(-20004, 'Demandas concluídas ou canceladas não podem mudar de status.');
+            end if;
+            if :old.status IN ('em andamento', 'em revisão') and :new.status = 'aberta' then
+                RAISE_APPLICATION_ERROR(-20005, 'Uma demanda "Em andamento" ou "Em revisão" não pode retornar para "Aberta".');
+            end if;
+            if :new.status = 'concluida' and :old.status != 'em revisão' then
+                RAISE_APPLICATION_ERROR(-20006, 'Para a demanda ser concluída, ela DEVE estar no status "Em revisão".');
+            end if;
+        END IF;
+    END IF;
+END;
