@@ -4,6 +4,7 @@ import authRoutes from "./routes/authRoutes";
 import dashboardRoutes from "./routes/dashboardRoutes";
 import listagemRoutes from "./routes/listagemRoutes";
 import detalhesDemandaRoutes from "./routes/detalhesDemandaRoutes";
+import edicaoDemandaRoutes from "./routes/edicaoDemandaRoutes";
 
 const app = express();
 const PORT = 3000;
@@ -15,6 +16,7 @@ app.use("/api", authRoutes);
 app.use("/api", dashboardRoutes);
 app.use("/api", listagemRoutes);
 app.use("/api", detalhesDemandaRoutes);
+app.use("/api", edicaoDemandaRoutes);
 
 app.get("/", (req, res) => {
     res.send("Servidor do Projeto Integrador II funcionando!");
