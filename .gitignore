@@ -1,0 +1,9 @@
+# Vinicius Zorzetto — RA:24008052: credenciais, dependências e artefatos locais.
+**/.env
+**/.env.*
+!**/.env.example
+**/node_modules/
+**/dist/
+**/*.log
+test-results/
+playwright-report/

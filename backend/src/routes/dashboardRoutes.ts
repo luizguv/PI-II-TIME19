@@ -1,14 +1,3 @@
-/**
- * Autor: Caio Peccinato
- * Componente: Projeto Integrador II - PUC-Campinas
- * Descrição: Registro das rotas do dashboard
- */
-
-import { Router } from "express";
-import { getDashboard } from "../controllers/dashboardController";
-
-const router = Router();
-
-router.get("/dashboard", getDashboard);
-
-export default router;
+/* Autor original: Caio Peccinato
+ * As rotas autenticadas foram unificadas em api.ts. */
+export { api as default } from "../api";

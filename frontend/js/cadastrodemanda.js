@@ -1,212 +1,63 @@
-
-/*
-  Autor: Vinicius Zorzetto
-  Componente: Projeto Integrador II - PUC-Campinas
-  Descrição: Validação da tela de Cadastro e Edição de Demandas.
-*/
-
-const demandForm = document.getElementById("demandForm");
-const pageTitle = document.getElementById("pageTitle");
-const submitText = document.getElementById("submitText");
-const statusGroup = document.getElementById("statusGroup");
-const status = document.getElementById("status");
-const formMessage = document.getElementById("formMessage");
-const deadline = document.getElementById("deadline");
-const holidayMessage = document.getElementById("holidayMessage");
-
-const titleInput = document.getElementById("title");
-const descriptionInput = document.getElementById("description");
-const typeInput = document.getElementById("type");
-const priorityInput = document.getElementById("priority");
-const projectInput = document.getElementById("project");
-const responsibleInput = document.getElementById("responsible");
-
-const params = new URLSearchParams(window.location.search);
-const demandId = params.get("id");
-const isEditing = Boolean(demandId);
-
-const allowedTypes = [
-    "Tarefa",
-    "Defeito",
-    "Melhoria",
-    "Documentação"
-];
-
-const allowedPriorities = [
-    "Crítica",
-    "Alta",
-    "Média",
-    "Baixa"
-];
-
-const allowedProjects = [
-    "Projeto A",
-    "Projeto B",
-    "Projeto C"
-];
-
-const allowedResponsibilities = [
-    "Usuário 1",
-    "Usuário 2",
-    "Usuário 3"
-];
-
-const allowedStatuses = [
-    "Aberta",
-    "Em andamento",
-    "Em revisão",
-    "Concluída",
-    "Cancelada"
-];
-
-if (isEditing) {
-    pageTitle.textContent = "Editar demanda";
-    submitText.textContent = "Salvar alterações";
-    document.title = "Gestão de Demandas | Editar Demanda";
-} else {
-    pageTitle.textContent = "Nova demanda";
-    submitText.textContent = "Cadastrar demanda";
-    status.value = "Aberta";
-    statusGroup.style.display = "none";
+/* Autor: Vinicius Zorzetto — RA:24008052
+ * Cadastro e edição persistentes. Opções, permissões e status vêm da API autenticada.
+ */
+const form=document.getElementById('demandForm'),feedback=document.getElementById('formMessage');
+const field=id=>document.getElementById(id);
+const demandId=new URLSearchParams(location.search).get('id');
+let current=null,user=null,holidayVersion=0;
+function options(select,items,label,placeholder) {
+  select.replaceChildren(new Option(placeholder,''));
+  items.forEach(item=>select.add(new Option(item[label],item.id)));
 }
-
-function showMessage(message, type) {
-    formMessage.textContent = message;
-    formMessage.className = `form-message active ${type}`;
+async function responsible() {
+  if(!field('project').value) {options(field('responsible'),[],'nome','Não atribuído'); return;}
+  const {usuarios}=await PI2.request('/usuarios?projetoId='+field('project').value);
+  options(field('responsible'),user.perfil==='Membro da Equipe'?usuarios.filter(u=>u.id===user.id):usuarios,'nome','Não atribuído');
 }
-
-function clearMessage() {
-    formMessage.textContent = "";
-    formMessage.className = "form-message";
+async function checkHoliday() {
+  const version=++holidayVersion,date=field('deadline').value;
+  field('holidayMessage').textContent='';
+  if(!date) return;
+  try {
+    const {feriados}=await PI2.request('/feriados/'+date.slice(0,4));
+    if(version!==holidayVersion) return;
+    const holiday=feriados.find(h=>h.date===date);
+    field('holidayMessage').textContent=holiday?`Escolha outra data: ${holiday.name} é feriado nacional.`:'';
+  }catch(error){if(version===holidayVersion) field('holidayMessage').textContent=error.message;}
 }
-
-function isValidDate(value) {
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
-        return false;
-    }
-
-    const date = new Date(`${value}T00:00:00`);
-
-    return !Number.isNaN(date.getTime()) &&
-        date.toISOString().slice(0, 10) === value;
-}
-
-function focusField(field, message) {
-    showMessage(message, "error");
-    field.focus();
-}
-
-demandForm.addEventListener("submit", function (event) {
-    event.preventDefault();
-
-    clearMessage();
-    holidayMessage.textContent = "";
-
-    const titulo = titleInput.value.trim();
-    const descricao = descriptionInput.value.trim();
-    const tipo = typeInput.value;
-    const prioridade = priorityInput.value;
-    const projeto = projectInput.value;
-    const responsavel = responsibleInput.value;
-    const prazo = deadline.value;
-
-    if (
-        !titulo ||
-        !descricao ||
-        !tipo ||
-        !prioridade ||
-        !projeto ||
-        !prazo
-    ) {
-        showMessage("Preencha todos os campos obrigatórios.", "error");
-        return;
-    }
-
-    if (titulo.length < 3 || titulo.length > 150) {
-        focusField(
-            titleInput,
-            "O título deve ter entre 3 e 150 caracteres."
-        );
-        return;
-    }
-
-    if (descricao.length < 10 || descricao.length > 2000) {
-        focusField(
-            descriptionInput,
-            "A descrição deve ter entre 10 e 2000 caracteres."
-        );
-        return;
-    }
-
-    if (!allowedTypes.includes(tipo)) {
-        focusField(typeInput, "Selecione um tipo de demanda válido.");
-        return;
-    }
-
-    if (!allowedPriorities.includes(prioridade)) {
-        focusField(priorityInput, "Selecione uma prioridade válida.");
-        return;
-    }
-
-    if (!allowedProjects.includes(projeto)) {
-        focusField(projectInput, "Selecione um projeto válido.");
-        return;
-    }
-
-    if (
-        responsavel &&
-        !allowedResponsibilities.includes(responsavel)
-    ) {
-        focusField(responsibleInput, "Selecione um responsável válido.");
-        return;
-    }
-
-    if (isEditing && !allowedStatuses.includes(status.value)) {
-        focusField(status, "Selecione um status válido.");
-        return;
-    }
-
-    if (!isValidDate(prazo)) {
-        focusField(deadline, "Informe uma data de prazo válida.");
-        return;
-    }
-
-    const selectedDate = new Date(`${prazo}T00:00:00`);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    if (selectedDate < today) {
-        focusField(deadline, "O prazo não pode ser uma data passada.");
-        return;
-    }
-
-    const demand = {
-        titulo: titulo,
-        descricao: descricao,
-        tipo: tipo,
-        prioridade: prioridade,
-        projeto: projeto,
-        responsavel: responsavel || null,
-        status: isEditing ? status.value : "Aberta",
-        prazoFinalizacao: prazo
-    };
-
-    console.log(
-        isEditing ? "Atualização da demanda:" : "Cadastro da demanda:",
-        demand
-    );
-
-    showMessage(
-        isEditing
-            ? "Validações concluídas. A integração com a API ainda será realizada."
-            : "Validações concluídas. A integração com a API ainda será realizada.",
-        "success"
-    );
-});
-
-demandForm.addEventListener("input", clearMessage);
-demandForm.addEventListener("change", clearMessage);
-
-deadline.addEventListener("change", function () {
-    holidayMessage.textContent = "";
+const submit=form.querySelector('button[type=submit]');submit.disabled=true;
+PI2.ready.then(async usuario=>{
+  user=usuario;
+  const {projetos}=await PI2.request('/projetos');options(field('project'),projetos,'nome','Selecione o projeto');
+  if(demandId) {
+    current=await PI2.request('/demandas/'+encodeURIComponent(demandId));
+    if(!current.podeEditar) throw new Error('Você não pode editar esta demanda ou ela já está encerrada.');
+    field('pageTitle').textContent='Editar demanda';field('submitText').textContent='Salvar alterações';document.title='Gestão de Demandas | Editar Demanda';
+    field('project').value=current.projetoId;field('project').disabled=true;await responsible();
+    for(const [input,key] of [['title','titulo'],['description','descricao'],['type','tipo'],['priority','prioridade'],['responsible','responsavelId'],['deadline','prazoFinalizacao']]) field(input).value=current[key]??'';
+    field('status').replaceChildren(...[current.status,...current.transicoesPermitidas].map(s=>new Option(s,s)));
+    if(user.perfil==='Membro da Equipe') ['title','description','type','priority','responsible','deadline'].forEach(id=>field(id).disabled=true);
+  } else {field('statusGroup').hidden=true;}
+  submit.disabled=false;
+}).catch(error=>PI2.message(feedback,error.message));
+field('project').addEventListener('change',()=>responsible().catch(error=>PI2.message(feedback,error.message)));
+field('deadline').addEventListener('change',checkHoliday);
+form.addEventListener('submit',async event=>{
+  event.preventDefault();PI2.message(feedback,'');
+  if(!form.reportValidity()) return;
+  const title=field('title').value.trim(),description=field('description').value.trim();
+  if(title.length<3 || title.length>150) {PI2.message(feedback,'O título deve ter entre 3 e 150 caracteres.');return;}
+  if(description.length<10 || description.length>2000) {PI2.message(feedback,'A descrição deve ter entre 10 e 2000 caracteres.');return;}
+  const payload={titulo:title,descricao:description,tipo:field('type').value,prioridade:field('priority').value,
+    projetoId:Number(field('project').value),responsavelId:field('responsible').value?Number(field('responsible').value):null,prazoFinalizacao:field('deadline').value};
+  if(current) payload.status=field('status').value;
+  if(!payload.projetoId || !payload.prazoFinalizacao) {PI2.message(feedback,'Selecione projeto e prazo.');return;}
+  // Não impede salvar uma mudança de status mantendo um prazo antigo já existente.
+  const today=new Intl.DateTimeFormat('sv-SE',{timeZone:'America/Sao_Paulo'}).format(new Date());
+  if((!current || payload.prazoFinalizacao!==current.prazoFinalizacao) && payload.prazoFinalizacao<today) {PI2.message(feedback,'O prazo não pode ser uma data passada.');return;}
+  submit.disabled=true;
+  try {
+    const saved=await PI2.request('/demandas'+(demandId?'/'+encodeURIComponent(demandId):''),{method:demandId?'PUT':'POST',body:JSON.stringify(payload)});
+    location.assign('detalhes-demanda.html?id='+saved.id);
+  }catch(error){PI2.message(feedback,error.message);}finally{submit.disabled=false;}
 });
