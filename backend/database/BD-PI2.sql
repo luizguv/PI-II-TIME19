@@ -86,3 +86,16 @@ CREATE TABLE comentarios (
     CONSTRAINT fk_comentario_usuario FOREIGN KEY (id_usuario) REFERENCES
     usuarios (id_usuario)
 );
+
+-- Criação da tabela de historico de alterações
+-- armazena o histórico da alteração de uma demanda e qual usuário que alterou
+CREATE TABLE historico_alteracoes (
+    id_historico NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    id_demanda NUMBER NOT NULL,
+    id_usuario NUMBER NOT NULL,
+    descricao VARCHAR2(500) NOT NULL,
+    data_alteracao TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    
+    CONSTRAINT fk_historico_demanda FOREIGN KEY (id_demanda) REFERENCES demandas (id_demanda),
+    CONSTRAINT fk_historico_usuario FOREIGN KEY (id_usuario) REFERENCES usuarios (id_usuario)
+);
