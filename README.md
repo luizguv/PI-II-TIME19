@@ -64,7 +64,7 @@ navegador. “Lembrar de mim”: até sete dias. Sair invalida a sessão no banc
 | GET | /feriados/:ano | Feriados nacionais obtidos da BrasilAPI |
 
 Cadastro recebe `titulo`, `descricao`, `tipo`, `prioridade`, `projetoId`,
-`responsavelId` (ou null) e `prazoFinalizacao` no formato AAAA-MM-DD.
+`responsavelId` (ou null) e `prazoFinalizacao` opcional, no formato AAAA-MM-DD ou null.
 Atualização permite os mesmos campos e `status`, preservando o projeto original.
 Ordenações aceitas: `dataCriacao`, `titulo`, `prioridade`, `status`, `prazoFinalizacao`.
 Erros de validação: 400; sessão inválida: 401; permissão: 403; inexistente: 404;
@@ -79,7 +79,7 @@ A implementação inicial usa a seguinte distribuição conservadora:
 | Ação | Administrador | Líder vinculado | Membro vinculado |
 |---|---|---|---|
 | Visualizar | Todos os projetos | Seus projetos | Seus projetos |
-| Cadastrar | Sim | Sim | Sim; atribuição apenas a si ou não atribuída |
+| Cadastrar | Sim | Sim | Sim, sem responsável (confirmar criação com a orientadora) |
 | Editar dados, responsável, prioridade e prazo | Sim | Sim | Não |
 | Iniciar / enviar para revisão | Sim | Sim | Apenas quando responsável |
 | Aprovar conclusão / devolver revisão | Sim | Sim | Não |

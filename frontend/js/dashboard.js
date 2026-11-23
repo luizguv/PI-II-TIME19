@@ -6,10 +6,18 @@ PI2.ready.then(async()=>{
   const d=await PI2.request('/dashboard');
   const cards=document.querySelectorAll('.kpi-valor');
   [d.totalDemandas,d.porStatus.Aberta,d.porStatus['Em andamento'],d.porTipo.Defeito].forEach((v,i)=>cards[i].textContent=v);
-  const chart=document.querySelector('.grafico-container'); chart.replaceChildren();
-  for(const [status,count] of Object.entries(d.porStatus)) {
-    const item=PI2.element('div',`${status}: ${count}`,'status-chart-row');
-    const bar=PI2.element('progress');bar.max=d.totalDemandas || 1;bar.value=count;bar.setAttribute('aria-label',status);item.append(bar);chart.append(item);
+  for (const [id, counts] of [['statusChart', d.porStatus], ['priorityChart', d.porPrioridade], ['typeChart', d.porTipo]]) {
+    const chart = document.getElementById(id);
+    chart.replaceChildren();
+    for (const [label, count] of Object.entries(counts)) {
+      const item = PI2.element('div', `${label}: ${count}`, 'status-chart-row');
+      const bar = PI2.element('progress');
+      bar.max = d.totalDemandas || 1;
+      bar.value = count;
+      bar.setAttribute('aria-label', label);
+      item.append(bar);
+      chart.append(item);
+    }
   }
   for(const [id,data] of [['criticalList',d.criticasEmAberto],['deadlineList',d.proximasDoPrazo]]) {
     const list=document.getElementById(id);list.replaceChildren();

@@ -135,13 +135,14 @@ api.post('/demandas', run(async (req: AuthRequest, res) => {
   const type = choice(b.tipo, types, 'Tipo'), priority = choice(b.prioridade, priorities, 'Prioridade');
   const project = id(b.projetoId), responsible = b.responsavelId == null || b.responsavelId === '' ? null : id(b.responsavelId);
   if (b.status !== undefined && b.status !== 'Aberta') fail(400, 'Novas demandas devem ter status Aberta.');
-  if (req.usuario.perfil === MEMBER && responsible !== null && responsible !== req.usuario.id) fail(403, 'Membros só podem atribuir demandas a si mesmos.');
-  await checkDeadline(b.prazoFinalizacao);
+  if (req.usuario.perfil === MEMBER && responsible !== null) fail(403, 'Membros não podem atribuir responsáveis.');
+  const deadline = b.prazoFinalizacao ?? null;
+  await checkDeadline(deadline);
   return connection(async c => {
     await projectAccess(c, project, req.usuario); await checkResponsible(c, responsible, project);
     const newId = await insertId(c, `INSERT INTO demandas (titulo, descricao, tipo_demanda, prioridade, id_projeto, id_responsavel, prazo_finalizacao)
       VALUES (:titulo, :descricao, :tipo, :prioridade, :projeto, :responsavel, TO_DATE(:prazo, 'YYYY-MM-DD')) RETURNING id_demanda INTO :newId`,
-      {titulo: title, descricao: description, tipo: type, prioridade: priority, projeto: project, responsavel: responsible, prazo: b.prazoFinalizacao});
+      {titulo: title, descricao: description, tipo: type, prioridade: priority, projeto: project, responsavel: responsible, prazo: deadline});
     await audit(c, newId, req.usuario, 'criação', null, 'Aberta');
     const result = await demand(c, newId, req.usuario); await c.commit();
     return res.status(201).json(result);

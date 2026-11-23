@@ -20,11 +20,11 @@ async function load() {
     tbody.replaceChildren();
     for(const d of demandas) {
       const row = element('tr');
-      for(const value of [d.titulo,d.tipo,d.prioridade,d.status,d.projetoNome,d.responsavelNome || 'Não atribuído',date(d.prazoFinalizacao)]) row.append(element('td',value));
+      for(const value of [d.titulo,d.tipo,d.prioridade,d.status,d.projetoNome,d.responsavelNome || 'Não atribuído',date(d.dataCriacao),date(d.prazoFinalizacao)]) row.append(element('td',value));
       const cell = element('td'), link = element('a','Ver','btn btn-secondary btn-acao');
       link.href = `detalhes-demanda.html?id=${d.id}`;cell.append(link);row.append(cell);tbody.append(row);
     }
-    if(!demandas.length) { const row=element('tr'),cell=element('td','Nenhuma demanda encontrada.');cell.colSpan=8;row.append(cell);tbody.append(row); }
+    if(!demandas.length) { const row=element('tr'),cell=element('td','Nenhuma demanda encontrada.');cell.colSpan=9;row.append(cell);tbody.append(row); }
     message(feedback,`${demandas.length} demanda(s) encontrada(s).`,false);
   } catch(error) {if(current === version) {tbody.replaceChildren();message(feedback,error.message);}}
 }

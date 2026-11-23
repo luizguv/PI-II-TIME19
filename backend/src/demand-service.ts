@@ -37,6 +37,7 @@ export async function checkResponsible(c: Connection, responsible: number | null
   if (!links.length) fail(400, 'O responsável precisa pertencer ao projeto.');
 }
 export async function checkDeadline(value: unknown) {
+  if (value === null) return;
   if (!validDate(value)) fail(400, 'Informe um prazo válido (AAAA-MM-DD).');
   const date = value as string;
   if (date < today()) fail(400, 'O prazo não pode ser uma data passada.');

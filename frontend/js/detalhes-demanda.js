@@ -405,7 +405,7 @@ formEdicao.addEventListener("submit", async function (event) {
   const classificacao = campoClassificacao.value;
   const prioridade = campoPrioridade.value;
   const responsavel = campoResponsavel.value;
-  const prazo = campoPrazo.value;
+  const prazo = campoPrazo.value || null;
 
   if (titulo === "") {
     mostrarErro(erroEdicao, "ERRO! O título não pode ficar vazio.");
@@ -417,12 +417,7 @@ formEdicao.addEventListener("submit", async function (event) {
     return;
   }
 
-  if (prazo === "") {
-    mostrarErro(erroEdicao, "ERRO! Escolha um prazo para a demanda.");
-    return;
-  }
-
-  if (prazo !== demandaAtual.prazoFinalizacao && prazo < obterDataDeHoje()) {
+  if (prazo && prazo !== demandaAtual.prazoFinalizacao && prazo < obterDataDeHoje()) {
     mostrarErro(erroEdicao, "ERRO! O novo prazo não pode ser anterior à data atual.");
     return;
   }
