@@ -8,7 +8,6 @@ Luiz Gustavo Urias Vieira e Vinicius Davi Zorzetto de Matos. Professora: Renata 
 Login e sessão: **Vinicius Zorzetto — RA:24008052**.
 Detalhes, comentários e histórico: **João Pedro Silveira de Souza** (atualização da main).
 Dashboard: **Caio Peccinato**. Listagem: **Leonardo Gambaroni Alves**.
-A contribuição adicional desta branch e os ajustes de compatibilidade estão em `docs/autoria-integracao.md`.
 Os cabeçalhos mantêm a autoria original dos componentes compartilhados.
 
 ## Requisitos e execução
@@ -113,8 +112,7 @@ existente não impede uma transição de status de demanda atrasada.
 
 Desenvolver em branches e integrar por revisão. Esta integração usa
 `codex/integracao-reuniao-5`. Não atribuir trabalho dos colegas a outro autor.
-O checklist `docs/reuniao-5.md` separa evidências técnicas dos registros que cada
-integrante deve preencher no GitHub Projects com estimativa e esforço **real**.
+Cada integrante deve preencher no GitHub Projects a estimativa e o esforço **real**.
 Não inventar horas. Após revisão do grupo e validação da versão final, criar a tag
 `1.0.0-final` no commit entregue e publicar a branch/tag conforme o fluxo da equipe.
 

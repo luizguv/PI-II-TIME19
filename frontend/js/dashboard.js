@@ -1,5 +1,5 @@
 /* Autoria do controller original: Caio Peccinato
- * Integração compartilhada documentada em docs/autoria-integracao.md.
+ * Integração compartilhada com a API.
  * Indicadores e distribuição usam exclusivamente a resposta da API.
  */
 PI2.ready.then(async()=>{
