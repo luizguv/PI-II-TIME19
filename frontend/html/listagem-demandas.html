@@ -1,4 +1,4 @@
-<!-- 
+<!--
   Autor: Leonardo Gambaroni Alves
   Componente: Projeto Integrador II - PUC-Campinas
   Descrição: Tela de Listagem de Demandas
@@ -9,47 +9,55 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Listagem de Demandas</title>
-    <!-- Importando o CSS global do grupo e o CSS específico da tela -->
+    <!-- Importando o CSS global do grupo, o CSS da tela e o CSS de integração -->
     <link rel="stylesheet" href="../css/global.css">
     <link rel="stylesheet" href="../css/listagem-demandas.css">
-<link rel="stylesheet" href="../css/integracao.css">
-<script src="../js/api.js" defer></script>
+    <link rel="stylesheet" href="../css/integracao.css">
+    <script src="../js/api.js" defer></script>
 </head>
 <body>
 
-    <!-- Menu Superior Simples -->
+    <!-- Menu Superior de Navegação -->
     <header class="topo-site">
         <div class="container menu-container">
             <h1>Sistema de Demandas</h1>
             <nav>
                 <a href="dashboard.html">Dashboard</a>
                 <a href="listagem-demandas.html" class="ativo">Demandas</a>
-                <a href="listagem-demandas.html">Sair</a>
+                <a href="login.html">Sair</a>
             </nav>
         </div>
     </header>
 
     <!-- Conteúdo Principal -->
     <main class="container">
-        
-        <!-- Cabeçalho da página com o botão de cadastrar -->
+
+        <!-- Cabeçalho da página com botão condicional de nova demanda -->
         <div class="cabecalho-pagina">
             <div>
                 <h2>Lista de Demandas</h2>
                 <p>Gerencie as tarefas e defeitos do projeto</p>
             </div>
-            <a href="cadastrodemanda.html" class="btn btn-primary">+ Nova Demanda</a>   
+            <a href="cadastrodemanda.html" id="btnNovaDemanda" class="btn btn-primary">+ Nova Demanda</a>
         </div>
 
-        <!-- Área de Filtros Básicos -->
-        <div class="card caixa-filtros">
-            <div class="grupo-filtro">
+        <!-- Área unificada de busca, filtros e ordenação -->
+        <section class="card caixa-filtros" aria-label="Filtros e busca de demandas">
+            <div class="grupo-filtro grupo-busca">
                 <label class="label" for="busca">Buscar</label>
-                <!-- Atributo list conectado ao datalist de sugestões -->
-                <input type="text" id="busca" class="input" placeholder="Digite ao menos 3 letras..." maxlength="61" list="sugestoes-demandas">
+                <!-- Atributo list conectado ao datalist de sugestões preenchido pela API -->
+                <input
+                    type="text"
+                    id="busca"
+                    class="input"
+                    placeholder="Digite ao menos 3 letras (título ou descrição)..."
+                    maxlength="61"
+                    list="sugestoes-demandas"
+                >
                 <datalist id="sugestoes-demandas"></datalist>
-                <small id="buscaErro" class="field-hint field-error" style="display:none;"></small>
+                <small id="buscaErro" class="field-hint field-error" hidden></small>
             </div>
+
             <div class="grupo-filtro">
                 <label class="label" for="filtro-status">Status</label>
                 <select id="filtro-status" class="input">
@@ -57,16 +65,67 @@
                     <option value="Aberta">Aberta</option>
                     <option value="Em andamento">Em andamento</option>
                     <option value="Em revisão">Em revisão</option>
-                    <option value="Concluída">Concluída</option><option value="Cancelada">Cancelada</option>
+                    <option value="Concluída">Concluída</option>
+                    <option value="Cancelada">Cancelada</option>
                 </select>
             </div>
-        </div>
 
-        <div id="apiMessage" role="alert"></div><div class="extra-filters">
-        <label>Prioridade<select id="filtro-prioridade" class="input"><option value="">Todas</option><option>Crítica</option><option>Alta</option><option>Média</option><option>Baixa</option></select></label>
-        <label>Tipo<select id="filtro-tipo" class="input"><option value="">Todos</option><option>Tarefa</option><option>Defeito</option><option>Melhoria</option><option>Documentação</option></select></label>
-        <label>Projeto<select id="filtro-projeto" class="input"><option value="">Todos</option></select></label>
-        <label>Ordenar por<select id="ordenarPor" class="input"><option value="dataCriacao">Mais recentes</option><option value="titulo">Título</option><option value="prioridade">Prioridade</option><option value="status">Status</option><option value="prazoFinalizacao">Prazo</option></select></label></div>
+            <div class="grupo-filtro">
+                <label class="label" for="filtro-prioridade">Prioridade</label>
+                <select id="filtro-prioridade" class="input">
+                    <option value="">Todas</option>
+                    <option value="Crítica">Crítica</option>
+                    <option value="Alta">Alta</option>
+                    <option value="Média">Média</option>
+                    <option value="Baixa">Baixa</option>
+                </select>
+            </div>
+
+            <div class="grupo-filtro">
+                <label class="label" for="filtro-tipo">Tipo</label>
+                <select id="filtro-tipo" class="input">
+                    <option value="">Todos</option>
+                    <option value="Tarefa">Tarefa</option>
+                    <option value="Defeito">Defeito</option>
+                    <option value="Melhoria">Melhoria</option>
+                    <option value="Documentação">Documentação</option>
+                </select>
+            </div>
+
+            <div class="grupo-filtro">
+                <label class="label" for="filtro-projeto">Projeto</label>
+                <select id="filtro-projeto" class="input">
+                    <option value="">Todos</option>
+                </select>
+            </div>
+
+            <div class="grupo-filtro">
+                <label class="label" for="ordenarPor">Ordenar por</label>
+                <select id="ordenarPor" class="input">
+                    <option value="dataCriacao">Mais recentes</option>
+                    <option value="titulo">Título</option>
+                    <option value="prioridade">Prioridade</option>
+                    <option value="status">Status</option>
+                    <option value="prazoFinalizacao">Prazo</option>
+                </select>
+            </div>
+
+            <!-- Ações complementares: filtro rápido por responsável e limpeza dos campos -->
+            <div class="acoes-filtros">
+                <label class="filtro-checkbox" for="filtro-minhas">
+                    <input type="checkbox" id="filtro-minhas">
+                    <span>Apenas atribuídas a mim</span>
+                </label>
+                <button type="button" id="btnLimparFiltros" class="btn btn-secondary btn-limpar">
+                    Limpar filtros
+                </button>
+            </div>
+        </section>
+
+        <!-- Área de retorno de status e erros da API -->
+        <div id="apiMessage" role="alert"></div>
+
+        <!-- Tabela principal de listagem das demandas -->
         <div class="card tabela-card table-wrap">
             <table class="tabela-demandas">
                 <thead>
@@ -77,6 +136,7 @@
                         <th>Status</th>
                         <th>Projeto</th>
                         <th>Responsável</th>
+                        <th>Criada em</th>
                         <th>Prazo</th>
                         <th>Ações</th>
                     </tr>
