@@ -1,5 +1,4 @@
-/* Autor: Vinicius Zorzetto — RA:24008052
- * Responsável pela apresentação: Leonardo Gambaroni Alves.
+/* Autor: Leonardo Gambaroni Alves
  * Regras compartilhadas pela API e testes de autorização e ciclo de vida.
  */
 export const statuses = ['Aberta', 'Em andamento', 'Em revisão', 'Concluída', 'Cancelada'];

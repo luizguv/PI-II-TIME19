@@ -1,6 +1,4 @@
-/* Autor da integração original: Vinicius Zorzetto — RA:24008052
- * Responsável pela apresentação: Luiz Gustavo Urias Vieira.
- */
+/* Autor: Luiz Gustavo Urias Vieira */
 import { Router } from 'express';
 import { loginRoutes, sessionRoutes } from './routes/authRoutes';
 import { requireSession } from './middleware/session';

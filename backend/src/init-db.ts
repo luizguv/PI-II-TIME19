@@ -1,5 +1,4 @@
-/* Autor: Vinicius Zorzetto — RA:24008052
- * Responsável pela apresentação: João Pedro Silveira de Souza.
+/* Autor: João Pedro Silveira de Souza
  * Criação e carga inicial reproduzível. Não exclui registros nem troca senhas existentes.
  */
 import fs from 'node:fs';

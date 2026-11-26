@@ -1,5 +1,4 @@
 /* Autor: Caio Peccinato
- * Responsável pela apresentação: Caio Peccinato.
  * Frontend e API na mesma origem para cookies HttpOnly; origem de escrita validada.
  */
 import express, {Request, Response, NextFunction} from 'express';

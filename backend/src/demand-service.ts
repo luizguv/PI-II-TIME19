@@ -1,5 +1,4 @@
-/* Autor: Vinicius Zorzetto — RA:24008052
- * Responsável pela apresentação: João Pedro Silveira de Souza.
+/* Autor: João Pedro Silveira de Souza
  * Regras transacionais compartilhadas entre cadastro e os detalhes de João Pedro.
  * Mantém feriados, bloqueio concorrente e histórico detalhado na mesma transação.
  */

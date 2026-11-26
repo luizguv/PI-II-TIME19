@@ -1,5 +1,4 @@
-/* Autor: Vinicius Zorzetto — RA:24008052
- * Responsável pela apresentação: Leonardo Gambaroni Alves.
+/* Autor: Leonardo Gambaroni Alves
  * Executar com servidor/VPN ativos. Grava duas demandas de teste identificadas,
  * um comentário e histórico; preserva tudo no banco como evidência de integração.
  */

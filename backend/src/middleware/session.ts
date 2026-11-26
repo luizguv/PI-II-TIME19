@@ -1,6 +1,4 @@
-/* Integração original da API: Vinicius Zorzetto.
- * Responsável pela apresentação: Luiz Gustavo Urias Vieira.
- */
+/* Autor: Luiz Gustavo Urias Vieira */
 
 import type { NextFunction, Request, Response } from 'express';
 import { connection, rows } from '../data/database';

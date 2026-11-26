@@ -1,6 +1,4 @@
-/* Integração original da API: Vinicius Zorzetto.
- * Responsável pela apresentação: Leonardo Gambaroni Alves.
- */
+/* Autor: Leonardo Gambaroni Alves */
 import type { Request, Response } from 'express';
 import type { SessionLocals } from '../middleware/session';
 import { connection, rows } from '../data/database';

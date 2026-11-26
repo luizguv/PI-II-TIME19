@@ -1,5 +1,4 @@
-/* Autor: Vinicius Zorzetto — RA:24008052
- * Responsável pela apresentação: Luiz Gustavo Urias Vieira.
+/* Autor: Luiz Gustavo Urias Vieira
  * Senhas com scrypt e sessões opacas: nunca enviar senhas ou hashes ao navegador.
  */
 import { randomBytes, scryptSync, timingSafeEqual, createHash } from 'node:crypto';

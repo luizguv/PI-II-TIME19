@@ -1,5 +1,4 @@
 /* Autor: Vinicius Zorzetto — RA:24008052
- * Responsável pela apresentação: Vinicius Zorzetto.
  * Validações compartilhadas de entrada. */
 export function fail(status: number, message: string): never { throw Object.assign(new Error(message), {status}); }
 // IDs de rota e formulário devem ser inteiros positivos.

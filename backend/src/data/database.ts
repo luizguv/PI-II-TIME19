@@ -1,5 +1,4 @@
-/* Autor: Vinicius Zorzetto — RA:24008052
- * Responsável pela apresentação: João Pedro Silveira de Souza.
+/* Autor: João Pedro Silveira de Souza
  * Cada operação usa conexão própria; erros revertem a transação antes de devolver ao pool.
  */
 import oracledb, { Connection } from 'oracledb';

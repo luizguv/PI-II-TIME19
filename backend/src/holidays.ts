@@ -1,5 +1,4 @@
 /* Autor: Caio Peccinato
- * Responsável pela apresentação: Caio Peccinato.
  * Consulta externa com prazo limite e cache; indisponibilidade não libera datas sem validação.
  */
 export interface Holiday { date: string; name: string; type: string; }
