@@ -5,10 +5,6 @@ Projeto Integrador II, Engenharia de Software, PUC-Campinas — 2º semestre de 
 Equipe: Caio Peccinato, João Pedro Silveira de Souza, Leonardo Gambaroni Alves,
 Luiz Gustavo Urias Vieira e Vinicius Davi Zorzetto de Matos. Professora: Renata Arantes.
 
-Login e sessão: **Vinicius Zorzetto — RA:24008052**.
-Detalhes, comentários e histórico: **João Pedro Silveira de Souza** (atualização da main).
-Dashboard: **Caio Peccinato**. Listagem: **Leonardo Gambaroni Alves**.
-Os cabeçalhos mantêm a autoria original dos componentes compartilhados.
 
 ## Requisitos e execução
 
@@ -108,11 +104,6 @@ existente não impede uma transição de status de demanda atrasada.
 8. Cancelar uma demanda não concluída e consultar seu histórico.
 9. Sair; conferir que as rotas deixam de aceitar a sessão.
 
-## Organização e entrega
-
-Desenvolver em branches e integrar por revisão. Esta integração usa
-`codex/integracao-reuniao-5`. Não atribuir trabalho dos colegas a outro autor.
-Cada integrante deve preencher no GitHub Projects a estimativa e o esforço **real**.
 Não inventar horas. Após revisão do grupo e validação da versão final, criar a tag
 `1.0.0-final` no commit entregue e publicar a branch/tag conforme o fluxo da equipe.
 
