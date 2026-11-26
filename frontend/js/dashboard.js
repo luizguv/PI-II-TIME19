@@ -1,6 +1,7 @@
-/* Autoria do controller original: Caio Peccinato
- * Integração compartilhada com a API.
- * Indicadores e distribuição usam exclusivamente a resposta da API.
+/*
+  Autor: Caio Peccinato
+  Componente: Projeto Integrador II - PUC-Campinas
+  Descrição: Indicadores e distribuição usam exclusivamente a resposta da API.
  */
 PI2.ready.then(async()=>{
   const d=await PI2.request('/dashboard');
