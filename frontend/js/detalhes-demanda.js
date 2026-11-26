@@ -86,7 +86,8 @@ function formatarData(iso) {
 }
 
 // Converte "AAAA-MM-DDTHH:MM:SS" para "DD/MM/AAAA HH:MM"
-function formatarDataHora(iso) { return PI2.date(iso);
+function formatarDataHora(iso) {
+  return PI2.date(iso);
 }
 
 // Retorna a data de hoje no formato "AAAA-MM-DD"
@@ -142,9 +143,7 @@ function mostrarDemandaNaTela(demanda) {
 
 async function carregarComentarios() {
   try {
-    const resposta = await apiFetch(URL_API + "/demandas/" + idDemanda + "/comentarios", {
-      headers: { }
-    });
+    const resposta = await apiFetch(URL_API + "/demandas/" + idDemanda + "/comentarios");
     const dados = await resposta.json();
 
     listaComentarios.innerHTML = "";
@@ -193,9 +192,7 @@ async function carregarComentarios() {
 
 async function carregarHistorico() {
   try {
-    const resposta = await apiFetch(URL_API + "/demandas/" + idDemanda + "/historico", {
-      headers: { }
-    });
+    const resposta = await apiFetch(URL_API + "/demandas/" + idDemanda + "/historico");
     const dados = await resposta.json();
 
     listaHistorico.innerHTML = "";
@@ -222,17 +219,22 @@ async function carregarHistorico() {
 // Compatibilidade com a sessão do login, sem confiar em usuarioId da URL.
 async function apiFetch(url, options = {}) {
   await PI2.ready;
-  return fetch(url,{...options,credentials:"same-origin",signal:AbortSignal.timeout(25000)});
+  return fetch(url, {
+    ...options,
+    credentials: "same-origin",
+    signal: AbortSignal.timeout(25000),
+  });
 }
 
 async function iniciarTela() {
-  if (!/^\d+$/.test(idDemanda || "")) { mostrarErro(erroGeral,"Selecione uma demanda na listagem."); return; }
+  if (!/^\d+$/.test(idDemanda || "")) {
+    mostrarErro(erroGeral, "Selecione uma demanda na listagem.");
+    return;
+  }
   limparErro(erroGeral);
 
   try {
-    const resposta = await apiFetch(URL_API + "/demandas/" + idDemanda, {
-      headers: { }
-    });
+    const resposta = await apiFetch(URL_API + "/demandas/" + idDemanda);
     const dados = await resposta.json();
 
     if (!resposta.ok) {
@@ -352,9 +354,7 @@ botaoAtualizarStatus.addEventListener("click", async function () {
 
 async function carregarResponsaveis() {
   try {
-    const resposta = await apiFetch(URL_API + "/demandas/" + idDemanda + "/responsaveis", {
-      headers: { }
-    });
+    const resposta = await apiFetch(URL_API + "/demandas/" + idDemanda + "/responsaveis");
     const dados = await resposta.json();
 
     campoResponsavel.innerHTML = "";

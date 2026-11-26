@@ -6,13 +6,13 @@
 
 import { Router } from "express";
 import {
-    getDemandaPorId,
-    listarComentarios,
-    criarComentario,
-    listarHistorico,
-    listarResponsaveis,
-    atualizarDemanda,
-    atualizarStatus,
+  getDemandaPorId,
+  listarComentarios,
+  criarComentario,
+  listarHistorico,
+  listarResponsaveis,
+  atualizarDemanda,
+  atualizarStatus,
 } from "./detalhesDemandaController";
 
 const router = Router();
@@ -28,4 +28,4 @@ router.post("/demandas/:id/comentarios", criarComentario);
 router.put("/demandas/:id", atualizarDemanda);
 router.patch("/demandas/:id/status", atualizarStatus);
 
-export default router;
+export default router;
