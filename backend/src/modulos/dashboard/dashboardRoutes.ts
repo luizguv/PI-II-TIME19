@@ -4,5 +4,5 @@ import { getDashboard } from './dashboardController';
 
 const router = Router();
 // A tela usa esse resumo para preencher cartões e gráficos.
-router.get('/dashboard', getDashboard);
+router.get('/dashboard', getDashboard); // FLUXO:DASHBOARD 3/4 rota
 export default router;

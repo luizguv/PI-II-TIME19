@@ -19,7 +19,7 @@ export interface User {
 // Status finais: a demanda não pode mais ser editada nem mudar de etapa.
 export const isClosed = (status: string): boolean => status === 'Concluída' || status === 'Cancelada';
 
-export function transitions(status: string, user: User, responsibleId: number | null): string[] {
+export function transitions(status: string, user: User, responsibleId: number | null): string[] { // FLUXO:ATUALIZAR-STATUS 7/7 regra de quem muda para qual status
   // Demandas encerradas não avançam no fluxo.
   if (isClosed(status)) return [];
 

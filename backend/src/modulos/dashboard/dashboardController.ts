@@ -16,7 +16,7 @@ function daquiA(dias: number): string {
   return limit.toISOString().slice(0, 10);
 }
 
-export async function getDashboard(_req: Request, res: Response<unknown, SessionLocals>) {
+export async function getDashboard(_req: Request, res: Response<unknown, SessionLocals>) { // FLUXO:DASHBOARD 4/4 funcao
   const { usuario } = res.locals;
   const isAdmin = usuario.perfil === ADMIN;
 

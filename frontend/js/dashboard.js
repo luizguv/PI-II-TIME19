@@ -53,10 +53,10 @@ function renderList(id, demandas) {
   }
 }
 
-PI2.ready
+PI2.ready // FLUXO:DASHBOARD 1/4 roda ao abrir a pagina
   .then(async () => {
     // Busca indicadores dos projetos acessíveis ao perfil da sessão.
-    const d = await PI2.request('/dashboard');
+    const d = await PI2.request('/dashboard'); // FLUXO:DASHBOARD 2/4 GET /api/dashboard
 
     renderKpis(d);
 

@@ -39,7 +39,7 @@ async function responsible() {
   let usuarios = [];
 
   if (user.perfil !== MEMBRO && projectId) {
-    ({ usuarios } = await PI2.request('/usuarios?projetoId=' + projectId));
+    ({ usuarios } = await PI2.request('/usuarios?projetoId=' + projectId)); // FLUXO:ESCOLHER-PROJETO 3/5 GET /api/usuarios
   }
 
   options(field('responsible'), usuarios, 'nome', 'Não atribuído');
@@ -55,7 +55,7 @@ async function checkHoliday() {
   if (!date) return;
 
   try {
-    const { feriados } = await PI2.request('/feriados/' + date.slice(0, 4));
+    const { feriados } = await PI2.request('/feriados/' + date.slice(0, 4)); // FLUXO:FERIADOS 3/6 GET /api/feriados/:ano
     if (version !== holidayVersion) return;
 
     const holiday = feriados.find(h => h.date === date);
@@ -147,7 +147,7 @@ PI2.ready
     user = usuario;
     field('responsible').disabled = user.perfil === MEMBRO;
 
-    const { projetos } = await PI2.request('/projetos');
+    const { projetos } = await PI2.request('/projetos'); // FLUXO:CARREGAR-PROJETOS 1/4 GET /api/projetos (cadastro)
     options(field('project'), projetos, 'nome', 'Selecione o projeto');
 
     // O ID na URL abre o formulário no modo de edição.
@@ -161,14 +161,14 @@ PI2.ready
   })
   .catch(error => showError(error.message));
 
-field('project').addEventListener('change', () => {
+field('project').addEventListener('change', () => { // FLUXO:ESCOLHER-PROJETO 2/5 evento change
   responsible().catch(error => showError(error.message));
 });
 
-field('deadline').addEventListener('change', checkHoliday);
+field('deadline').addEventListener('change', checkHoliday); // FLUXO:FERIADOS 2/6 evento change
 
 // Salva com POST no cadastro ou PUT na edição.
-form.addEventListener('submit', async event => {
+form.addEventListener('submit', async event => { // FLUXO:CADASTRAR-DEMANDA 2/6 evento submit
   event.preventDefault();
   PI2.message(feedback, '');
 
@@ -180,7 +180,7 @@ form.addEventListener('submit', async event => {
   submit.disabled = true;
   try {
     const path = '/demandas' + (demandId ? '/' + encodeURIComponent(demandId) : '');
-    const saved = await PI2.request(path, {
+    const saved = await PI2.request(path, { // FLUXO:CADASTRAR-DEMANDA 3/6 POST /api/demandas
       method: demandId ? 'PUT' : 'POST',
       body: JSON.stringify(payload),
     });

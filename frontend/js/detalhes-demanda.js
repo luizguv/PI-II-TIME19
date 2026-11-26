@@ -143,7 +143,7 @@ function mostrarDemandaNaTela(demanda) {
 
 async function carregarComentarios() {
   try {
-    const resposta = await apiFetch(URL_API + "/demandas/" + idDemanda + "/comentarios");
+    const resposta = await apiFetch(URL_API + "/demandas/" + idDemanda + "/comentarios"); // FLUXO:LISTAR-COMENTARIOS 1/3 GET /api/demandas/:id/comentarios
     const dados = await resposta.json();
 
     listaComentarios.innerHTML = "";
@@ -192,7 +192,7 @@ async function carregarComentarios() {
 
 async function carregarHistorico() {
   try {
-    const resposta = await apiFetch(URL_API + "/demandas/" + idDemanda + "/historico");
+    const resposta = await apiFetch(URL_API + "/demandas/" + idDemanda + "/historico"); // FLUXO:HISTORICO 1/3 GET /api/demandas/:id/historico
     const dados = await resposta.json();
 
     listaHistorico.innerHTML = "";
@@ -226,7 +226,7 @@ async function apiFetch(url, options = {}) {
   });
 }
 
-async function iniciarTela() {
+async function iniciarTela() { // FLUXO:VER-DETALHES 2/5 roda ao abrir a pagina
   if (!/^\d+$/.test(idDemanda || "")) {
     mostrarErro(erroGeral, "Selecione uma demanda na listagem.");
     return;
@@ -234,7 +234,7 @@ async function iniciarTela() {
   limparErro(erroGeral);
 
   try {
-    const resposta = await apiFetch(URL_API + "/demandas/" + idDemanda);
+    const resposta = await apiFetch(URL_API + "/demandas/" + idDemanda); // FLUXO:VER-DETALHES 3/5 GET /api/demandas/:id
     const dados = await resposta.json();
 
     if (!resposta.ok) {
@@ -261,7 +261,7 @@ comentario.addEventListener("input", function somarCaractere() {
 });
 
 // Publicar envia o comentário e recarrega a lista.
-formComentario.addEventListener("submit", async function validador(event) {
+formComentario.addEventListener("submit", async function validador(event) { // FLUXO:ENVIAR-COMENTARIO 2/5 evento submit
   event.preventDefault();
   limparErro(erroComentario);
 
@@ -281,7 +281,7 @@ formComentario.addEventListener("submit", async function validador(event) {
   botaoComentario.disabled = true;
 
   try {
-    const resposta = await apiFetch(URL_API + "/demandas/" + idDemanda + "/comentarios", {
+    const resposta = await apiFetch(URL_API + "/demandas/" + idDemanda + "/comentarios", { // FLUXO:ENVIAR-COMENTARIO 3/5 POST /api/demandas/:id/comentarios
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -307,7 +307,7 @@ formComentario.addEventListener("submit", async function validador(event) {
 });
 
 // Alterar status usa PATCH; cancelar pede confirmação antes do envio.
-botaoAtualizarStatus.addEventListener("click", async function () {
+botaoAtualizarStatus.addEventListener("click", async function () { // FLUXO:ATUALIZAR-STATUS 2/7 evento click
   limparErro(erroStatus);
 
   const novoStatus = campoNovoStatus.value;
@@ -327,7 +327,7 @@ botaoAtualizarStatus.addEventListener("click", async function () {
   botaoAtualizarStatus.disabled = true;
 
   try {
-    const resposta = await apiFetch(URL_API + "/demandas/" + idDemanda + "/status", {
+    const resposta = await apiFetch(URL_API + "/demandas/" + idDemanda + "/status", { // FLUXO:ATUALIZAR-STATUS 3/7 PATCH /api/demandas/:id/status
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -354,7 +354,7 @@ botaoAtualizarStatus.addEventListener("click", async function () {
 
 async function carregarResponsaveis() {
   try {
-    const resposta = await apiFetch(URL_API + "/demandas/" + idDemanda + "/responsaveis");
+    const resposta = await apiFetch(URL_API + "/demandas/" + idDemanda + "/responsaveis"); // FLUXO:EDITAR-ABRIR 3/5 GET /api/demandas/:id/responsaveis
     const dados = await resposta.json();
 
     campoResponsavel.innerHTML = "";
@@ -379,7 +379,7 @@ async function carregarResponsaveis() {
 }
 
 // Editar abre o formulário com os valores atuais da demanda.
-editarDemanda.addEventListener("click", async function () {
+editarDemanda.addEventListener("click", async function () { // FLUXO:EDITAR-ABRIR 2/5 evento click
   limparErro(erroEdicao);
 
   await carregarResponsaveis();
@@ -401,7 +401,7 @@ cancelarEdicao.addEventListener("click", function () {
 });
 
 // Salvar valida os campos e envia a edição por PUT.
-formEdicao.addEventListener("submit", async function (event) {
+formEdicao.addEventListener("submit", async function (event) { // FLUXO:SALVAR-ALTERACOES 2/6 evento submit
   event.preventDefault();
   limparErro(erroEdicao);
 
@@ -444,7 +444,7 @@ formEdicao.addEventListener("submit", async function (event) {
   salvarEdicao.disabled = true;
 
   try {
-    const resposta = await apiFetch(URL_API + "/demandas/" + idDemanda, {
+    const resposta = await apiFetch(URL_API + "/demandas/" + idDemanda, { // FLUXO:SALVAR-ALTERACOES 3/6 PUT /api/demandas/:id
       method: "PUT",
       headers: {
         "Content-Type": "application/json",

@@ -21,7 +21,7 @@ function respostaValida(data: unknown): data is Holiday[] {
   );
 }
 
-export async function holidays(year: number): Promise<Holiday[]> {
+export async function holidays(year: number): Promise<Holiday[]> { // FLUXO:FERIADOS 6/6 consulta a BrasilAPI
   if (!Number.isInteger(year) || year < 1900 || year > 2199) fail(400, 'Ano inválido.');
 
   // Reutiliza os feriados já consultados para esse ano.

@@ -46,7 +46,7 @@ function registrarTentativa(ip: string | undefined, email: string): string {
   return key;
 }
 
-export async function login(req: Request, res: Response) {
+export async function login(req: Request, res: Response) { // FLUXO:ENTRAR 5/5 funcao
   const { email, password, lembrar } = validarCredenciais(req.body);
   const key = registrarTentativa(req.ip, email);
 
@@ -90,11 +90,11 @@ export async function login(req: Request, res: Response) {
   });
 }
 
-export function getSession(_req: Request, res: Response<unknown, SessionLocals>) {
+export function getSession(_req: Request, res: Response<unknown, SessionLocals>) { // FLUXO:SESSAO 4/4 funcao
   return res.json({ usuario: res.locals.usuario });
 }
 
-export async function logout(_req: Request, res: Response<unknown, SessionLocals>) {
+export async function logout(_req: Request, res: Response<unknown, SessionLocals>) { // FLUXO:SAIR 5/5 funcao
   // Apaga a sessão no Oracle para invalidar o token mesmo se o cookie for reapresentado.
   await connection(async c => {
     await c.execute('DELETE FROM sessoes WHERE token_hash = :token', { token: res.locals.sessionHash });

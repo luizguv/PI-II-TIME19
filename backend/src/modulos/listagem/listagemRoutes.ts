@@ -4,5 +4,5 @@ import { listDemands } from './listagemController';
 
 const router = Router();
 // Filtros e ordenação chegam pela query de GET /demandas.
-router.get('/demandas', listDemands);
+router.get('/demandas', listDemands); // FLUXO:LISTAGEM 4/5 rota
 export default router;

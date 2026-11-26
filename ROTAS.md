@@ -51,3 +51,27 @@ Caminhos abaixo relativos a `backend/src/modulos/` (backend) e `frontend/` (fron
 | Método | Endereço | Arquivo:linha | Função:linhas | Quem usa no backend | Origem na tela |
 |---|---|---|---|---|---|
 | GET | https://brasilapi.com.br/api/feriados/v1/{ano} | backend/src/holidays.ts:12 | `holidays` — holidays.ts:6-23 | modulos/cadastro/cadastroController.ts:32 (`listHolidays`); demand-service.ts:47 (`checkDeadline`, validação de prazo ao salvar) | Troca do prazo no cadastro (via `/api/feriados/:ano`) e envio do formulário |
+
+## Etiquetas para busca
+
+Cada fluxo tem comentários `FLUXO:NOME n/total` no fim das linhas envolvidas, da tela até o backend.
+Para seguir um fluxo, busque a etiqueta com Ctrl+Shift+F (ou `git grep -n "FLUXO:NOME"`).
+
+| Etiqueta | Passos | O que cobre |
+|---|---|---|
+| `FLUXO:ENTRAR` | 5 | Botão Entrar → POST /api/login → `login` |
+| `FLUXO:SAIR` | 5 | Link Sair → POST /api/logout → `logout` |
+| `FLUXO:SESSAO` | 4 | GET /api/sessao ao abrir tela interna → `requireSession` → `getSession` |
+| `FLUXO:DASHBOARD` | 4 | Abertura do dashboard → GET /api/dashboard → `getDashboard` |
+| `FLUXO:CARREGAR-PROJETOS` | 4 | GET /api/projetos (cadastro e listagem) → `listProjects` |
+| `FLUXO:ESCOLHER-PROJETO` | 5 | Campo Projeto → GET /api/usuarios → `listProjectUsers` |
+| `FLUXO:FERIADOS` | 6 | Campo Prazo → GET /api/feriados/:ano → `listHolidays` → BrasilAPI |
+| `FLUXO:CADASTRAR-DEMANDA` | 6 | Botão Cadastrar → POST /api/demandas → `createDemand` → `checkDeadline` |
+| `FLUXO:LISTAGEM` | 5 | Busca e filtros → GET /api/demandas → `listDemands` |
+| `FLUXO:VER-DETALHES` | 5 | Link Ver → GET /api/demandas/:id → `getDemandaPorId` |
+| `FLUXO:LISTAR-COMENTARIOS` | 3 | GET /api/demandas/:id/comentarios → `listarComentarios` |
+| `FLUXO:HISTORICO` | 3 | GET /api/demandas/:id/historico → `listarHistorico` |
+| `FLUXO:ENVIAR-COMENTARIO` | 5 | Botão Enviar → POST /api/demandas/:id/comentarios → `criarComentario` |
+| `FLUXO:EDITAR-ABRIR` | 5 | Link Editar → GET /api/demandas/:id/responsaveis → `listarResponsaveis` |
+| `FLUXO:SALVAR-ALTERACOES` | 6 | Botão Salvar → PUT /api/demandas/:id → `atualizarDemanda` → `updateDemand` |
+| `FLUXO:ATUALIZAR-STATUS` | 7 | Botão Atualizar status → PATCH /api/demandas/:id/status → `atualizarStatus` → `updateDemand` → `transitions` |

@@ -7,7 +7,7 @@ import { holidays } from '../../holidays';
 import { ADMIN, MEMBER, priorities, types } from '../../rules';
 import { choice, fail, id, text } from '../../validation';
 
-export async function listProjects(_req: Request, res: Response<unknown, SessionLocals>) {
+export async function listProjects(_req: Request, res: Response<unknown, SessionLocals>) { // FLUXO:CARREGAR-PROJETOS 4/4 funcao
   const { usuario } = res.locals;
   const isAdmin = usuario.perfil === ADMIN;
 
@@ -27,7 +27,7 @@ export async function listProjects(_req: Request, res: Response<unknown, Session
   });
 }
 
-export async function listProjectUsers(req: Request, res: Response<unknown, SessionLocals>) {
+export async function listProjectUsers(req: Request, res: Response<unknown, SessionLocals>) { // FLUXO:ESCOLHER-PROJETO 5/5 funcao
   const { usuario } = res.locals;
 
   return connection(async c => {
@@ -47,11 +47,11 @@ export async function listProjectUsers(req: Request, res: Response<unknown, Sess
   });
 }
 
-export async function listHolidays(req: Request, res: Response) {
+export async function listHolidays(req: Request, res: Response) { // FLUXO:FERIADOS 5/6 funcao
   return res.json({ feriados: await holidays(Number(req.params.ano)) });
 }
 
-export async function createDemand(req: Request, res: Response<unknown, SessionLocals>) {
+export async function createDemand(req: Request, res: Response<unknown, SessionLocals>) { // FLUXO:CADASTRAR-DEMANDA 5/6 funcao
   const { usuario } = res.locals;
   const b = req.body || {};
 

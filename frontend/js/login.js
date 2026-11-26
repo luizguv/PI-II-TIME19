@@ -20,7 +20,7 @@ function validate(email, senha) {
 }
 
 // Entrar envia as credenciais; a API devolve o cookie se a validação passar.
-form.addEventListener('submit', async event => {
+form.addEventListener('submit', async event => { // FLUXO:ENTRAR 2/5 evento submit
   event.preventDefault();
   showError('');
 
@@ -38,7 +38,7 @@ form.addEventListener('submit', async event => {
   button.textContent = 'Entrando…';
 
   try {
-    await PI2.request('/login', {
+    await PI2.request('/login', { // FLUXO:ENTRAR 3/5 POST /api/login
       method: 'POST',
       body: JSON.stringify({ email, senha, lembrar }),
     });

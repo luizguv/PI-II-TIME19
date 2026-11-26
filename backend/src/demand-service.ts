@@ -104,7 +104,7 @@ export async function checkResponsible(c: Connection, responsible: number | null
 }
 
 // Valida a data e consulta feriados quando o prazo é informado.
-export async function checkDeadline(value: unknown) {
+export async function checkDeadline(value: unknown) { // FLUXO:CADASTRAR-DEMANDA 6/6 valida prazo e feriado
   if (value === null) return;
   if (!validDate(value)) fail(400, 'Informe um prazo válido (AAAA-MM-DD).');
   if (value < today()) fail(400, 'O prazo não pode ser uma data passada.');
@@ -153,7 +153,7 @@ function mergeChanges(before: any, b: any) {
   };
 }
 
-export async function updateDemand(user: User, demandIdValue: unknown, body: any) {
+export async function updateDemand(user: User, demandIdValue: unknown, body: any) { // FLUXO:SALVAR-ALTERACOES 6/6 regras, UPDATE e historico // FLUXO:ATUALIZAR-STATUS 6/7 mesma funcao do Salvar
   return connection(async c => {
     const demandId = id(demandIdValue);
     const before = await demand(c, demandId, user, true);

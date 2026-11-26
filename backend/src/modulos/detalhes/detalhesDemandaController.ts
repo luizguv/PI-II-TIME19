@@ -142,7 +142,7 @@ async function contexto(req: Request, res: Response) {
 }
 
 // Verifica o vínculo com o projeto antes de devolver detalhes e permissões.
-export async function getDemandaPorId(req: Request, res: Response) {
+export async function getDemandaPorId(req: Request, res: Response) { // FLUXO:VER-DETALHES 5/5 funcao
   const dados = await contexto(req, res);
   if (dados.erro) return responderErro(res, dados.erro[0], dados.erro[1]);
   try {
@@ -154,7 +154,7 @@ export async function getDemandaPorId(req: Request, res: Response) {
   }
 }
 
-export async function listarComentarios(req: Request, res: Response) {
+export async function listarComentarios(req: Request, res: Response) { // FLUXO:LISTAR-COMENTARIOS 3/3 funcao
   const dados = await contexto(req, res);
   if (dados.erro) return responderErro(res, dados.erro[0], dados.erro[1]);
   try {
@@ -181,7 +181,7 @@ export async function listarComentarios(req: Request, res: Response) {
 }
 
 // O autor do comentário vem da sessão validada.
-export async function criarComentario(req: Request, res: Response) {
+export async function criarComentario(req: Request, res: Response) { // FLUXO:ENVIAR-COMENTARIO 5/5 funcao
   const dados = await contexto(req, res);
   if (dados.erro) return responderErro(res, dados.erro[0], dados.erro[1]);
   const texto = typeof req.body?.texto === "string" ? req.body.texto.trim() : "";
@@ -205,7 +205,7 @@ export async function criarComentario(req: Request, res: Response) {
 }
 
 // Consulta mudanças e seus autores, das mais recentes para as mais antigas.
-export async function listarHistorico(req: Request, res: Response) {
+export async function listarHistorico(req: Request, res: Response) { // FLUXO:HISTORICO 3/3 funcao
   const dados = await contexto(req, res);
   if (dados.erro) return responderErro(res, dados.erro[0], dados.erro[1]);
   try {
@@ -236,7 +236,7 @@ export async function listarHistorico(req: Request, res: Response) {
 }
 
 // O formulário de edição recebe só integrantes do projeto.
-export async function listarResponsaveis(req: Request, res: Response) {
+export async function listarResponsaveis(req: Request, res: Response) { // FLUXO:EDITAR-ABRIR 5/5 funcao
   const dados = await contexto(req, res);
   if (dados.erro) return responderErro(res, dados.erro[0], dados.erro[1]);
   if (dados.usuario.perfil === "Membro da Equipe") {
@@ -264,7 +264,7 @@ export async function listarResponsaveis(req: Request, res: Response) {
 }
 
 // O serviço compartilhado acrescenta validação de feriados e histórico por campo.
-export async function atualizarDemanda(req: Request, res: Response) {
+export async function atualizarDemanda(req: Request, res: Response) { // FLUXO:SALVAR-ALTERACOES 5/6 funcao
   const usuario = usuarioAtual(res);
   if (!usuario) return responderErro(res, 401, "Usuário não autenticado.");
 
@@ -273,7 +273,7 @@ export async function atualizarDemanda(req: Request, res: Response) {
 }
 
 // Envia só o novo status ao serviço que valida as transições.
-export async function atualizarStatus(req: Request, res: Response) {
+export async function atualizarStatus(req: Request, res: Response) { // FLUXO:ATUALIZAR-STATUS 5/7 funcao
   const usuario = usuarioAtual(res);
   if (!usuario) return responderErro(res, 401, "Usuário não autenticado.");
 

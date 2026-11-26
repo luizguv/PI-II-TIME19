@@ -73,10 +73,10 @@ window.PI2 = (() => {
       if (link.textContent.trim() !== 'Sair') return;
 
       link.href = LOGIN_URL;
-      link.addEventListener('click', async event => {
+      link.addEventListener('click', async event => { // FLUXO:SAIR 2/5 evento click
         event.preventDefault();
         try {
-          await request('/logout', { method: 'POST', body: '{}' });
+          await request('/logout', { method: 'POST', body: '{}' }); // FLUXO:SAIR 3/5 POST /api/logout
           location.replace(LOGIN_URL);
         } catch (error) {
           alert(error.message);
@@ -88,7 +88,7 @@ window.PI2 = (() => {
   // Telas internas consultam /sessao antes de carregar os dados.
   const ready = naTelaDeLogin
     ? Promise.resolve(null)
-    : request('/sessao').then(({ usuario }) => {
+    : request('/sessao').then(({ usuario }) => { // FLUXO:SESSAO 1/4 GET /api/sessao ao abrir tela interna
         const nav = document.querySelector('nav, .navegacao');
         if (nav) {
           nav.append(element('span', `${usuario.nome} · ${usuario.perfil}`, 'session-user'));

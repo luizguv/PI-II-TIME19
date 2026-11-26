@@ -51,7 +51,7 @@ function createRow(d) {
   // O botão Ver leva o ID para a tela de detalhes.
   const cell = element('td');
   const link = element('a', 'Ver', 'btn btn-secondary btn-acao');
-  link.href = `detalhes-demanda.html?id=${d.id}`;
+  link.href = `detalhes-demanda.html?id=${d.id}`; // FLUXO:VER-DETALHES 1/5 link Ver
   cell.append(link);
   row.append(cell);
 
@@ -78,7 +78,7 @@ async function load() {
   message(feedback, 'Carregando demandas…', false);
 
   try {
-    const { demandas } = await request('/demandas?' + buildParams());
+    const { demandas } = await request('/demandas?' + buildParams()); // FLUXO:LISTAGEM 3/5 GET /api/demandas
     if (current !== version) return;
 
     tbody.replaceChildren(...demandas.map(createRow));
@@ -95,7 +95,7 @@ async function load() {
 
 ready
   .then(async () => {
-    const { projetos } = await request('/projetos');
+    const { projetos } = await request('/projetos'); // FLUXO:CARREGAR-PROJETOS 2/4 GET /api/projetos (listagem)
     const filtroProjeto = document.getElementById('filtro-projeto');
     for (const p of projetos) {
       const option = element('option', p.nome);
@@ -106,13 +106,13 @@ ready
     await load();
 
     // Espera um pouco após digitar antes de consultar a API.
-    search.addEventListener('input', () => {
+    search.addEventListener('input', () => { // FLUXO:LISTAGEM 1/5 evento da busca
       clearTimeout(timer);
       timer = setTimeout(load, DEBOUNCE_MS);
     });
 
     Object.values(controls).forEach(id => {
-      document.getElementById(id).addEventListener('change', load);
+      document.getElementById(id).addEventListener('change', load); // FLUXO:LISTAGEM 2/5 evento dos filtros
     });
   })
   .catch(error => message(feedback, error.message));

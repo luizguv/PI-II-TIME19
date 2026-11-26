@@ -34,7 +34,7 @@ const ORDENACOES: Record<string, string> = {
            END`,
 };
 
-export async function listDemands(req: Request, res: Response<unknown, SessionLocals>) {
+export async function listDemands(req: Request, res: Response<unknown, SessionLocals>) { // FLUXO:LISTAGEM 5/5 funcao
   const { usuario } = res.locals;
   const where: string[] = [];
   const binds: Record<string, unknown> = {};

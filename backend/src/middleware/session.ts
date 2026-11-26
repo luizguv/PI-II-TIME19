@@ -28,7 +28,7 @@ export const cookieOptions = {
 };
 
 // Consulta o hash do cookie no Oracle e entrega o usuário aos controladores.
-export async function requireSession(req: Request, res: Response, next: NextFunction) {
+export async function requireSession(req: Request, res: Response, next: NextFunction) { // FLUXO:SESSAO 2/4 confere o cookie
   const raw = token(req);
   if (!/^[a-f0-9]{64}$/.test(raw)) {
     res.status(401).json({ mensagem: 'Entre no sistema para continuar.' });

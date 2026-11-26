@@ -18,14 +18,14 @@ import {
 const router = Router();
 
 // As leituras usam o ID recebido no link da listagem.
-router.get("/demandas/:id", getDemandaPorId);
-router.get("/demandas/:id/comentarios", listarComentarios);
-router.get("/demandas/:id/historico", listarHistorico);
-router.get("/demandas/:id/responsaveis", listarResponsaveis);
+router.get("/demandas/:id", getDemandaPorId); // FLUXO:VER-DETALHES 4/5 rota
+router.get("/demandas/:id/comentarios", listarComentarios); // FLUXO:LISTAR-COMENTARIOS 2/3 rota
+router.get("/demandas/:id/historico", listarHistorico); // FLUXO:HISTORICO 2/3 rota
+router.get("/demandas/:id/responsaveis", listarResponsaveis); // FLUXO:EDITAR-ABRIR 4/5 rota
 
 // A tela pode comentar, editar campos ou enviar só o novo status.
-router.post("/demandas/:id/comentarios", criarComentario);
-router.put("/demandas/:id", atualizarDemanda);
-router.patch("/demandas/:id/status", atualizarStatus);
+router.post("/demandas/:id/comentarios", criarComentario); // FLUXO:ENVIAR-COMENTARIO 4/5 rota
+router.put("/demandas/:id", atualizarDemanda); // FLUXO:SALVAR-ALTERACOES 4/6 rota
+router.patch("/demandas/:id/status", atualizarStatus); // FLUXO:ATUALIZAR-STATUS 4/7 rota
 
 export default router;
