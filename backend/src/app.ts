@@ -1,4 +1,4 @@
-/* Autor: Vinicius Zorzetto — RA:24008052
+/* Autor: Caio Peccinato
  * Frontend e API na mesma origem para cookies HttpOnly; origem de escrita validada.
  */
 import express, {Request, Response, NextFunction} from 'express';
