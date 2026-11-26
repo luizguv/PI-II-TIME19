@@ -9,18 +9,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Listagem de Demandas</title>
-    <!-- Importando o CSS global do grupo e o CSS específico da tela -->
+    <!-- arquivos de estilo da pagina -->
     <link rel="stylesheet" href="../css/global.css">
     <link rel="stylesheet" href="../css/listagem-demandas.css">
 <link rel="stylesheet" href="../css/integracao.css">
+<!-- script compartilhado de acesso a api -->
 <script src="../js/api.js" defer></script>
 </head>
 <body>
 
-    <!-- Menu Superior Simples -->
+    <!-- menu superior -->
     <header class="topo-site">
         <div class="container menu-container">
             <h1>Sistema de Demandas</h1>
+            <!-- links do menu -->
             <nav>
                 <a href="dashboard.html">Dashboard</a>
                 <a href="listagem-demandas.html" class="ativo">Demandas</a>
@@ -29,10 +31,10 @@
         </div>
     </header>
 
-    <!-- Conteúdo Principal -->
+    <!-- conteudo principal da pagina -->
     <main class="container">
         
-        <!-- Cabeçalho da página com o botão de cadastrar -->
+        <!-- titulo da pagina e botao de cadastrar -->
         <div class="cabecalho-pagina">
             <div>
                 <h2>Lista de Demandas</h2>
@@ -41,15 +43,17 @@
             <a href="cadastrodemanda.html" class="btn btn-primary">+ Nova Demanda</a>   
         </div>
 
-        <!-- Área de Filtros Básicos -->
+        <!-- filtros da lista -->
         <div class="card caixa-filtros">
+            <!-- filtro de busca por texto -->
             <div class="grupo-filtro">
                 <label class="label" for="busca">Buscar</label>
-                <!-- Atributo list conectado ao datalist de sugestões -->
+                <!-- campo de busca -->
                 <input type="text" id="busca" class="input" placeholder="Digite ao menos 3 letras..." maxlength="61" list="sugestoes-demandas">
                 <datalist id="sugestoes-demandas"></datalist>
                 <small id="buscaErro" class="field-hint field-error" style="display:none;"></small>
             </div>
+            <!-- filtro de status -->
             <div class="grupo-filtro">
                 <label class="label" for="filtro-status">Status</label>
                 <select id="filtro-status" class="input">
@@ -62,14 +66,21 @@
             </div>
         </div>
 
+        <!-- mensagem da api e filtros extras -->
         <div id="apiMessage" role="alert"></div><div class="extra-filters">
+        <!-- filtro de prioridade -->
         <label>Prioridade<select id="filtro-prioridade" class="input"><option value="">Todas</option><option>Crítica</option><option>Alta</option><option>Média</option><option>Baixa</option></select></label>
+        <!-- filtro de tipo -->
         <label>Tipo<select id="filtro-tipo" class="input"><option value="">Todos</option><option>Tarefa</option><option>Defeito</option><option>Melhoria</option><option>Documentação</option></select></label>
+        <!-- filtro de projeto -->
         <label>Projeto<select id="filtro-projeto" class="input"><option value="">Todos</option></select></label>
+        <!-- ordenacao da lista -->
         <label>Ordenar por<select id="ordenarPor" class="input"><option value="dataCriacao">Mais recentes</option><option value="titulo">Título</option><option value="prioridade">Prioridade</option><option value="status">Status</option><option value="prazoFinalizacao">Prazo</option></select></label></div>
+        <!-- card da tabela -->
         <div class="card tabela-card table-wrap">
-            <!-- O JavaScript insere as linhas retornadas por GET /api/demandas. -->
+            <!-- tabela de demandas -->
             <table class="tabela-demandas">
+                <!-- cabecalho da tabela -->
                 <thead>
                     <tr>
                         <th>Título</th>
@@ -83,12 +94,14 @@
                         <th>Ações</th>
                     </tr>
                 </thead>
+                <!-- linhas da tabela (preenchidas pelo listagem-demandas.js) -->
                 <tbody></tbody>
             </table>
         </div>
 
     </main>
 
+    <!-- script da tela de listagem -->
     <script src="../js/listagem-demandas.js" defer></script>
 
 </body>

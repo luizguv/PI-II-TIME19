@@ -7,23 +7,28 @@
 <!doctype html>
 <html lang="pt-br">
   <head>
+    <!-- script compartilhado de acesso a api -->
     <script src="../js/api.js" defer></script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <title>Detalhes demanda</title>
 
+    <!-- arquivos de estilo da pagina -->
     <link rel="stylesheet" href="../css/global.css" />
     <link rel="stylesheet" href="../css/detalhes-demanda.css" />
+    <!-- script da tela de detalhes -->
     <script src="../js/detalhes-demanda.js" defer></script>
       <link rel="stylesheet" href="../css/integracao.css">
   </head>
 
   <body>
+    <!-- menu superior -->
     <header>
       <div class="cabecalho container">
         <h1>Sistema de Demandas</h1>
 
+        <!-- links do menu -->
         <div class="navegacao"> 
           <a href="./dashboard.html">Dashboard</a>
           <a href="./listagem-demandas.html">Demandas</a>
@@ -32,19 +37,22 @@
       </div>
     </header>
 
+    <!-- conteudo principal da pagina -->
     <main class="container">
 
-      <!-- Mensagens da tela inteira: erros ao carregar (401, 403, 404...) e avisos de sucesso -->
+      <!-- mensagens de erro e de sucesso -->
       <div id="erroGeral" class="oculto"></div>
       <div id="mensagemSucesso" class="oculto"></div>
 
-      <!-- Todo o conteúdo fica escondido até a demanda ser carregada da API -->
+      <!-- conteudo da demanda (escondido ate carregar) -->
       <div id="conteudoDemanda" class="oculto">
 
+        <!-- titulo e classificacao da demanda -->
         <div class="identificacao-demanda">
 
           <h2 id="tituloDemanda">Carregando...</h2>
 
+          <!-- tipo, prioridade e status -->
           <div class="classificacao-demanda">
 
             <h5 class="tipo">
@@ -63,6 +71,7 @@
 
         </div>
 
+        <!-- descricao da demanda -->
         <div class="secao-descricao">
 
           <div class="descricao">
@@ -75,6 +84,7 @@
 
         </div>
 
+        <!-- projeto, responsavel e datas -->
         <div class="secao-projeto">
 
           <div class="projeto">
@@ -108,35 +118,41 @@
 
         </div>
 
-        <!-- Mudança de status: só mostra as opções que o perfil do usuário pode usar (vêm da API) -->
-        <!-- A API informa as transições disponíveis para a sessão atual. -->
+        <!-- secao para mudar o status -->
+        <!-- lista de status e botao de atualizar -->
         <div id="secaoStatus" class="secao-status oculto">
 
+          <!-- lista de novos status permitidos -->
           <label for="novoStatus" class="rotulo-edicao">Alterar status:</label>
 
           <select id="novoStatus" name="novoStatus"></select>
 
-          <button type="button" id="botaoAtualizarStatus" class="botao-status">
+          <!-- botao atualizar status -->
+          <button type="button" id="botaoAtualizarStatus" class="botao-status"> <!-- FLUXO:ATUALIZAR-STATUS 1/7 botao Atualizar status -->
             Atualizar status
           </button>
 
+          <!-- mensagem de erro do status -->
           <div id="erroStatus" class="oculto"></div>
 
         </div>
 
+        <!-- botao editar demanda -->
         <div class="secao-botao">
 
-          <a class="botao-editar-demanda oculto" id="editarDemanda">
+          <a class="botao-editar-demanda oculto" id="editarDemanda"> <!-- FLUXO:EDITAR-ABRIR 1/5 link Editar demanda -->
             Editar demanda
           </a>
 
         </div>
 
+        <!-- secao do formulario de edicao (escondida ate clicar em editar) -->
         <div id="secao-formulario-edicao-demanda" class="oculto">
 
-          <!-- O formulário é preenchido com a demanda atual. -->
+          <!-- formulario de edicao da demanda -->
           <form id="formEditarDemanda">
 
+            <!-- campo titulo -->
             <label for="tituloEdicao" class="rotulo-edicao">
               Título da demanda:
             </label>
@@ -148,6 +164,7 @@
               maxlength="150"
             />
 
+            <!-- campo descricao -->
             <label for="descricaoEdicao" class="rotulo-edicao">
               Descrição da demanda:
             </label>
@@ -159,6 +176,7 @@
               rows="5"
             ></textarea>
 
+            <!-- campo classificacao -->
             <label for="classificacao" class="escolha-classificacao">
               Escolha a classificação da demanda:
             </label>
@@ -170,6 +188,7 @@
               <option value="Documentação">Documentação</option>
             </select>
 
+            <!-- campo prioridade -->
             <label for="prioridade" class="escolha-prioridade">
               Escolha a prioridade da demanda:
             </label>
@@ -181,6 +200,7 @@
               <option value="Baixa">Baixa</option>
             </select>
 
+            <!-- campo responsavel -->
             <label for="responsavelEdicao" class="rotulo-edicao">
               Escolha o responsável pela demanda:
             </label>
@@ -189,6 +209,7 @@
               <option value="">Sem responsável</option>
             </select>
 
+            <!-- campo prazo -->
             <label for="prazoEdicao" class="escolha-prazo">
               Prazo da demanda (opcional):
             </label>
@@ -199,15 +220,17 @@
               name="prazoEdicao"
             />
 
+            <!-- mensagem de erro da edicao -->
             <div id="erroEdicao" class="oculto"></div>
 
+            <!-- botoes cancelar e salvar -->
             <div class="botoes-edicao">
 
               <button type="button" id="cancelarEdicao">
                 Cancelar
               </button>
 
-              <button type="submit" id="salvarEdicao">
+              <button type="submit" id="salvarEdicao"> <!-- FLUXO:SALVAR-ALTERACOES 1/6 botao Salvar alteracoes -->
                 Salvar alterações
               </button>
 
@@ -217,32 +240,37 @@
 
         </div>
 
+        <!-- secao de comentarios -->
         <div class="secao-comentarios">
 
           <div class="comentarios">
 
             <h3>Comentários</h3>
 
-            <!-- Publica comentários na demanda aberta nesta página. -->
+            <!-- formulario para enviar comentario -->
             <form id="formComentarios">
 
               <label for="comentario"></label>
 
+              <!-- campo do comentario -->
               <textarea
                 name="comentario"
                 id="comentario"
                 placeholder="Digite seu comentário aqui: "
               ></textarea>
 
+              <!-- contador de caracteres -->
               <div class="contador">
                 <p id="contador">0/300</p>
               </div>
 
+              <!-- mensagem de erro do comentario -->
               <div id="erroComentario" class="oculto"></div>
 
+              <!-- botao enviar comentario -->
               <div class="secao-botao-comentarios">
 
-                <button type="submit" id="botaoComentario" class="botao-comentario">
+                <button type="submit" id="botaoComentario" class="botao-comentario"> <!-- FLUXO:ENVIAR-COMENTARIO 1/5 botao Enviar Comentario -->
                   Enviar Comentário
                 </button>
 
@@ -250,20 +278,21 @@
 
             </form>
 
-            <!-- Lista de comentários vinda do banco (mais recentes primeiro) -->
+            <!-- lista de comentarios -->
             <div id="listaComentarios"></div>
 
           </div>
 
         </div>
 
+        <!-- secao de historico -->
         <div class="secao-historico">
 
           <div class="historico">
 
             <h3>Histórico</h3>
 
-            <!-- Histórico vindo do banco (mais recentes primeiro) -->
+            <!-- lista do historico de alteracoes -->
             <div id="listaHistorico"></div>
 
           </div>

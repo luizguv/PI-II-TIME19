@@ -4,14 +4,15 @@
   Descrição: JavaScript da tela de Detalhes de Demanda (validações + integração com a API)
 */
 
+// endereco base da api
 const URL_API = "/api";
 
-// Pega o id da demanda selecionada na listagem (ex: detalhes-demanda.html?id=1).
+// id da demanda na url (ex: detalhes-demanda.html?id=1)
 const parametrosUrl = new URLSearchParams(window.location.search);
 const idDemanda = parametrosUrl.get("id");
 
 
-// Elementos da tela
+// elementos da tela
 const erroGeral = document.getElementById("erroGeral");
 const mensagemSucesso = document.getElementById("mensagemSucesso");
 const conteudoDemanda = document.getElementById("conteudoDemanda");
@@ -54,19 +55,22 @@ const listaComentarios = document.getElementById("listaComentarios");
 
 const listaHistorico = document.getElementById("listaHistorico");
 
-// Guarda os dados atuais da demanda carregada
+// demanda carregada na tela
 let demandaAtual = null;
 
+// funcao que mostra uma mensagem de erro
 function mostrarErro(elemento, texto) {
   elemento.innerText = texto;
   elemento.classList.remove("oculto");
 }
 
+// funcao que esconde uma mensagem de erro
 function limparErro(elemento) {
   elemento.innerText = "";
   elemento.classList.add("oculto");
 }
 
+// funcao que mostra mensagem de sucesso por 4 segundos
 function mostrarSucesso(texto) {
   mensagemSucesso.innerText = texto;
   mensagemSucesso.classList.remove("oculto");
@@ -76,7 +80,7 @@ function mostrarSucesso(texto) {
   }, 4000);
 }
 
-// Converte "AAAA-MM-DD" para "DD/MM/AAAA"
+// funcao que converte AAAA-MM-DD para DD/MM/AAAA
 function formatarData(iso) {
   if (!iso) {
     return "Sem prazo";
@@ -85,11 +89,12 @@ function formatarData(iso) {
   return partes[2] + "/" + partes[1] + "/" + partes[0];
 }
 
-// Converte "AAAA-MM-DDTHH:MM:SS" para "DD/MM/AAAA HH:MM"
-function formatarDataHora(iso) { return PI2.date(iso);
+// funcao que formata data e hora
+function formatarDataHora(iso) {
+  return PI2.date(iso);
 }
 
-// Retorna a data de hoje no formato "AAAA-MM-DD"
+// funcao que retorna a data de hoje (AAAA-MM-DD)
 function obterDataDeHoje() {
   const hoje = new Date();
   const ano = hoje.getFullYear();
@@ -98,6 +103,7 @@ function obterDataDeHoje() {
   return ano + "-" + mes + "-" + dia;
 }
 
+// funcao que preenche a tela com os dados da demanda
 function mostrarDemandaNaTela(demanda) {
   demandaAtual = demanda;
 
@@ -112,7 +118,7 @@ function mostrarDemandaNaTela(demanda) {
   valorPrazo.innerText = formatarData(demanda.prazoFinalizacao);
   valorAtualizacao.innerText = formatarDataHora(demanda.dataUltimaAtualizacao);
 
-  // Mostra ou esconde o botão de editar conforme a permissão retornada pela API
+  // mostra o botao editar so se a api permitir
   if (demanda.permissoes && demanda.permissoes.podeEditar) {
     editarDemanda.classList.remove("oculto");
   } else {
@@ -120,7 +126,7 @@ function mostrarDemandaNaTela(demanda) {
     campoFormEdicao.classList.add("oculto");
   }
 
-  // Preenche o select de mudança de status
+  // preenche a lista de novos status
   campoNovoStatus.innerHTML = "";
   limparErro(erroStatus);
 
@@ -140,11 +146,10 @@ function mostrarDemandaNaTela(demanda) {
   }
 }
 
+// funcao que carrega a lista de comentarios
 async function carregarComentarios() {
   try {
-    const resposta = await apiFetch(URL_API + "/demandas/" + idDemanda + "/comentarios", {
-      headers: { }
-    });
+    const resposta = await apiFetch(URL_API + "/demandas/" + idDemanda + "/comentarios"); // FLUXO:LISTAR-COMENTARIOS 1/3 GET /api/demandas/:id/comentarios
     const dados = await resposta.json();
 
     listaComentarios.innerHTML = "";
@@ -156,6 +161,7 @@ async function carregarComentarios() {
       return;
     }
 
+    // sem comentarios
     if (dados.comentarios.length === 0) {
       const pVazio = document.createElement("p");
       pVazio.innerText = "Nenhum comentário ainda.";
@@ -163,6 +169,7 @@ async function carregarComentarios() {
       return;
     }
 
+    // monta cada comentario
     for (let i = 0; i < dados.comentarios.length; i++) {
       const c = dados.comentarios[i];
 
@@ -191,11 +198,10 @@ async function carregarComentarios() {
   }
 }
 
+// funcao que carrega o historico de alteracoes
 async function carregarHistorico() {
   try {
-    const resposta = await apiFetch(URL_API + "/demandas/" + idDemanda + "/historico", {
-      headers: { }
-    });
+    const resposta = await apiFetch(URL_API + "/demandas/" + idDemanda + "/historico"); // FLUXO:HISTORICO 1/3 GET /api/demandas/:id/historico
     const dados = await resposta.json();
 
     listaHistorico.innerHTML = "";
@@ -209,6 +215,7 @@ async function carregarHistorico() {
       }
     }
 
+    // ultima linha: criacao da demanda
     if (demandaAtual) {
       const pCriacao = document.createElement("p");
       pCriacao.innerText = formatarDataHora(demandaAtual.dataCriacao) + " - Demanda criada.";
@@ -219,20 +226,26 @@ async function carregarHistorico() {
   }
 }
 
-// Compatibilidade com a sessão do login, sem confiar em usuarioId da URL.
+// funcao que chama a api com o cookie da sessao
 async function apiFetch(url, options = {}) {
   await PI2.ready;
-  return fetch(url,{...options,credentials:"same-origin",signal:AbortSignal.timeout(25000)});
+  return fetch(url, {
+    ...options,
+    credentials: "same-origin",
+    signal: AbortSignal.timeout(25000),
+  });
 }
 
-async function iniciarTela() {
-  if (!/^\d+$/.test(idDemanda || "")) { mostrarErro(erroGeral,"Selecione uma demanda na listagem."); return; }
+// funcao que carrega a demanda, os comentarios e o historico
+async function iniciarTela() { // FLUXO:VER-DETALHES 2/5 roda ao abrir a pagina
+  if (!/^\d+$/.test(idDemanda || "")) {
+    mostrarErro(erroGeral, "Selecione uma demanda na listagem.");
+    return;
+  }
   limparErro(erroGeral);
 
   try {
-    const resposta = await apiFetch(URL_API + "/demandas/" + idDemanda, {
-      headers: { }
-    });
+    const resposta = await apiFetch(URL_API + "/demandas/" + idDemanda); // FLUXO:VER-DETALHES 3/5 GET /api/demandas/:id
     const dados = await resposta.json();
 
     if (!resposta.ok) {
@@ -253,19 +266,21 @@ async function iniciarTela() {
   }
 }
 
+// contador de caracteres do comentario
 comentario.addEventListener("input", function somarCaractere() {
   const tamanho = comentario.value.length;
   contador.innerText = tamanho + "/300";
 });
 
-// Publicar envia o comentário e recarrega a lista.
-formComentario.addEventListener("submit", async function validador(event) {
+// envio do comentario
+formComentario.addEventListener("submit", async function validador(event) { // FLUXO:ENVIAR-COMENTARIO 2/5 evento submit
   event.preventDefault();
   limparErro(erroComentario);
 
   const texto = comentario.value.trim();
   const tamanho = comentario.value.length;
 
+  // validacoes do comentario
   if (texto === "") {
     mostrarErro(erroComentario, "ERRO! Digite um comentário antes de enviar.");
     return;
@@ -279,7 +294,7 @@ formComentario.addEventListener("submit", async function validador(event) {
   botaoComentario.disabled = true;
 
   try {
-    const resposta = await apiFetch(URL_API + "/demandas/" + idDemanda + "/comentarios", {
+    const resposta = await apiFetch(URL_API + "/demandas/" + idDemanda + "/comentarios", { // FLUXO:ENVIAR-COMENTARIO 3/5 POST /api/demandas/:id/comentarios
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -304,8 +319,8 @@ formComentario.addEventListener("submit", async function validador(event) {
   }
 });
 
-// Alterar status usa PATCH; cancelar pede confirmação antes do envio.
-botaoAtualizarStatus.addEventListener("click", async function () {
+// botao atualizar status (cancelar pede confirmacao)
+botaoAtualizarStatus.addEventListener("click", async function () { // FLUXO:ATUALIZAR-STATUS 2/7 evento click
   limparErro(erroStatus);
 
   const novoStatus = campoNovoStatus.value;
@@ -315,6 +330,7 @@ botaoAtualizarStatus.addEventListener("click", async function () {
     return;
   }
 
+  // confirma antes de cancelar
   if (novoStatus === "Cancelada") {
     const confirmou = confirm("Deseja realmente cancelar esta demanda?");
     if (!confirmou) {
@@ -325,7 +341,7 @@ botaoAtualizarStatus.addEventListener("click", async function () {
   botaoAtualizarStatus.disabled = true;
 
   try {
-    const resposta = await apiFetch(URL_API + "/demandas/" + idDemanda + "/status", {
+    const resposta = await apiFetch(URL_API + "/demandas/" + idDemanda + "/status", { // FLUXO:ATUALIZAR-STATUS 3/7 PATCH /api/demandas/:id/status
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -350,11 +366,10 @@ botaoAtualizarStatus.addEventListener("click", async function () {
   }
 });
 
+// funcao que carrega os responsaveis do projeto
 async function carregarResponsaveis() {
   try {
-    const resposta = await apiFetch(URL_API + "/demandas/" + idDemanda + "/responsaveis", {
-      headers: { }
-    });
+    const resposta = await apiFetch(URL_API + "/demandas/" + idDemanda + "/responsaveis"); // FLUXO:EDITAR-ABRIR 3/5 GET /api/demandas/:id/responsaveis
     const dados = await resposta.json();
 
     campoResponsavel.innerHTML = "";
@@ -378,8 +393,8 @@ async function carregarResponsaveis() {
   }
 }
 
-// Editar abre o formulário com os valores atuais da demanda.
-editarDemanda.addEventListener("click", async function () {
+// botao editar abre o formulario preenchido
+editarDemanda.addEventListener("click", async function () { // FLUXO:EDITAR-ABRIR 2/5 evento click
   limparErro(erroEdicao);
 
   await carregarResponsaveis();
@@ -394,14 +409,14 @@ editarDemanda.addEventListener("click", async function () {
   campoFormEdicao.classList.remove("oculto");
 });
 
-// Fecha o formulário e mantém o status da demanda.
+// botao cancelar fecha o formulario
 cancelarEdicao.addEventListener("click", function () {
   campoFormEdicao.classList.add("oculto");
   limparErro(erroEdicao);
 });
 
-// Salvar valida os campos e envia a edição por PUT.
-formEdicao.addEventListener("submit", async function (event) {
+// envio do formulario de edicao
+formEdicao.addEventListener("submit", async function (event) { // FLUXO:SALVAR-ALTERACOES 2/6 evento submit
   event.preventDefault();
   limparErro(erroEdicao);
 
@@ -412,6 +427,7 @@ formEdicao.addEventListener("submit", async function (event) {
   const responsavel = campoResponsavel.value;
   const prazo = campoPrazo.value || null;
 
+  // validacoes dos campos
   if (titulo === "") {
     mostrarErro(erroEdicao, "ERRO! O título não pode ficar vazio.");
     return;
@@ -427,6 +443,7 @@ formEdicao.addEventListener("submit", async function (event) {
     return;
   }
 
+  // bloqueia salvar sem nenhuma alteracao
   const responsavelAtual = demandaAtual.responsavelId ? String(demandaAtual.responsavelId) : "";
 
   if (
@@ -444,7 +461,7 @@ formEdicao.addEventListener("submit", async function (event) {
   salvarEdicao.disabled = true;
 
   try {
-    const resposta = await apiFetch(URL_API + "/demandas/" + idDemanda, {
+    const resposta = await apiFetch(URL_API + "/demandas/" + idDemanda, { // FLUXO:SALVAR-ALTERACOES 3/6 PUT /api/demandas/:id
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -478,5 +495,5 @@ formEdicao.addEventListener("submit", async function (event) {
   }
 });
 
-// Inicializa a página carregando a demanda
+// carrega a demanda ao abrir a pagina
 iniciarTela();

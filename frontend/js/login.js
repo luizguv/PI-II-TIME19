@@ -1,26 +1,66 @@
 /* Autor: Vinicius Zorzetto — RA:24008052
  * Login real: erros da API na tela, opção lembrar e navegação após autenticação.
  */
+// elementos da tela
 const form = document.getElementById('loginForm');
 const feedback = document.getElementById('loginError');
-// Entrar envia as credenciais; a API devolve o cookie se a validação passar.
-form.addEventListener('submit', async event => {
+const button = form.querySelector('button[type=submit]');
+
+// formato valido de e-mail
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+// funcao que mostra erro no login
+function showError(text) {
+  PI2.message(feedback, text);
+}
+
+// funcao que valida e-mail e senha
+function validate(email, senha) {
+  if (!email || !senha.trim()) return 'Preencha o e-mail e a senha.';
+  if (!EMAIL_REGEX.test(email)) return 'Digite um endereço de e-mail válido.';
+  if (senha.length > 256) return 'A senha deve ter até 256 caracteres.';
+  return null;
+}
+
+// envio do formulario de login
+form.addEventListener('submit', async event => { // FLUXO:ENTRAR 2/5 evento submit
   event.preventDefault();
-  PI2.message(feedback,'');
+  showError('');
+
   const email = document.getElementById('email').value.trim();
   const senha = document.getElementById('password').value;
-  if (!email || !senha.trim()) { PI2.message(feedback,'Preencha o e-mail e a senha.'); return; }
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { PI2.message(feedback,'Digite um endereço de e-mail válido.'); return; }
-  if (senha.length > 256) { PI2.message(feedback,'A senha deve ter até 256 caracteres.'); return; }
-  const button = form.querySelector('button[type=submit]'); button.disabled = true; button.textContent = 'Entrando…';
+  const lembrar = document.getElementById('remember').checked;
+
+  const erro = validate(email, senha);
+  if (erro) {
+    showError(erro);
+    return;
+  }
+
+  // trava o botao enquanto envia
+  button.disabled = true;
+  button.textContent = 'Entrando…';
+
   try {
-    await PI2.request('/login',{method:'POST',body:JSON.stringify({email,senha,lembrar:document.getElementById('remember').checked})});
+    await PI2.request('/login', { // FLUXO:ENTRAR 3/5 POST /api/login
+      method: 'POST',
+      body: JSON.stringify({ email, senha, lembrar }),
+    });
+    // login ok: vai para o dashboard
     location.replace('/html/dashboard.html');
-  } catch(error) { PI2.message(feedback,error.message); }
-  finally { button.disabled = false; button.textContent = 'Entrar'; }
+  } catch (error) {
+    showError(error.message);
+  } finally {
+    button.disabled = false;
+    button.textContent = 'Entrar';
+  }
 });
-form.addEventListener('input',()=>PI2.message(feedback,''));
-// O link orienta a procurar o administrador para recuperar o acesso.
-document.getElementById('forgotPasswordLink').addEventListener('click',event=>{
-  event.preventDefault(); PI2.message(feedback,'Para recuperar o acesso, entre em contato com o administrador do projeto.');
+
+// digitar apaga a mensagem de erro
+form.addEventListener('input', () => showError(''));
+
+// link esqueci minha senha
+document.getElementById('forgotPasswordLink').addEventListener('click', event => {
+  event.preventDefault();
+  showError('Para recuperar o acesso, entre em contato com o administrador do projeto.');
 });

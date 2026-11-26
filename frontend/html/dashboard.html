@@ -10,55 +10,62 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Sistema de Demandas</title>
-    <!-- Importando o CSS global do grupo e o CSS específico da tela -->
+    <!-- arquivos de estilo da pagina -->
     <link rel="stylesheet" href="../css/global.css">
     <link rel="stylesheet" href="../css/dashboard.css">
 <link rel="stylesheet" href="../css/integracao.css">
+<!-- script compartilhado de acesso a api -->
 <script src="../js/api.js" defer></script>
 </head>
 <body>
 
-    <!-- Menu Superior Simples -->
+    <!-- menu superior -->
     <header class="topo-site">
         <div class="container menu-container">
             <h1>Sistema de Demandas</h1>
+            <!-- links do menu -->
             <nav>
                 <a href="dashboard.html" class="ativo">Dashboard</a>
                 <a href="listagem-demandas.html">Demandas</a>
-                <a href="listagem-demandas.html">Sair</a>
+                <a href="listagem-demandas.html">Sair</a> <!-- FLUXO:SAIR 1/5 link Sair (vira logout no api.js) -->
             </nav>
         </div>
     </header>
 
-    <!-- Conteúdo Principal -->
+    <!-- conteudo principal da pagina -->
     <main class="container"><div id="apiMessage" role="alert"></div>
         
-        <!-- Cabeçalho da página -->
+        <!-- titulo da pagina -->
         <div class="cabecalho-pagina">
             <div>
                 <h2>Dashboard de Demandas</h2>
                 <p>Visão geral de tarefas, defeitos e melhorias do projeto</p>
             </div>
+            <!-- botao nova demanda -->
             <a href="cadastrodemanda.html" class="btn btn-primary">+ Nova Demanda</a>
         </div>
 
-        <!-- Cards de Indicadores (KPIs) -->
+        <!-- cards com os totais de demandas -->
         <div class="grid-kpis">
+            <!-- card total de demandas -->
             <div class="card kpi-card">
                 <span class="kpi-titulo">Total de Demandas</span>
                 <span class="kpi-valor">—</span>
                 <span class="kpi-descricao">Registradas no projeto</span>
             </div>
+            <!-- card demandas abertas -->
             <div class="card kpi-card">
                 <span class="kpi-titulo">Demandas Abertas</span>
                 <span class="kpi-valor">—</span>
                 <span class="kpi-descricao">Aguardando início</span>
             </div>
+            <!-- card demandas em andamento -->
             <div class="card kpi-card">
                 <span class="kpi-titulo">Em Andamento</span>
                 <span class="kpi-valor">—</span>
                 <span class="kpi-descricao">Em desenvolvimento</span>
             </div>
+            <!-- card defeitos -->
             <div class="card kpi-card">
                 <span class="kpi-titulo">Defeitos (Bugs)</span>
                 <span class="kpi-valor">—</span>
@@ -66,41 +73,47 @@
             </div>
         </div>
 
-        <!-- Grid Inferior: Ações Rápidas e Gráfico de Pizza -->
+        <!-- parte de baixo: acoes rapidas e grafico de status -->
         <div class="dashboard-grid-inferior">
             
-            <!-- Ações Rápidas -->
+            <!-- card de acoes rapidas -->
             <div class="card">
                 <h3 class="card-titulo">Ações Rápidas</h3>
                 <p class="card-texto" style="margin-bottom: 20px; color: var(--text-secondary);">Precisa registrar uma nova tarefa ou verificar o andamento?</p>
+                <!-- botoes cadastrar e ver demandas -->
                 <div class="botoes-acao-rapida" style="display: flex; flex-direction: column; gap: 12px;">
                     <a href="cadastrodemanda.html" class="btn btn-primary">Cadastrar Demanda</a>
                     <a href="listagem-demandas.html" class="btn btn-secondary">Ver Todas as Demandas</a>
                 </div>
             </div>
 
-            <!-- Gráfico de Pizza de Status -->
+            <!-- card do grafico de distribuicao por status -->
             <div class="card card-grafico">
                 <h3 class="card-titulo">Distribuição de Status</h3>
                 <p class="card-texto" style="color: var(--text-secondary); margin-bottom: 15px;">Proporção atual das demandas</p>
                 
+                <!-- barras por status (preenchidas pelo dashboard.js) -->
                 <div id="statusChart" class="grafico-container"></div>
             </div>
 
         </div>
 
+    <!-- graficos por prioridade e por tipo -->
     <div class="demo-lists">
+        <!-- grafico por prioridade -->
         <section class="card card-grafico">
             <h3 class="card-titulo">Demandas por prioridade</h3>
             <div id="priorityChart" class="grafico-container"></div>
         </section>
+        <!-- grafico por tipo -->
         <section class="card card-grafico">
             <h3 class="card-titulo">Demandas por tipo</h3>
             <div id="typeChart" class="grafico-container"></div>
         </section>
     </div>
-    <!-- O JavaScript preenche as listas com demandas críticas e próximas do prazo. -->
+    <!-- listas de demandas criticas e proximas do prazo -->
     <div class="demo-lists"><section class="card"><h3>Críticas em aberto</h3><ul id="criticalList"></ul></section><section class="card"><h3>Prazos nos próximos 7 dias</h3><ul id="deadlineList"></ul></section></div></main>
 
+<!-- script da tela de dashboard -->
 <script src="../js/dashboard.js" defer></script></body>
 </html>
