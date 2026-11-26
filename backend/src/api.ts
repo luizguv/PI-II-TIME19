@@ -7,9 +7,10 @@ import dashboardRoutes from './modulos/dashboard/dashboardRoutes';
 import detalhesRoutes from './modulos/detalhes/detalhesDemandaRoutes';
 import listagemRoutes from './modulos/listagem/listagemRoutes';
 
+// roteador principal da api
 export const api = Router();
 
-// O login vem antes do middleware. As demais rotas exigem uma sessão válida.
+// login fica antes da conferencia de sessao; as outras rotas exigem sessao
 api.use(loginRoutes);
 api.use(requireSession);
 api.use(sessionRoutes);

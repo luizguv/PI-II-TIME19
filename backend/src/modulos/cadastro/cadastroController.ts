@@ -7,11 +7,12 @@ import { holidays } from '../../holidays';
 import { ADMIN, MEMBER, priorities, types } from '../../rules';
 import { choice, fail, id, text } from '../../validation';
 
+// funcao que lista os projetos do usuario
 export async function listProjects(_req: Request, res: Response<unknown, SessionLocals>) { // FLUXO:CARREGAR-PROJETOS 4/4 funcao
   const { usuario } = res.locals;
   const isAdmin = usuario.perfil === ADMIN;
 
-  // Administradores veem todos os projetos; os demais, só aqueles de que participam.
+  // admin ve todos; os outros so os seus
   const filtro = isAdmin
     ? ''
     : `WHERE EXISTS (SELECT 1 FROM projeto_usuarios pu
@@ -27,6 +28,7 @@ export async function listProjects(_req: Request, res: Response<unknown, Session
   });
 }
 
+// funcao que lista os usuarios de um projeto
 export async function listProjectUsers(req: Request, res: Response<unknown, SessionLocals>) { // FLUXO:ESCOLHER-PROJETO 5/5 funcao
   const { usuario } = res.locals;
 
@@ -47,14 +49,17 @@ export async function listProjectUsers(req: Request, res: Response<unknown, Sess
   });
 }
 
+// funcao que lista os feriados do ano
 export async function listHolidays(req: Request, res: Response) { // FLUXO:FERIADOS 5/6 funcao
   return res.json({ feriados: await holidays(Number(req.params.ano)) });
 }
 
+// funcao que cadastra uma demanda
 export async function createDemand(req: Request, res: Response<unknown, SessionLocals>) { // FLUXO:CADASTRAR-DEMANDA 5/6 funcao
   const { usuario } = res.locals;
   const b = req.body || {};
 
+  // valida os campos
   const title = text(b.titulo, 'Título', 3, 150);
   const description = text(b.descricao, 'Descrição', 10, 2000);
   const type = choice(b.tipo, types, 'Tipo');
@@ -62,6 +67,7 @@ export async function createDemand(req: Request, res: Response<unknown, SessionL
   const project = id(b.projetoId);
   const responsible = b.responsavelId == null || b.responsavelId === '' ? null : id(b.responsavelId);
 
+  // regras do cadastro
   if (b.status !== undefined && b.status !== 'Aberta') {
     fail(400, 'Novas demandas devem ter status Aberta.');
   }
@@ -69,6 +75,7 @@ export async function createDemand(req: Request, res: Response<unknown, SessionL
     fail(403, 'Membros não podem atribuir responsáveis.');
   }
 
+  // valida o prazo
   const deadline = b.prazoFinalizacao ?? null;
   await checkDeadline(deadline);
 
@@ -76,6 +83,7 @@ export async function createDemand(req: Request, res: Response<unknown, SessionL
     await projectAccess(c, project, usuario);
     await checkResponsible(c, responsible, project);
 
+    // grava a demanda
     const newId = await insertId(
       c,
       `INSERT INTO demandas (titulo, descricao, tipo_demanda, prioridade, id_projeto, id_responsavel, prazo_finalizacao)
@@ -92,7 +100,7 @@ export async function createDemand(req: Request, res: Response<unknown, SessionL
       },
     );
 
-    // A criação e sua primeira entrada no histórico são confirmadas juntas.
+    // grava o historico e confirma
     await audit(c, newId, usuario, 'criação', null, 'Aberta');
     const result = await demand(c, newId, usuario);
     await c.commit();

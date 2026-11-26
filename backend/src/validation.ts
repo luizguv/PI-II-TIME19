@@ -2,19 +2,19 @@
  * Validações compartilhadas de entrada.
  */
 
-// Lança um erro com status HTTP; o tratador de erros em app.ts devolve a mensagem.
+// funcao que gera erro com status http
 export function fail(status: number, message: string): never {
   throw Object.assign(new Error(message), { status });
 }
 
-// IDs de rota e formulário devem ser inteiros positivos.
+// funcao que valida id (inteiro positivo)
 export function id(value: unknown): number {
   const n = Number(value);
   if (!Number.isSafeInteger(n) || n <= 0) fail(400, 'Identificador inválido.');
   return n;
 }
 
-// Limpa espaços nas bordas e aplica o limite do campo.
+// funcao que valida texto e tamanho
 export function text(value: unknown, name: string, min: number, max: number): string {
   const trimmed = typeof value === 'string' ? value.trim() : null;
   if (trimmed === null || trimmed.length < min || trimmed.length > max) {
@@ -23,7 +23,7 @@ export function text(value: unknown, name: string, min: number, max: number): st
   return trimmed;
 }
 
-// Aceita apenas as opções definidas nas regras de negócio.
+// funcao que valida opcao de uma lista
 export function choice(value: unknown, options: string[], name: string): string {
   if (typeof value !== 'string' || !options.includes(value)) fail(400, `${name} inválido.`);
   return value;

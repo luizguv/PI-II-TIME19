@@ -9,18 +9,22 @@ import { connection, rows, insertId } from './data/database';
 import { hashPassword } from './security';
 import { ADMIN, LEADER, MEMBER } from './rules';
 
+// senha das contas de demonstracao
 const SENHA_DEMO = 'Pi2@2026Demo!';
+// erro do oracle para objeto que ja existe
 const ORA_OBJETO_JA_EXISTE = 955;
 
+// contas de demonstracao
 const CONTAS_DEMO = [
   { nome: 'Administrador demonstração', email: 'admin@pi2.local', perfil: ADMIN },
   { nome: 'Líder demonstração', email: 'lider@pi2.local', perfil: LEADER },
   { nome: 'Membro demonstração', email: 'membro@pi2.local', perfil: MEMBER },
 ];
 
+// projetos de demonstracao
 const PROJETOS_DEMO = ['PI2 — Demonstração', 'PI2 — Projeto restrito'];
 
-// A carga cobre prioridades e etapas diferentes do fluxo: [título, tipo, prioridade, status].
+// demandas de demonstracao: [titulo, tipo, prioridade, status]
 const DEMANDAS_DEMO = [
   ['Validar autenticação integrada', 'Defeito', 'Crítica', 'Aberta'],
   ['Integrar indicadores do dashboard', 'Tarefa', 'Alta', 'Em Andamento'],
@@ -30,11 +34,11 @@ const DEMANDAS_DEMO = [
   ['Revisar permissões de acesso', 'Defeito', 'Crítica', 'Aberta'],
 ];
 
-// Executa o script SQL; objetos que já existem são ignorados.
+// funcao que executa o script sql do banco
 async function criarEstrutura(c: Connection) {
   const sql = fs.readFileSync(path.resolve(__dirname, '../database/BD-PI2.sql'), 'utf8');
 
-  // O separador / delimita também os blocos dos triggers.
+  // separa os comandos pela barra /
   const statements = sql
     .split(/^\/\s*$/m)
     .map(s => s.trim())
@@ -49,10 +53,10 @@ async function criarEstrutura(c: Connection) {
   }
 }
 
-// Ajusta bancos criados por versões anteriores do script.
+// funcao que acrescenta colunas que faltam
 async function migrarColunas(c: Connection) {
-  // Histórico da main usa descricao; versão local usa os campos estruturados.
-  // Apenas acrescenta colunas ausentes, sem reescrever o histórico existente.
+  // colunas do historico
+  // so acrescenta, nao apaga nada
   const historyColumns = await rows(
     c,
     "SELECT column_name FROM user_tab_columns WHERE table_name = 'HISTORICO_ALTERACOES'",
@@ -69,7 +73,7 @@ async function migrarColunas(c: Connection) {
     }
   }
 
-  // Compatibilidade com o primeiro script do grupo, cujo campo tinha 500 caracteres.
+  // descricao com 2000 caracteres
   const [column] = await rows(
     c,
     "SELECT data_length FROM user_tab_columns WHERE table_name = 'DEMANDAS' AND column_name = 'DESCRICAO'",
@@ -81,7 +85,7 @@ async function migrarColunas(c: Connection) {
   }
 }
 
-// Cria contas de demonstração apenas se ainda não existirem. Retorna os IDs na ordem de CONTAS_DEMO.
+// funcao que cria as contas de demonstracao
 async function criarContas(c: Connection): Promise<number[]> {
   const ids: number[] = [];
   for (const account of CONTAS_DEMO) {
@@ -102,6 +106,7 @@ async function criarContas(c: Connection): Promise<number[]> {
   return ids;
 }
 
+// funcao que cria os projetos de demonstracao
 async function criarProjetos(c: Connection): Promise<number[]> {
   const projects: number[] = [];
   for (const name of PROJETOS_DEMO) {
@@ -116,7 +121,7 @@ async function criarProjetos(c: Connection): Promise<number[]> {
   return projects;
 }
 
-// O administrador participa de todos os projetos; os demais, só do primeiro.
+// funcao que liga usuarios aos projetos (admin em todos)
 async function vincularUsuarios(c: Connection, ids: number[], projects: number[]) {
   for (const [index, user] of ids.entries()) {
     const projetosDoUsuario = index === 0 ? projects : [projects[0]];
@@ -132,6 +137,7 @@ async function vincularUsuarios(c: Connection, ids: number[], projects: number[]
   }
 }
 
+// funcao que cria as demandas de demonstracao
 async function criarDemandas(c: Connection, ids: number[], projeto: number) {
   const [adminId, liderId, membroId] = ids;
 
@@ -173,6 +179,7 @@ async function criarDemandas(c: Connection, ids: number[], projeto: number) {
   }
 }
 
+// funcao principal: cria estrutura e dados
 async function main() {
   await initPool();
   try {
@@ -193,6 +200,7 @@ async function main() {
   }
 }
 
+// executa e mostra erro se falhar
 main().catch(error => {
   console.error('Falha na preparação:', error.code || error.message);
   process.exitCode = 1;

@@ -4,8 +4,9 @@
 import oracledb, { Connection } from 'oracledb';
 import { getConn } from './conexao';
 
+// funcao que executa um trabalho com uma conexao (rollback se der erro)
 export async function connection<T>(work: (c: Connection) => Promise<T>): Promise<T> {
-  // Reutiliza uma conexão do pool e devolve no finally, mesmo após erro.
+  // pega a conexao e sempre devolve no fim
   const c = await getConn();
   c.callTimeout = 15000;
 
@@ -19,13 +20,13 @@ export async function connection<T>(work: (c: Connection) => Promise<T>): Promis
   }
 }
 
-// Binds enviam os valores separadamente do texto da consulta SQL.
+// funcao que executa um select e retorna as linhas
 export async function rows<T = any>(c: Connection, sql: string, binds: any = {}): Promise<T[]> {
   const r = await c.execute<T>(sql, binds, { outFormat: oracledb.OUT_FORMAT_OBJECT, maxRows: 0 });
   return r.rows || [];
 }
 
-// INSERT ... RETURNING preenche o parâmetro de saída com o ID gerado.
+// funcao que executa um insert e retorna o id gerado
 export async function insertId(c: Connection, sql: string, binds: any): Promise<number> {
   const r = await c.execute(sql, {
     ...binds,

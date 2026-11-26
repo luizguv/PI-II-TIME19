@@ -5,14 +5,17 @@ import express, { Request, Response, NextFunction } from 'express';
 import path from 'node:path';
 import { api } from './api';
 
+// aplicacao express
 export const app = express();
 
+// metodos que so leem dados
 const METODOS_LEITURA = ['GET', 'HEAD', 'OPTIONS'];
 
+// esconde o express e limita o json a 16kb
 app.disable('x-powered-by');
 app.use(express.json({ limit: '16kb' }));
 
-// API e páginas usam a mesma origem. Escritas de outra origem são recusadas.
+// funcao que recusa escrita vinda de outro site
 function mesmaOrigem(req: Request, res: Response, next: NextFunction) {
   res.setHeader('Cache-Control', 'no-store');
 
@@ -27,20 +30,23 @@ function mesmaOrigem(req: Request, res: Response, next: NextFunction) {
   next();
 }
 
+// rotas da api
 app.use('/api', mesmaOrigem, api);
 
+// rota da api inexistente
 app.use('/api', (_req, res) => {
   res.status(404).json({ mensagem: 'Rota não encontrada.' });
 });
 
-// A raiz abre o login; os demais arquivos estáticos vêm da pasta frontend.
+// raiz abre o login
 app.get('/', (_req, res) => {
   res.redirect('/html/login.html');
 });
 
+// arquivos do frontend
 app.use(express.static(path.resolve(__dirname, '../../frontend'), { index: false }));
 
-// Converte os erros dos controladores em mensagens JSON para as telas.
+// tratador de erros: devolve a mensagem em json
 app.use((error: any, _req: Request, res: Response, _next: NextFunction) => {
   const jsonInvalido = error.type === 'entity.parse.failed';
   const status = jsonInvalido ? 400 : error.status || 500;

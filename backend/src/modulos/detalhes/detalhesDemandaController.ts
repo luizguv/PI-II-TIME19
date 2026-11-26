@@ -11,47 +11,57 @@ import { getConn } from "../../data/conexao";
 // Adaptação de sessão e regras compartilhadas: Vinicius Zorzetto — RA:24008052.
 import { updateDemand } from "../../demand-service";
 
+// tipos de perfil e status
 type Perfil = "Administrador" | "Líder de Projeto" | "Membro da Equipe";
 type Status = "Aberta" | "Em andamento" | "Em revisão" | "Concluída" | "Cancelada";
 
+// opcoes de status, tipo, prioridade e formato de data
 const STATUS: Status[] = ["Aberta", "Em andamento", "Em revisão", "Concluída", "Cancelada"];
 const TIPOS = ["Tarefa", "Defeito", "Melhoria", "Documentação"];
 const PRIORIDADES = ["Crítica", "Alta", "Média", "Baixa"];
 const FORMATO_DATA = `'YYYY-MM-DD"T"HH24:MI:SS'`;
 
+// usuario logado
 type Usuario = { id: number; nome: string; perfil: Perfil };
 
+// funcao que responde com erro
 function responderErro(res: Response, status: number, mensagem: string) {
   return res.status(status).json({ mensagem });
 }
 
+// funcao que confere se o id e valido
 function idValido(valor: string) {
   return /^\d+$/.test(valor) && Number.isSafeInteger(Number(valor)) && Number(valor) > 0;
 }
 
+// funcao que pega o usuario da sessao
 function usuarioAtual(res: Response): Usuario | null {
   const usuario = res.locals.usuario as Usuario | undefined;
   if (!usuario || !usuario.id || !usuario.nome || !usuario.perfil) return null;
   return usuario;
 }
 
+// funcao que acha o status ignorando maiusculas
 function normalizarStatus(valor: unknown): Status | null {
   if (typeof valor !== "string") return null;
   return STATUS.find((status) => status.toLowerCase() === valor.trim().toLowerCase()) || null;
 }
 
+// funcao que converte o status para o banco
 function statusBanco(status: Status) {
   if (status === "Em andamento") return "Em Andamento";
   if (status === "Em revisão") return "Em Revisão";
   return status;
 }
 
+// funcao que converte o status para a tela
 function statusTela(status: string): Status {
   if (status === "Em Andamento") return "Em andamento";
   if (status === "Em Revisão") return "Em revisão";
   return status as Status;
 }
 
+// funcao que lista os status permitidos
 function transicoes(perfil: Perfil, atual: Status, responsavel: boolean): Status[] {
   if (atual === "Concluída" || atual === "Cancelada") return [];
   if (perfil === "Membro da Equipe") {
@@ -65,6 +75,7 @@ function transicoes(perfil: Perfil, atual: Status, responsavel: boolean): Status
   return ["Em andamento", "Concluída", "Cancelada"];
 }
 
+// funcao que busca a demanda no banco
 async function demandaPorId(conn: oracledb.Connection, id: number) {
   const resultado = await conn.execute<any>(
     `SELECT d.id_demanda, d.titulo, d.descricao, d.tipo_demanda, d.prioridade, d.status,
@@ -81,6 +92,7 @@ async function demandaPorId(conn: oracledb.Connection, id: number) {
   return resultado.rows?.[0] || null;
 }
 
+// funcao que confere se o usuario esta no projeto
 async function podeAcessar(conn: oracledb.Connection, usuario: Usuario, projetoId: number) {
   if (usuario.perfil === "Administrador") return true;
   const resultado = await conn.execute(
@@ -90,6 +102,7 @@ async function podeAcessar(conn: oracledb.Connection, usuario: Usuario, projetoI
   return (resultado.rows?.length || 0) > 0;
 }
 
+// funcao que monta a resposta da demanda
 function respostaDemanda(linha: any, usuario: Usuario) {
   const status = statusTela(linha.STATUS);
   const ehResponsavel = linha.ID_RESPONSAVEL === usuario.id;
@@ -116,6 +129,7 @@ function respostaDemanda(linha: any, usuario: Usuario) {
   };
 }
 
+// funcao que confere usuario, id e acesso antes de cada rota
 async function contexto(req: Request, res: Response) {
   const usuario = usuarioAtual(res);
   const idTexto = String(req.params.id);
@@ -141,7 +155,7 @@ async function contexto(req: Request, res: Response) {
   }
 }
 
-// Verifica o vínculo com o projeto antes de devolver detalhes e permissões.
+// funcao que devolve os detalhes da demanda
 export async function getDemandaPorId(req: Request, res: Response) { // FLUXO:VER-DETALHES 5/5 funcao
   const dados = await contexto(req, res);
   if (dados.erro) return responderErro(res, dados.erro[0], dados.erro[1]);
@@ -154,6 +168,7 @@ export async function getDemandaPorId(req: Request, res: Response) { // FLUXO:VE
   }
 }
 
+// funcao que lista os comentarios
 export async function listarComentarios(req: Request, res: Response) { // FLUXO:LISTAR-COMENTARIOS 3/3 funcao
   const dados = await contexto(req, res);
   if (dados.erro) return responderErro(res, dados.erro[0], dados.erro[1]);
@@ -180,7 +195,7 @@ export async function listarComentarios(req: Request, res: Response) { // FLUXO:
   }
 }
 
-// O autor do comentário vem da sessão validada.
+// funcao que grava um comentario (autor vem da sessao)
 export async function criarComentario(req: Request, res: Response) { // FLUXO:ENVIAR-COMENTARIO 5/5 funcao
   const dados = await contexto(req, res);
   if (dados.erro) return responderErro(res, dados.erro[0], dados.erro[1]);
@@ -204,7 +219,7 @@ export async function criarComentario(req: Request, res: Response) { // FLUXO:EN
   }
 }
 
-// Consulta mudanças e seus autores, das mais recentes para as mais antigas.
+// funcao que lista o historico
 export async function listarHistorico(req: Request, res: Response) { // FLUXO:HISTORICO 3/3 funcao
   const dados = await contexto(req, res);
   if (dados.erro) return responderErro(res, dados.erro[0], dados.erro[1]);
@@ -235,7 +250,7 @@ export async function listarHistorico(req: Request, res: Response) { // FLUXO:HI
   }
 }
 
-// O formulário de edição recebe só integrantes do projeto.
+// funcao que lista os responsaveis do projeto
 export async function listarResponsaveis(req: Request, res: Response) { // FLUXO:EDITAR-ABRIR 5/5 funcao
   const dados = await contexto(req, res);
   if (dados.erro) return responderErro(res, dados.erro[0], dados.erro[1]);
@@ -263,7 +278,7 @@ export async function listarResponsaveis(req: Request, res: Response) { // FLUXO
   }
 }
 
-// O serviço compartilhado acrescenta validação de feriados e histórico por campo.
+// funcao que salva a edicao da demanda
 export async function atualizarDemanda(req: Request, res: Response) { // FLUXO:SALVAR-ALTERACOES 5/6 funcao
   const usuario = usuarioAtual(res);
   if (!usuario) return responderErro(res, 401, "Usuário não autenticado.");
@@ -272,7 +287,7 @@ export async function atualizarDemanda(req: Request, res: Response) { // FLUXO:S
   return res.json({ ...demanda, mensagem: "Demanda atualizada com sucesso.", demanda });
 }
 
-// Envia só o novo status ao serviço que valida as transições.
+// funcao que muda o status da demanda
 export async function atualizarStatus(req: Request, res: Response) { // FLUXO:ATUALIZAR-STATUS 5/7 funcao
   const usuario = usuarioAtual(res);
   if (!usuario) return responderErro(res, 401, "Usuário não autenticado.");

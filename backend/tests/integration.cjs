@@ -4,10 +4,11 @@
  */
 const assert = require('node:assert/strict');
 
+// endereco do servidor e senha de demonstracao
 const base = process.env.PI2_TEST_URL || 'http://localhost:3000';
 const SENHA_DEMO = 'Pi2@2026Demo!';
 
-// Faz uma requisição à API e devolve status, corpo JSON e cookie recebido.
+// funcao que faz uma requisicao a api
 async function call(path, { cookie, method = 'GET', body, origin } = {}) {
   const headers = {};
   if (cookie) headers.cookie = cookie;
@@ -28,8 +29,10 @@ async function call(path, { cookie, method = 'GET', body, origin } = {}) {
   };
 }
 
+// atalho para POST
 const post = (path, session, body) => call(path, { ...session, method: 'POST', body });
 
+// funcao que faz login e retorna o cookie
 async function login(email) {
   const r = await post('/login', {}, { email, senha: SENHA_DEMO });
 
@@ -41,22 +44,23 @@ async function login(email) {
 }
 
 (async () => {
-  // Sem sessão e com credenciais inválidas.
+  // sem sessao e com credenciais invalidas
   assert.equal((await call('/dashboard')).status, 401);
   assert.equal((await post('/login', {}, { email: 'admin@pi2.local', senha: 'incorreta' })).status, 401);
   assert.equal((await post('/login', {}, {})).status, 400);
 
-  // Usa sessões dos três perfis para verificar permissões diferentes.
+  // login com os tres perfis
   const admin = await login('admin@pi2.local');
   const leader = await login('lider@pi2.local');
   const member = await login('membro@pi2.local');
   assert.equal((await call('/sessao', admin)).data.usuario.perfil, 'Administrador');
 
+  // projetos de demonstracao
   const projects = (await call('/projetos', admin)).data.projetos;
   const project = projects.find(p => p.nome === 'PI2 — Demonstração').id;
   const restricted = projects.find(p => p.nome === 'PI2 — Projeto restrito').id;
 
-  // Acesso, validação de IDs, ordenação e busca com SQL malicioso.
+  // acesso, ids invalidos, ordenacao e busca com sql malicioso
   assert.equal((await call('/usuarios?projetoId=' + restricted, member)).status, 403);
   assert.equal((await call('/demandas/abc', admin)).status, 400);
   assert.equal((await call('/demandas/999999999', admin)).status, 404);
@@ -64,7 +68,7 @@ async function login(email) {
   assert.equal((await call('/demandas?ordenarPor=naoexiste', admin)).status, 400);
   assert.equal((await call('/demandas?busca=' + encodeURIComponent("' OR 1=1 --"), admin)).status, 200);
 
-  // Escolhe um prazo futuro que não caia em feriado.
+  // prazo futuro que nao seja feriado
   const future = new Date();
   future.setUTCFullYear(future.getUTCFullYear() + 1);
   future.setUTCMonth(5, 10);
@@ -77,6 +81,7 @@ async function login(email) {
     future.setUTCDate(future.getUTCDate() + 1);
   }
 
+  // dados da demanda de teste
   const natal = year + '-12-25';
   const payload = {
     titulo: 'Teste de integração ' + Date.now(),
@@ -88,7 +93,7 @@ async function login(email) {
     prazoFinalizacao: future.toISOString().slice(0, 10),
   };
 
-  // Bloqueios no cadastro.
+  // bloqueios no cadastro
   assert.equal(
     (await post('/demandas', admin, { ...payload, prazoFinalizacao: natal })).status,
     400,
@@ -105,24 +110,25 @@ async function login(email) {
     'Membro não pode se atribuir uma demanda',
   );
 
-  // Comprova que o cadastro sem prazo e sem responsável chega ao Oracle.
+  // cadastro sem prazo e sem responsavel
   const { responsavelId, prazoFinalizacao, ...withoutDeadlineOrOwner } = payload;
   const created = await post('/demandas', member, withoutDeadlineOrOwner);
   assert.equal(created.status, 201, 'Cadastro sem prazo e sem responsável no Oracle');
   assert.equal(created.data.prazoFinalizacao, null);
   assert.equal(created.data.responsavelId, null);
 
+  // atalho para editar a demanda criada
   const route = '/demandas/' + created.data.id;
   const update = (session, body) => call(route, { ...session, method: 'PUT', body });
 
-  // Edição pelo líder.
+  // edicao pelo lider
   assert.equal((await update(admin, { prazoFinalizacao: natal })).status, 400, 'Bloqueio de feriado na atualização');
   const scheduled = await update(leader, { prioridade: 'Crítica', responsavelId, prazoFinalizacao });
   assert.equal(scheduled.status, 200);
   assert.equal(scheduled.data.prazoFinalizacao, prazoFinalizacao);
   assert.equal(scheduled.data.responsavelId, responsavelId);
 
-  // Ciclo de vida: membro avança, líder revisa e conclui.
+  // mudancas de status: membro avanca, lider revisa e conclui
   assert.equal((await update(member, { prioridade: 'Alta' })).status, 403);
   assert.equal((await update(member, { status: 'Em andamento' })).status, 200);
   assert.equal((await update(member, { status: 'Concluída' })).status, 403);
@@ -135,7 +141,7 @@ async function login(email) {
   assert.equal((await update(admin, { status: 'Cancelada' })).status, 403);
   assert.equal((await call(route, member)).data.status, 'Concluída');
 
-  // O autor do comentário vem da sessão, não do corpo da requisição.
+  // comentario: autor vem da sessao
   const comment = 'Teste de persistência <script>texto sem execução</script>';
   assert.equal(
     (await post(route + '/comentarios', member, { texto: comment, usuarioId: admin.user.id })).status,
@@ -147,22 +153,23 @@ async function login(email) {
     'Autor do comentário obtido da sessão',
   );
 
-  // Confere o que ficou gravado depois das transições e comentários.
+  // confere o historico gravado
   const history = (await call(route + '/historico', admin)).data.historico;
   assert(history.length >= 7);
   assert(history.some(h => h.campo === 'prioridade' && h.valorNovo === 'Crítica'));
   assert.equal(history.filter(h => h.campo === 'status').length, 5);
 
-  // Cancelamento pelo líder.
+  // cancelamento pelo lider
   const second = await post('/demandas', admin, { ...payload, titulo: payload.titulo + ' — cancelamento' });
   assert.equal(second.status, 201);
   const secondRoute = '/demandas/' + second.data.id;
   assert.equal((await call(secondRoute, { ...leader, method: 'PUT', body: { status: 'Cancelada' } })).status, 200);
   assert.equal((await call(secondRoute, admin)).data.status, 'Cancelada');
 
-  // Não existe rota de exclusão.
+  // nao existe rota de exclusao
   assert.equal((await call(route, { ...admin, method: 'DELETE' })).status, 404);
 
+  // filtros da listagem
   const filtered = await call(
     '/demandas?status=Concluída&prioridade=Crítica&busca=' + encodeURIComponent(payload.titulo) + '&ordenarPor=prioridade',
     admin,
@@ -170,12 +177,13 @@ async function login(email) {
   assert.equal(filtered.status, 200);
   assert.equal(filtered.data.total, 1);
 
-  // Logout invalida a sessão.
+  // logout invalida a sessao
   assert.equal((await post('/logout', member, {})).status, 200);
   assert.equal((await call('/sessao', member)).status, 401);
   await post('/logout', leader, {});
   await post('/logout', admin, {});
 
+  // resultado final
   console.log('INTEGRACAO_OK: login, sessão, autorização, feriados, CRUD, filtros, status, comentários, histórico e logout.');
   console.log('Demandas de evidência: ' + created.data.id + ' (concluída), ' + second.data.id + ' (cancelada).');
 })().catch(error => {

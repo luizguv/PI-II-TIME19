@@ -6,20 +6,20 @@ import { demandSelect } from '../../demand-service';
 import { ADMIN, statuses, priorities, types } from '../../rules';
 import { choice, fail, id, text } from '../../validation';
 
-// Filtros por opção fixa: [parâmetro da query, coluna, valores aceitos].
+// filtros por opcao: [parametro, coluna, valores]
 const FILTROS_OPCAO = [
   ['status', 'd.status', statuses],
   ['prioridade', 'd.prioridade', priorities],
   ['tipo', 'd.tipo_demanda', types],
 ] as const;
 
-// Filtros por ID: [parâmetro da query, coluna].
+// filtros por id: [parametro, coluna]
 const FILTROS_ID = [
   ['projetoId', 'd.id_projeto'],
   ['responsavelId', 'd.id_responsavel'],
 ] as const;
 
-// A chave recebida seleciona uma expressão SQL de uma lista fechada.
+// ordenacoes permitidas
 const ORDENACOES: Record<string, string> = {
   dataCriacao: 'd.data_criacao DESC',
   titulo: 'LOWER(d.titulo)',
@@ -34,12 +34,13 @@ const ORDENACOES: Record<string, string> = {
            END`,
 };
 
+// funcao que lista as demandas com filtros
 export async function listDemands(req: Request, res: Response<unknown, SessionLocals>) { // FLUXO:LISTAGEM 5/5 funcao
   const { usuario } = res.locals;
   const where: string[] = [];
   const binds: Record<string, unknown> = {};
 
-  // Os demais perfis só enxergam demandas dos projetos em que participam.
+  // admin ve tudo; os outros so seus projetos
   if (usuario.perfil !== ADMIN) {
     where.push(
       'EXISTS (SELECT 1 FROM projeto_usuarios pu WHERE pu.id_projeto = d.id_projeto AND pu.id_usuario = :usuario)',
@@ -47,6 +48,7 @@ export async function listDemands(req: Request, res: Response<unknown, SessionLo
     binds.usuario = usuario.id;
   }
 
+  // filtros de status, prioridade e tipo
   for (const [key, column, values] of FILTROS_OPCAO) {
     const value = req.query[key];
     if (value) {
@@ -55,6 +57,7 @@ export async function listDemands(req: Request, res: Response<unknown, SessionLo
     }
   }
 
+  // filtros de projeto e responsavel
   for (const [key, column] of FILTROS_ID) {
     if (req.query[key]) {
       where.push(`${column} = :${key}`);
@@ -62,8 +65,9 @@ export async function listDemands(req: Request, res: Response<unknown, SessionLo
     }
   }
 
+  // busca por texto no titulo e na descricao
   if (req.query.busca) {
-    // Escapa os curingas do LIKE para buscar o texto literal.
+    // escapa % e _ da busca
     const search = text(req.query.busca, 'Busca', 1, 150)
       .toLowerCase()
       .replace(/[\\%_]/g, '\\$&');
@@ -71,15 +75,18 @@ export async function listDemands(req: Request, res: Response<unknown, SessionLo
     binds.busca = `%${search}%`;
   }
 
+  // ordenacao escolhida
   const order = req.query.ordenarPor || 'dataCriacao';
   if (typeof order !== 'string' || !Object.prototype.hasOwnProperty.call(ORDENACOES, order)) {
     fail(400, 'Ordenação inválida.');
   }
 
+  // monta o sql final
   const whereSql = where.length ? ' WHERE ' + where.join(' AND ') : '';
   const sql = `${demandSelect}${whereSql} ORDER BY ${ORDENACOES[order]}, d.id_demanda`;
 
   return connection(async c => {
+    // executa a consulta
     const result = await rows(c, sql, binds);
     return res.json({ sucesso: true, total: result.length, demandas: result });
   });

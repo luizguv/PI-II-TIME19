@@ -14,16 +14,20 @@
 
     <title>Gestão de Demandas | Nova Demanda</title>
 
+    <!-- arquivos de estilo da pagina -->
     <link rel="stylesheet" href="../css/global.css">
     <link rel="stylesheet" href="../css/cadastrodemanda.css">
 <link rel="stylesheet" href="../css/integracao.css">
+<!-- script compartilhado de acesso a api -->
 <script src="../js/api.js" defer></script>
 </head>
 
 <body>
 
+    <!-- pagina de cadastro de demanda -->
     <main class="demand-page">
 
+        <!-- titulo da pagina e botao voltar -->
         <header class="demand-header">
             <div>
                 <span class="page-overline">Gestão de Demandas</span>
@@ -38,11 +42,13 @@
             <a href="listagem-demandas.html" class="btn btn-secondary">Voltar</a>
         </header>
 
+        <!-- card do formulario -->
         <section class="demand-card">
 
-            <!-- cadastrodemanda.js alterna entre cadastro e edição. -->
+            <!-- formulario de cadastro e edicao de demanda -->
             <form id="demandForm">
 
+                <!-- titulo da secao do formulario -->
                 <div class="form-section">
                     <h2>Informações da demanda</h2>
 
@@ -51,8 +57,10 @@
                     </p>
                 </div>
 
+                <!-- campos do formulario -->
                 <div class="form-grid">
 
+                    <!-- campo titulo -->
                     <div class="form-group form-group-full">
                         <label class="label" for="title">Título</label>
 
@@ -67,6 +75,7 @@
                         >
                     </div>
 
+                    <!-- campo descricao -->
                     <div class="form-group form-group-full">
                         <label class="label" for="description">Descrição</label>
 
@@ -81,6 +90,7 @@
                         ></textarea>
                     </div>
 
+                    <!-- campo tipo da demanda -->
                     <div class="form-group">
                         <label class="label" for="type">Tipo da demanda</label>
 
@@ -93,6 +103,7 @@
                         </select>
                     </div>
 
+                    <!-- campo prioridade -->
                     <div class="form-group">
                         <label class="label" for="priority">Prioridade</label>
 
@@ -105,6 +116,7 @@
                         </select>
                     </div>
 
+                    <!-- campo projeto -->
                     <div class="form-group">
                         <label class="label" for="project">Projeto</label>
 
@@ -113,6 +125,7 @@
                         </select>
                     </div>
 
+                    <!-- campo responsavel -->
                     <div class="form-group">
                         <label class="label" for="responsible">Responsável</label>
 
@@ -121,6 +134,7 @@
                         </select>
                     </div>
 
+                    <!-- campo status (so aparece na edicao) -->
                     <div class="form-group" id="statusGroup">
                         <label class="label" for="status">Status</label>
 
@@ -137,6 +151,7 @@
                         </small>
                     </div>
 
+                    <!-- campo prazo -->
                     <div class="form-group">
                         <label class="label" for="deadline">
                             Prazo de finalização (opcional)
@@ -149,6 +164,7 @@
                             name="deadline"
                         > <!-- FLUXO:FERIADOS 1/6 campo Prazo -->
 
+                        <!-- aviso de feriado no prazo -->
                         <small
                             id="holidayMessage"
                             class="field-hint field-error"
@@ -157,6 +173,7 @@
 
                 </div>
 
+                <!-- mensagem de erro ou sucesso do formulario -->
                 <div
                     id="formMessage"
                     class="form-message"
@@ -164,12 +181,13 @@
                     aria-live="polite"
                 ></div>
 
+                <!-- botoes cancelar e cadastrar -->
                 <footer class="form-actions">
                     <a href="listagem-demandas.html" class="btn btn-secondary">
                         Cancelar
                     </a>
 
-                    <!-- Envia o formulário após a validação dos campos. -->
+                    <!-- botao para cadastro de demanda -->
                     <button type="submit" class="btn btn-primary"> <!-- FLUXO:CADASTRAR-DEMANDA 1/6 botao Cadastrar demanda -->
                         <span id="submitText">Cadastrar demanda</span>
                     </button>
@@ -180,6 +198,7 @@
 
     </main>
 
+    <!-- script da tela de cadastro -->
     <script src="../js/cadastrodemanda.js" defer></script>
 
 </body>

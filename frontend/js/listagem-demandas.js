@@ -1,13 +1,15 @@
 /* Autor original: Leonardo Gambaroni Alves
  * Os filtros são enviados à API; nenhuma demanda é extraída de HTML fixo.
  */
+// funcoes compartilhadas do api.js
 const { request, element, message, date, ready } = PI2;
 
+// elementos da tela
 const feedback = document.getElementById('apiMessage');
 const tbody = document.querySelector('.tabela-demandas tbody');
 const search = document.getElementById('busca');
 
-// Parâmetro da API -> id do <select> correspondente na tela.
+// filtros da tela: nome na api e id do select
 const controls = {
   status: 'filtro-status',
   prioridade: 'filtro-prioridade',
@@ -16,12 +18,15 @@ const controls = {
   ordenarPor: 'ordenarPor',
 };
 
+// numero de colunas da tabela e espera da busca
 const TOTAL_COLUNAS = 9;
 const DEBOUNCE_MS = 250;
 
+// controle da ultima consulta e timer da busca
 let version = 0;
 let timer;
 
+// funcao que monta os filtros da url
 function buildParams() {
   const params = new URLSearchParams();
   const busca = search.value.trim();
@@ -34,6 +39,7 @@ function buildParams() {
   return params;
 }
 
+// funcao que cria uma linha da tabela
 function createRow(d) {
   const row = element('tr');
   const values = [
@@ -48,7 +54,7 @@ function createRow(d) {
   ];
   for (const value of values) row.append(element('td', value));
 
-  // O botão Ver leva o ID para a tela de detalhes.
+  // botao ver abre os detalhes
   const cell = element('td');
   const link = element('a', 'Ver', 'btn btn-secondary btn-acao');
   link.href = `detalhes-demanda.html?id=${d.id}`; // FLUXO:VER-DETALHES 1/5 link Ver
@@ -58,6 +64,7 @@ function createRow(d) {
   return row;
 }
 
+// funcao que cria a linha de lista vazia
 function createEmptyRow() {
   const row = element('tr');
   const cell = element('td', 'Nenhuma demanda encontrada.');
@@ -66,7 +73,7 @@ function createEmptyRow() {
   return row;
 }
 
-// Envia filtros à API; só a resposta mais recente atualiza a tabela.
+// funcao que busca as demandas na api e monta a tabela
 async function load() {
   const current = ++version;
 
@@ -79,8 +86,10 @@ async function load() {
 
   try {
     const { demandas } = await request('/demandas?' + buildParams()); // FLUXO:LISTAGEM 3/5 GET /api/demandas
+    // ignora resposta de consulta antiga
     if (current !== version) return;
 
+    // monta as linhas
     tbody.replaceChildren(...demandas.map(createRow));
     if (!demandas.length) tbody.append(createEmptyRow());
 
@@ -93,8 +102,10 @@ async function load() {
   }
 }
 
+// inicio da tela
 ready
   .then(async () => {
+    // carrega os projetos no filtro
     const { projetos } = await request('/projetos'); // FLUXO:CARREGAR-PROJETOS 2/4 GET /api/projetos (listagem)
     const filtroProjeto = document.getElementById('filtro-projeto');
     for (const p of projetos) {
@@ -103,14 +114,16 @@ ready
       filtroProjeto.append(option);
     }
 
+    // primeira carga da tabela
     await load();
 
-    // Espera um pouco após digitar antes de consultar a API.
+    // busca espera 250 ms depois de digitar
     search.addEventListener('input', () => { // FLUXO:LISTAGEM 1/5 evento da busca
       clearTimeout(timer);
       timer = setTimeout(load, DEBOUNCE_MS);
     });
 
+    // cada filtro recarrega a tabela
     Object.values(controls).forEach(id => {
       document.getElementById(id).addEventListener('change', load); // FLUXO:LISTAGEM 2/5 evento dos filtros
     });

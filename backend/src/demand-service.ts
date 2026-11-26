@@ -19,17 +19,19 @@ import {
 } from './rules';
 import { holidays } from './holidays';
 
-// Campos que um membro da equipe não pode alterar.
+// campos que membro nao pode alterar
 const CAMPOS_GERENCIAIS = ['titulo', 'descricao', 'tipo', 'prioridade', 'responsavelId', 'prazoFinalizacao'];
+// todos os campos que podem mudar
 const CAMPOS_ATUALIZAVEIS = [...CAMPOS_GERENCIAIS, 'status'];
 
-// O banco grava "Em Andamento"/"Em Revisão"; a interface usa minúsculas.
+// funcao que converte o status para o formato do banco
 function statusBanco(status: string): string {
   if (status === 'Em andamento') return 'Em Andamento';
   if (status === 'Em revisão') return 'Em Revisão';
   return status;
 }
 
+// funcao que confere se o usuario esta no projeto
 async function participaDoProjeto(c: Connection, projectId: number, userId: number): Promise<boolean> {
   const links = await rows(
     c,
@@ -39,7 +41,7 @@ async function participaDoProjeto(c: Connection, projectId: number, userId: numb
   return links.length > 0;
 }
 
-// Confere se o projeto existe e se o usuário pode acessá-lo.
+// funcao que confere se o projeto existe e se o usuario tem acesso
 export async function projectAccess(c: Connection, projectId: number, user: User) {
   const [project] = await rows(c, 'SELECT id_projeto FROM projetos WHERE id_projeto = :id', { id: projectId });
   if (!project) fail(404, 'Projeto não encontrado.');
@@ -49,7 +51,7 @@ export async function projectAccess(c: Connection, projectId: number, user: User
   }
 }
 
-// Padroniza nomes de campos, datas e status para o frontend.
+// select padrao das demandas
 export const demandSelect = `
   SELECT d.id_demanda "id",
          d.titulo "titulo",
@@ -72,8 +74,9 @@ export const demandSelect = `
     JOIN projetos p ON p.id_projeto = d.id_projeto
     LEFT JOIN usuarios u ON u.id_usuario = d.id_responsavel`;
 
+// funcao que busca uma demanda com as permissoes do usuario
 export async function demand(c: Connection, demandId: number, user: User, lock = false) {
-  // A linha é bloqueada antes da leitura para impedir atualização perdida no histórico.
+  // trava a linha para edicao
   if (lock) {
     await rows(c, 'SELECT id_demanda FROM demandas WHERE id_demanda = :id FOR UPDATE WAIT 5', { id: demandId });
   }
@@ -82,6 +85,7 @@ export async function demand(c: Connection, demandId: number, user: User, lock =
   if (!d) fail(404, 'Demanda não encontrada.');
   await projectAccess(c, d.projetoId, user);
 
+  // permissoes do usuario na demanda
   const encerrada = isClosed(d.status);
   const transicoesPermitidas = transitions(d.status, user, d.responsavelId);
 
@@ -96,6 +100,7 @@ export async function demand(c: Connection, demandId: number, user: User, lock =
   };
 }
 
+// funcao que confere se o responsavel esta no projeto
 export async function checkResponsible(c: Connection, responsible: number | null, project: number) {
   if (responsible === null) return;
   if (!(await participaDoProjeto(c, project, responsible))) {
@@ -103,7 +108,7 @@ export async function checkResponsible(c: Connection, responsible: number | null
   }
 }
 
-// Valida a data e consulta feriados quando o prazo é informado.
+// funcao que valida o prazo (data, passado e feriado)
 export async function checkDeadline(value: unknown) { // FLUXO:CADASTRAR-DEMANDA 6/6 valida prazo e feriado
   if (value === null) return;
   if (!validDate(value)) fail(400, 'Informe um prazo válido (AAAA-MM-DD).');
@@ -114,6 +119,7 @@ export async function checkDeadline(value: unknown) { // FLUXO:CADASTRAR-DEMANDA
   if (holiday) fail(400, `O prazo não pode cair em feriado nacional: ${holiday.name}.`);
 }
 
+// funcao que grava uma linha no historico
 export async function audit(
   c: Connection,
   demandId: number,
@@ -136,7 +142,7 @@ export async function audit(
   );
 }
 
-// Campos omitidos mantêm o valor atual; null pode limpar o prazo e o responsável.
+// funcao que junta os dados atuais com os enviados
 function mergeChanges(before: any, b: any) {
   const keep = (key: string, parse: (value: any) => unknown) =>
     b[key] === undefined ? before[key] : parse(b[key]);
@@ -153,34 +159,41 @@ function mergeChanges(before: any, b: any) {
   };
 }
 
+// funcao que atualiza a demanda (regras, update e historico)
 export async function updateDemand(user: User, demandIdValue: unknown, body: any) { // FLUXO:SALVAR-ALTERACOES 6/6 regras, UPDATE e historico // FLUXO:ATUALIZAR-STATUS 6/7 mesma funcao do Salvar
   return connection(async c => {
     const demandId = id(demandIdValue);
     const before = await demand(c, demandId, user, true);
     const b = body || {};
 
+    // confere se pode editar
     if (!before.podeEditar) fail(403, 'Você não pode editar esta demanda ou ela já está encerrada.');
 
     const after = mergeChanges(before, b);
 
+    // projeto nao muda
     if (b.projetoId !== undefined && id(b.projetoId) !== before.projetoId) {
       fail(400, 'O projeto não pode ser alterado após a criação.');
     }
 
+    // confere a mudanca de status
     const statusMudou = after.status !== before.status;
     if (statusMudou && !transitions(before.status, user, before.responsavelId).includes(after.status)) {
       fail(403, 'Transição de status não permitida para seu perfil.');
     }
 
+    // membro so muda status
     if (user.perfil === MEMBER && CAMPOS_GERENCIAIS.some(f => after[f] !== before[f])) {
       fail(403, 'Membros podem alterar apenas o status das demandas atribuídas a eles.');
     }
 
+    // valida responsavel e prazo
     await checkResponsible(c, after.responsavelId, before.projetoId);
     if (after.prazoFinalizacao !== before.prazoFinalizacao) {
       await checkDeadline(after.prazoFinalizacao);
     }
 
+    // campos alterados e update no banco
     const changed = CAMPOS_ATUALIZAVEIS.filter(f => after[f] !== before[f]);
     if (!changed.length) fail(400, 'Nenhuma alteração foi informada.');
 
@@ -207,11 +220,12 @@ export async function updateDemand(user: User, demandIdValue: unknown, body: any
       },
     );
 
-    // Registra o histórico por campo na mesma transação da atualização.
+    // grava o historico de cada campo
     for (const field of changed) {
       await audit(c, demandId, user, field, before[field], after[field]);
     }
 
+    // salva e retorna a demanda atualizada
     const result = await demand(c, demandId, user);
     await c.commit();
     return result;

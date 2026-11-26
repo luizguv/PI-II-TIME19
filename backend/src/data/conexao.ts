@@ -5,17 +5,19 @@ import oracledb from 'oracledb';
 import dotenv from 'dotenv';
 import path from 'node:path';
 
-// Carrega a configuração a partir de backend/.env, inclusive ao rodar o JS compilado.
+// carrega o backend/.env
 dotenv.config({ path: path.resolve(__dirname, '../../.env'), quiet: true });
 oracledb.outFormat = oracledb.OUT_FORMAT_OBJECT;
 
+// variaveis obrigatorias do .env
 const VARIAVEIS_OBRIGATORIAS = ['ORACLE_HOST', 'ORACLE_PORT', 'ORACLE_SERVICE', 'ORACLE_USER', 'ORACLE_PASSWORD'];
 
+// funcao que cria o pool de conexoes do oracle
 export async function initPool() {
   const missing = VARIAVEIS_OBRIGATORIAS.filter(k => !process.env[k]);
   if (missing.length) throw new Error(`Configure backend/.env: ${missing.join(', ')}`);
 
-  // Host, porta e serviço compõem o endereço do Oracle usado pelo pool.
+  // endereco do oracle
   const { ORACLE_HOST, ORACLE_PORT, ORACLE_SERVICE, ORACLE_USER, ORACLE_PASSWORD } = process.env;
   const opcoes = 'connect_timeout=10&transport_connect_timeout=5&retry_count=0';
 
@@ -30,10 +32,11 @@ export async function initPool() {
   });
 }
 
+// funcao que pega uma conexao do pool
 export async function getConn() {
   const c = await oracledb.getPool().getConnection();
 
-  // TIMESTAMP sem fuso é armazenado em UTC e enviado com Z à interface.
+  // sessao do banco em UTC
   try {
     await c.execute("ALTER SESSION SET TIME_ZONE = '+00:00'");
     return c;
@@ -43,4 +46,5 @@ export async function getConn() {
   }
 }
 
+// funcao que fecha o pool
 export const closePool = () => oracledb.getPool().close(5);

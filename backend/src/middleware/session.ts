@@ -6,20 +6,23 @@ import type { User } from '../rules';
 import { hashToken } from '../security';
 import { fail } from '../validation';
 
+// nome do cookie da sessao
 const COOKIE = 'pi2_session';
 
+// dados da sessao guardados em res.locals
 export interface SessionLocals {
   usuario: User;
   sessionHash: string;
 }
 
-// Lê o token de sessão do cabeçalho Cookie ('' se não houver).
+// funcao que le o token do cookie
 export function token(req: Request): string {
   const cookies = (req.headers.cookie || '').split(';').map(s => s.trim());
   const prefixo = `${COOKIE}=`;
   return cookies.find(s => s.startsWith(prefixo))?.slice(prefixo.length) || '';
 }
 
+// opcoes do cookie da sessao
 export const cookieOptions = {
   httpOnly: true,
   sameSite: 'lax' as const,
@@ -27,14 +30,16 @@ export const cookieOptions = {
   path: '/',
 };
 
-// Consulta o hash do cookie no Oracle e entrega o usuário aos controladores.
+// funcao que confere a sessao e carrega o usuario
 export async function requireSession(req: Request, res: Response, next: NextFunction) { // FLUXO:SESSAO 2/4 confere o cookie
   const raw = token(req);
+  // token em formato invalido
   if (!/^[a-f0-9]{64}$/.test(raw)) {
     res.status(401).json({ mensagem: 'Entre no sistema para continuar.' });
     return;
   }
 
+  // busca a sessao pelo hash do token
   const sessionHash = hashToken(raw);
 
   await connection(async c => {

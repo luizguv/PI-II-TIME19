@@ -6,7 +6,9 @@ const assert = require('node:assert/strict');
 const { hashPassword, verifyPassword, hashToken, newToken } = require('../dist/security');
 const { transitions, validDate, ADMIN, LEADER, MEMBER } = require('../dist/rules');
 
+// senha usada nos testes
 const SENHA = 'Pi2@2026Demo!';
+// funcao que cria um usuario de teste
 const user = perfil => ({ id: 3, nome: 'Teste', email: 'teste@pi2.local', perfil });
 
 test('senha é verificada sem armazenar texto puro e salts são distintos', () => {

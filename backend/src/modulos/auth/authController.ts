@@ -7,15 +7,17 @@ import { cookieOptions, token, type SessionLocals } from '../../middleware/sessi
 import { hashToken, newToken, verifyPassword } from '../../security';
 import { fail, text } from '../../validation';
 
+// nome do cookie, limite de tentativas e duracao da sessao
 const COOKIE = 'pi2_session';
 const MAX_TENTATIVAS = 10;
 const JANELA_TENTATIVAS_MS = 60_000;
 const HORAS_SESSAO = 12;
 const HORAS_SESSAO_LEMBRAR = 168; // 7 dias
 
-// Tentativas limitadas por endereço e e-mail; entradas antigas são removidas para limitar memória.
+// tentativas de login por ip e e-mail
 const attempts = new Map<string, { count: number; until: number }>();
 
+// funcao que valida e-mail, senha e lembrar
 function validarCredenciais(body: any) {
   const email = text(body?.email, 'E-mail', 3, 150).toLowerCase();
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) fail(400, 'E-mail inválido.');
@@ -30,7 +32,7 @@ function validarCredenciais(body: any) {
   return { email, password, lembrar: Boolean(body.lembrar) };
 }
 
-// Conta a tentativa e bloqueia após o limite. Retorna a chave para limpar em caso de sucesso.
+// funcao que conta tentativas e bloqueia apos 10
 function registrarTentativa(ip: string | undefined, email: string): string {
   const now = Date.now();
   for (const [k, v] of attempts) {
@@ -46,6 +48,7 @@ function registrarTentativa(ip: string | undefined, email: string): string {
   return key;
 }
 
+// funcao de login
 export async function login(req: Request, res: Response) { // FLUXO:ENTRAR 5/5 funcao
   const { email, password, lembrar } = validarCredenciais(req.body);
   const key = registrarTentativa(req.ip, email);
@@ -60,10 +63,11 @@ export async function login(req: Request, res: Response) { // FLUXO:ENTRAR 5/5 f
     );
     if (!user || !verifyPassword(password, user.senha)) fail(401, 'E-mail ou senha inválidos.');
 
-    // O navegador recebe o token bruto; o Oracle guarda apenas seu hash.
+    // cria o token; o banco guarda so o hash
     const raw = newToken();
     const hours = lembrar ? HORAS_SESSAO_LEMBRAR : HORAS_SESSAO;
 
+    // apaga sessoes vencidas e a sessao anterior
     await c.execute('DELETE FROM sessoes WHERE expira_em < CURRENT_TIMESTAMP');
 
     const previous = token(req);
@@ -79,23 +83,26 @@ export async function login(req: Request, res: Response) { // FLUXO:ENTRAR 5/5 f
     await c.commit();
     attempts.delete(key);
 
-    // Sem "lembrar", o cookie é de sessão e some ao fechar o navegador.
+    // cookie da sessao (com lembrar dura 7 dias)
     res.cookie(COOKIE, raw, {
       ...cookieOptions,
       ...(lembrar ? { maxAge: hours * 3_600_000 } : {}),
     });
 
+    // devolve o usuario sem a senha
     const { senha, ...publicUser } = user;
     return res.json({ mensagem: 'Login realizado com sucesso.', usuario: publicUser });
   });
 }
 
+// funcao que devolve o usuario da sessao
 export function getSession(_req: Request, res: Response<unknown, SessionLocals>) { // FLUXO:SESSAO 4/4 funcao
   return res.json({ usuario: res.locals.usuario });
 }
 
+// funcao de logout
 export async function logout(_req: Request, res: Response<unknown, SessionLocals>) { // FLUXO:SAIR 5/5 funcao
-  // Apaga a sessão no Oracle para invalidar o token mesmo se o cookie for reapresentado.
+  // apaga a sessao no banco
   await connection(async c => {
     await c.execute('DELETE FROM sessoes WHERE token_hash = :token', { token: res.locals.sessionHash });
     await c.commit();
