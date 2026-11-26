@@ -7,9 +7,9 @@
 
 import { Request, Response } from "express";
 import oracledb from "oracledb";
-import { getConn } from "../data/conexao";
+import { getConn } from "../../data/conexao";
 // Adaptação de sessão e regras compartilhadas: Vinicius Zorzetto — RA:24008052.
-import {updateDemand} from "../demand-service";
+import {updateDemand} from "../../demand-service";
 
 type Perfil = "Administrador" | "Líder de Projeto" | "Membro da Equipe";
 type Status = "Aberta" | "Em andamento" | "Em revisão" | "Concluída" | "Cancelada";

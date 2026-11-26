@@ -1,10 +1,10 @@
 /* Autor: Leonardo Gambaroni Alves */
 import type { Request, Response } from 'express';
-import type { SessionLocals } from '../middleware/session';
-import { connection, rows } from '../data/database';
-import { demandSelect } from '../demand-service';
-import { ADMIN, statuses, priorities, types } from '../rules';
-import { choice, fail, id, text } from '../validation';
+import type { SessionLocals } from '../../middleware/session';
+import { connection, rows } from '../../data/database';
+import { demandSelect } from '../../demand-service';
+import { ADMIN, statuses, priorities, types } from '../../rules';
+import { choice, fail, id, text } from '../../validation';
 
 export async function listDemands(req: Request, res: Response<unknown, SessionLocals>) {
   const {usuario} = res.locals;

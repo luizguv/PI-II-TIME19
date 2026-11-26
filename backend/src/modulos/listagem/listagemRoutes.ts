@@ -1,6 +1,6 @@
 /* Autor original: Leonardo Gambaroni Alves */
 import { Router } from 'express';
-import { listDemands } from '../controllers/listagemController';
+import { listDemands } from './listagemController';
 
 const router = Router();
 // Filtros e ordenação chegam pela query de GET /demandas.

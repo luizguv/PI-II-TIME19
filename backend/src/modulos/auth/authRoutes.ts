@@ -2,7 +2,7 @@
  * Integração: Vinicius Zorzetto — RA:24008052
  */
 import { Router } from 'express';
-import { login, getSession, logout } from '../controllers/authController';
+import { login, getSession, logout } from './authController';
 
 export const loginRoutes = Router();
 loginRoutes.post('/login', login);

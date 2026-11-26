@@ -1,11 +1,11 @@
 /* Cadastro extraído da integração original da API de Vinicius Zorzetto. */
 import type { Request, Response } from 'express';
-import type { SessionLocals } from '../middleware/session';
-import { connection, rows, insertId } from '../data/database';
-import { audit, checkDeadline, checkResponsible, demand, projectAccess } from '../demand-service';
-import { holidays } from '../holidays';
-import { ADMIN, MEMBER, priorities, types } from '../rules';
-import { choice, fail, id, text } from '../validation';
+import type { SessionLocals } from '../../middleware/session';
+import { connection, rows, insertId } from '../../data/database';
+import { audit, checkDeadline, checkResponsible, demand, projectAccess } from '../../demand-service';
+import { holidays } from '../../holidays';
+import { ADMIN, MEMBER, priorities, types } from '../../rules';
+import { choice, fail, id, text } from '../../validation';
 
 export async function listProjects(_req: Request, res: Response<unknown, SessionLocals>) {
   const {usuario} = res.locals;

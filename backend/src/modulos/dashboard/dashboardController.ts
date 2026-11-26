@@ -2,10 +2,10 @@
  * Consulta Oracle movida da integração original em api.ts.
  */
 import type { Request, Response } from 'express';
-import type { SessionLocals } from '../middleware/session';
-import { connection, rows } from '../data/database';
-import { demandSelect } from '../demand-service';
-import { ADMIN, statuses, priorities, types, today } from '../rules';
+import type { SessionLocals } from '../../middleware/session';
+import { connection, rows } from '../../data/database';
+import { demandSelect } from '../../demand-service';
+import { ADMIN, statuses, priorities, types, today } from '../../rules';
 
 export async function getDashboard(_req: Request, res: Response<unknown, SessionLocals>) {
   const {usuario} = res.locals;

@@ -13,7 +13,7 @@ import {
     listarResponsaveis,
     atualizarDemanda,
     atualizarStatus,
-} from "../controllers/detalhesDemandaController";
+} from "./detalhesDemandaController";
 
 const router = Router();
 

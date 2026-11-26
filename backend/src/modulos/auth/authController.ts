@@ -2,10 +2,10 @@
  * Integração: Vinicius Zorzetto — RA:24008052
  */
 import type { Request, Response } from 'express';
-import { connection, rows } from '../data/database';
-import { cookieOptions, token, type SessionLocals } from '../middleware/session';
-import { hashToken, newToken, verifyPassword } from '../security';
-import { fail, text } from '../validation';
+import { connection, rows } from '../../data/database';
+import { cookieOptions, token, type SessionLocals } from '../../middleware/session';
+import { hashToken, newToken, verifyPassword } from '../../security';
+import { fail, text } from '../../validation';
 
 // Tentativas limitadas por endereço e e-mail; entradas antigas são removidas para limitar memória.
 const attempts = new Map<string, {count: number; until: number}>();
