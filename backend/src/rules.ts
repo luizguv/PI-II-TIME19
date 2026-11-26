@@ -1,4 +1,5 @@
 /* Autor: Vinicius Zorzetto — RA:24008052
+ * Responsável pela apresentação: Leonardo Gambaroni Alves.
  * Regras compartilhadas pela API e testes de autorização e ciclo de vida.
  */
 export const statuses = ['Aberta', 'Em andamento', 'Em revisão', 'Concluída', 'Cancelada'];
@@ -9,7 +10,9 @@ export const LEADER = 'Líder de Projeto';
 export const MEMBER = 'Membro da Equipe';
 export interface User { id: number; nome: string; email: string; perfil: string; }
 export function transitions(status: string, user: User, responsibleId: number | null): string[] {
+  // Demandas encerradas não avançam no fluxo.
   if (status === 'Concluída' || status === 'Cancelada') return [];
+  // O perfil e a atribuição da demanda limitam as transições.
   const manager = user.perfil === ADMIN || user.perfil === LEADER;
   if (!manager && responsibleId !== user.id) return [];
   const result: string[] = [];
@@ -19,6 +22,7 @@ export function transitions(status: string, user: User, responsibleId: number | 
   if (manager) result.push('Cancelada');
   return result;
 }
+// A conversão de volta para ISO rejeita datas ajustadas pelo JavaScript.
 export function validDate(value: unknown): value is string {
   return typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value)
     && Number.isFinite(Date.parse(value)) && new Date(value).toISOString().slice(0, 10) === value;

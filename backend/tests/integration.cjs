@@ -1,4 +1,5 @@
 /* Autor: Vinicius Zorzetto — RA:24008052
+ * Responsável pela apresentação: Leonardo Gambaroni Alves.
  * Executar com servidor/VPN ativos. Grava duas demandas de teste identificadas,
  * um comentário e histórico; preserva tudo no banco como evidência de integração.
  */
@@ -17,6 +18,7 @@ async function login(email) {
   assert.equal((await call('/dashboard')).status,401);
   assert.equal((await call('/login',{method:'POST',body:{email:'admin@pi2.local',senha:'incorreta'}})).status,401);
   assert.equal((await call('/login',{method:'POST',body:{}})).status,400);
+  // Usa sessões dos três perfis para verificar permissões diferentes.
   const admin=await login('admin@pi2.local'),leader=await login('lider@pi2.local'),member=await login('membro@pi2.local');
   assert.equal((await call('/sessao',admin)).data.usuario.perfil,'Administrador');
   const projects=(await call('/projetos',admin)).data.projetos;
@@ -38,6 +40,7 @@ async function login(email) {
   assert.equal((await call('/demandas',{...admin,method:'POST',body:payload,origin:'http://site-invalido.example'})).status,403,'Bloqueio de origem');
   assert.equal((await call('/demandas',{...member,method:'POST',body:payload})).status,403,'Membro não pode se atribuir uma demanda');
   const {responsavelId, prazoFinalizacao, ...withoutDeadlineOrOwner}=payload;
+  // Comprova que o cadastro sem prazo e sem responsável chega ao Oracle.
   const created=await call('/demandas',{...member,method:'POST',body:withoutDeadlineOrOwner});
   assert.equal(created.status,201,'Cadastro sem prazo e sem responsável no Oracle');
   assert.equal(created.data.prazoFinalizacao,null);
@@ -64,6 +67,7 @@ async function login(email) {
   assert.equal((await call(route+'/comentarios',{...member,method:'POST',body:{texto:comment,usuarioId:admin.user.id}})).status,201);
   const comments=(await call(route+'/comentarios',admin)).data.comentarios;
   assert(comments.some(c=>c.texto===comment&&c.usuarioId===member.user.id),'Autor do comentário obtido da sessão');
+  // Confere o que ficou gravado depois das transições e comentários.
   const history=(await call(route+'/historico',admin)).data.historico;
   assert(history.length>=7);assert(history.some(h=>h.campo==='prioridade'&&h.valorNovo==='Crítica'));
   assert.equal(history.filter(h=>h.campo==='status').length,5);

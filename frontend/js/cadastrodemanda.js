@@ -9,11 +9,13 @@ function options(select,items,label,placeholder) {
   select.replaceChildren(new Option(placeholder,''));
   items.forEach(item=>select.add(new Option(item[label],item.id)));
 }
+// Carrega responsáveis do projeto selecionado; membros não fazem atribuição.
 async function responsible() {
   if(user.perfil==='Membro da Equipe' || !field('project').value) {options(field('responsible'),[],'nome','Não atribuído'); return;}
   const {usuarios}=await PI2.request('/usuarios?projetoId='+field('project').value);
   options(field('responsible'),usuarios,'nome','Não atribuído');
 }
+// Ignora respostas de consultas anteriores à última troca de prazo.
 async function checkHoliday() {
   const version=++holidayVersion,date=field('deadline').value;
   field('holidayMessage').textContent='';
@@ -30,6 +32,7 @@ PI2.ready.then(async usuario=>{
   user=usuario;
   field('responsible').disabled=user.perfil==='Membro da Equipe';
   const {projetos}=await PI2.request('/projetos');options(field('project'),projetos,'nome','Selecione o projeto');
+  // O ID na URL abre o formulário no modo de edição.
   if(demandId) {
     current=await PI2.request('/demandas/'+encodeURIComponent(demandId));
     if(!current.podeEditar) throw new Error('Você não pode editar esta demanda ou ela já está encerrada.');
@@ -43,6 +46,7 @@ PI2.ready.then(async usuario=>{
 }).catch(error=>PI2.message(feedback,error.message));
 field('project').addEventListener('change',()=>responsible().catch(error=>PI2.message(feedback,error.message)));
 field('deadline').addEventListener('change',checkHoliday);
+// Salva com POST no cadastro ou PUT na edição.
 form.addEventListener('submit',async event=>{
   event.preventDefault();PI2.message(feedback,'');
   if(!form.reportValidity()) return;

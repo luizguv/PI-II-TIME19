@@ -4,9 +4,11 @@
   Descrição: Indicadores e distribuição usam exclusivamente a resposta da API.
  */
 PI2.ready.then(async()=>{
+  // Busca indicadores dos projetos acessíveis ao perfil da sessão.
   const d=await PI2.request('/dashboard');
   const cards=document.querySelectorAll('.kpi-valor');
   [d.totalDemandas,d.porStatus.Aberta,d.porStatus['Em andamento'],d.porTipo.Defeito].forEach((v,i)=>cards[i].textContent=v);
+  // As barras usam o total como escala e incluem categorias com zero.
   for (const [id, counts] of [['statusChart', d.porStatus], ['priorityChart', d.porPrioridade], ['typeChart', d.porTipo]]) {
     const chart = document.getElementById(id);
     chart.replaceChildren();

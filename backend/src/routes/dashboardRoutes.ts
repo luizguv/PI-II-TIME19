@@ -1,3 +1,8 @@
-/* Autor original: Caio Peccinato
- * As rotas autenticadas foram unificadas em api.ts. */
-export { api as default } from "../api";
+/* Autor original: Caio Peccinato */
+import { Router } from 'express';
+import { getDashboard } from '../controllers/dashboardController';
+
+const router = Router();
+// A tela usa esse resumo para preencher cartões e gráficos.
+router.get('/dashboard', getDashboard);
+export default router;

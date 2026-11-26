@@ -467,6 +467,7 @@ main {
   font-weight: bold;
 }
 
+/* Área de ações sobre o status atual da demanda. */
 .secao-status {
   display: flex;
   flex-wrap: wrap;

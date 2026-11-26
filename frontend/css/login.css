@@ -4,6 +4,7 @@
   Descrição: Estilos da tela de Login
 */
 
+/* Reúne a apresentação do sistema e o formulário de acesso. */
 .login-page {
     min-height: 100vh;
     display: flex;

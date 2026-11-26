@@ -138,6 +138,7 @@ async function contexto(req: Request, res: Response) {
   } catch(error) { await conn.close(); throw error; }
 }
 
+// Verifica o vínculo com o projeto antes de devolver detalhes e permissões.
 export async function getDemandaPorId(req: Request, res: Response) {
   const dados = await contexto(req, res);
   if (dados.erro) return responderErro(res, dados.erro[0], dados.erro[1]);
@@ -171,6 +172,7 @@ export async function listarComentarios(req: Request, res: Response) {
   }
 }
 
+// O autor do comentário vem da sessão validada.
 export async function criarComentario(req: Request, res: Response) {
   const dados = await contexto(req, res);
   if (dados.erro) return responderErro(res, dados.erro[0], dados.erro[1]);
@@ -194,6 +196,7 @@ export async function criarComentario(req: Request, res: Response) {
   }
 }
 
+// Consulta mudanças e seus autores, das mais recentes para as mais antigas.
 export async function listarHistorico(req: Request, res: Response) {
   const dados = await contexto(req, res);
   if (dados.erro) return responderErro(res, dados.erro[0], dados.erro[1]);
@@ -216,6 +219,7 @@ export async function listarHistorico(req: Request, res: Response) {
   }
 }
 
+// O formulário de edição recebe só integrantes do projeto.
 export async function listarResponsaveis(req: Request, res: Response) {
   const dados = await contexto(req, res);
   if (dados.erro) return responderErro(res, dados.erro[0], dados.erro[1]);
@@ -248,6 +252,7 @@ export async function atualizarDemanda(req: Request, res: Response) {
   return res.json({...demanda, mensagem:"Demanda atualizada com sucesso.",demanda});
 }
 
+// Envia só o novo status ao serviço que valida as transições.
 export async function atualizarStatus(req: Request, res: Response) {
   const usuario = usuarioAtual(res);
   if (!usuario) return responderErro(res,401,"Usuário não autenticado.");

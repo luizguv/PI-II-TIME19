@@ -1,4 +1,5 @@
 /* Autor: Caio Peccinato
+ * Responsável pela apresentação: Caio Peccinato.
  * Frontend e API na mesma origem para cookies HttpOnly; origem de escrita validada.
  */
 import express, {Request, Response, NextFunction} from 'express';
@@ -7,6 +8,7 @@ import {api} from './api';
 export const app = express();
 app.disable('x-powered-by');
 app.use(express.json({limit:'16kb'}));
+// API e páginas usam a mesma origem. Escritas de outra origem são recusadas.
 app.use('/api', (req,res,next) => {
   res.setHeader('Cache-Control','no-store');
   if (!['GET','HEAD','OPTIONS'].includes(req.method)) {
@@ -18,8 +20,10 @@ app.use('/api', (req,res,next) => {
   next();
 }, api);
 app.use('/api', (_req,res) => {res.status(404).json({mensagem:'Rota não encontrada.'});});
+// A raiz abre o login; os demais arquivos estáticos vêm da pasta frontend.
 app.get('/', (_req,res) => {res.redirect('/html/login.html');});
 app.use(express.static(path.resolve(__dirname,'../../frontend'), {index:false}));
+// Converte os erros dos controladores em mensagens JSON para as telas.
 app.use((error: any, _req: Request, res: Response, _next: NextFunction) => {
   const status = error.type === 'entity.parse.failed' ? 400 : error.status || 500;
   if (status >= 500) console.error('Falha na operação:', error.code || error.name || 'ERRO');

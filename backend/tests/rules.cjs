@@ -1,4 +1,5 @@
 /* Autor: Vinicius Zorzetto — RA:24008052
+ * Responsável pela apresentação: Leonardo Gambaroni Alves.
  * Verificações de senha, datas e limites do ciclo de vida, independentes do banco.
  */
 const {test}=require('node:test');

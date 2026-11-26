@@ -3,6 +3,7 @@
  */
 const form = document.getElementById('loginForm');
 const feedback = document.getElementById('loginError');
+// Entrar envia as credenciais; a API devolve o cookie se a validação passar.
 form.addEventListener('submit', async event => {
   event.preventDefault();
   PI2.message(feedback,'');
@@ -19,6 +20,7 @@ form.addEventListener('submit', async event => {
   finally { button.disabled = false; button.textContent = 'Entrar'; }
 });
 form.addEventListener('input',()=>PI2.message(feedback,''));
+// O link orienta a procurar o administrador para recuperar o acesso.
 document.getElementById('forgotPasswordLink').addEventListener('click',event=>{
   event.preventDefault(); PI2.message(feedback,'Para recuperar o acesso, entre em contato com o administrador do projeto.');
 });

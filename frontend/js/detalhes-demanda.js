@@ -258,6 +258,7 @@ comentario.addEventListener("input", function somarCaractere() {
   contador.innerText = tamanho + "/300";
 });
 
+// Publicar envia o comentário e recarrega a lista.
 formComentario.addEventListener("submit", async function validador(event) {
   event.preventDefault();
   limparErro(erroComentario);
@@ -303,6 +304,7 @@ formComentario.addEventListener("submit", async function validador(event) {
   }
 });
 
+// Alterar status usa PATCH; cancelar pede confirmação antes do envio.
 botaoAtualizarStatus.addEventListener("click", async function () {
   limparErro(erroStatus);
 
@@ -376,6 +378,7 @@ async function carregarResponsaveis() {
   }
 }
 
+// Editar abre o formulário com os valores atuais da demanda.
 editarDemanda.addEventListener("click", async function () {
   limparErro(erroEdicao);
 
@@ -391,11 +394,13 @@ editarDemanda.addEventListener("click", async function () {
   campoFormEdicao.classList.remove("oculto");
 });
 
+// Fecha o formulário e mantém o status da demanda.
 cancelarEdicao.addEventListener("click", function () {
   campoFormEdicao.classList.add("oculto");
   limparErro(erroEdicao);
 });
 
+// Salvar valida os campos e envia a edição por PUT.
 formEdicao.addEventListener("submit", async function (event) {
   event.preventDefault();
   limparErro(erroEdicao);

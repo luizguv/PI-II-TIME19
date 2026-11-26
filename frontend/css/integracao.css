@@ -8,6 +8,7 @@
 .form-message.success {background:#ecf8f4;color:#175d47;border:1px solid #abd5c8;}
 .form-message:empty {display:none;}
 .session-user {font-size:.8rem;color:inherit;display:block;margin:8px 0;}
+/* Sinaliza indisponibilidade do botão durante o envio. */
 button:disabled {opacity:.6;cursor:wait;}
 .grafico-container {display:block !important;}
 .status-chart-row {margin:12px 0;}

@@ -2,6 +2,7 @@
  * Sessão validada pelo servidor; cookie HttpOnly não é lido nem salvo em localStorage.
  */
 window.PI2 = (() => {
+  // Chama /api na mesma origem para enviar o cookie da sessão.
   async function request(path, options = {}) {
     if (!['http:', 'https:'].includes(location.protocol)) throw new Error('Abra http://localhost:3000 para usar o sistema.');
     let response;
@@ -29,12 +30,14 @@ window.PI2 = (() => {
     node.setAttribute('role', 'alert');
   }
   const date = value => value ? new Date(value.length === 10 ? `${value}T12:00:00` : value).toLocaleString('pt-BR', value.length === 10 ? {dateStyle:'short'} : {dateStyle:'short', timeStyle:'short'}) : 'Não definido';
+  // Telas internas consultam /sessao antes de carregar os dados.
   const ready = location.pathname.endsWith('/login.html') ? Promise.resolve(null) : request('/sessao').then(({usuario}) => {
     const nav = document.querySelector('nav, .navegacao');
     if (nav) nav.append(element('span', `${usuario.nome} · ${usuario.perfil}`, 'session-user'));
     document.querySelectorAll('a').forEach(link => {
       if (link.textContent.trim() !== 'Sair') return;
       link.href = '/html/login.html';
+      // Sair invalida a sessão no servidor e volta ao login.
       link.addEventListener('click', async event => {
         event.preventDefault();
         try { await request('/logout',{method:'POST',body:'{}'}); location.replace('/html/login.html'); }

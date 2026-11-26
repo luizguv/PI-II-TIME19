@@ -7,6 +7,7 @@ const tbody = document.querySelector('.tabela-demandas tbody');
 const search = document.getElementById('busca');
 const controls = {status:'filtro-status',prioridade:'filtro-prioridade',tipo:'filtro-tipo',projetoId:'filtro-projeto',ordenarPor:'ordenarPor'};
 let version = 0, timer;
+// Envia filtros à API; só a resposta mais recente atualiza a tabela.
 async function load() {
   const current = ++version;
   if (search.value.length > 60) {message(feedback,'A busca deve ter no máximo 60 caracteres.'); return;}
@@ -22,6 +23,7 @@ async function load() {
       const row = element('tr');
       for(const value of [d.titulo,d.tipo,d.prioridade,d.status,d.projetoNome,d.responsavelNome || 'Não atribuído',date(d.dataCriacao),date(d.prazoFinalizacao)]) row.append(element('td',value));
       const cell = element('td'), link = element('a','Ver','btn btn-secondary btn-acao');
+      // O botão Ver leva o ID para a tela de detalhes.
       link.href = `detalhes-demanda.html?id=${d.id}`;cell.append(link);row.append(cell);tbody.append(row);
     }
     if(!demandas.length) { const row=element('tr'),cell=element('td','Nenhuma demanda encontrada.');cell.colSpan=9;row.append(cell);tbody.append(row); }
@@ -32,6 +34,7 @@ ready.then(async()=>{
   const {projetos} = await request('/projetos');
   projetos.forEach(p=>{const option=element('option',p.nome);option.value=p.id;document.getElementById('filtro-projeto').append(option);});
   await load();
+  // Espera 250 ms após digitar antes de consultar a API.
   search.addEventListener('input',()=>{clearTimeout(timer);timer=setTimeout(load,250);});
   Object.values(controls).forEach(id=>document.getElementById(id).addEventListener('change',load));
 }).catch(error=>message(feedback,error.message));

@@ -1,10 +1,12 @@
 /* Autor: Caio Peccinato
+ * Responsável pela apresentação: Caio Peccinato.
  * Consulta externa com prazo limite e cache; indisponibilidade não libera datas sem validação.
  */
 export interface Holiday { date: string; name: string; type: string; }
 const cache = new Map<number, {until: number; data: Holiday[]}>();
 export async function holidays(year: number): Promise<Holiday[]> {
   if (!Number.isInteger(year) || year < 1900 || year > 2199) throw Object.assign(new Error('Ano inválido.'), {status: 400});
+  // Reutiliza os feriados já consultados para esse ano.
   const hit = cache.get(year);
   if (hit && hit.until > Date.now()) return hit.data;
   try {
@@ -12,6 +14,7 @@ export async function holidays(year: number): Promise<Holiday[]> {
     if (!response.ok) throw new Error('Falha externa');
     const data = await response.json() as Holiday[];
     if (!Array.isArray(data) || data.some(h => !/^\d{4}-\d{2}-\d{2}$/.test(h.date) || typeof h.name !== 'string')) throw new Error('Resposta inválida');
+    // Só os feriados nacionais bloqueiam prazo no sistema.
     const national = data.filter(h => h.type === 'national');
     cache.set(year, {until: Date.now() + 86400000, data: national});
     return national;
