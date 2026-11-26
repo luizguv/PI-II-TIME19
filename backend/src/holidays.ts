@@ -1,4 +1,4 @@
-/* Autor: Vinicius Zorzetto — RA:24008052
+/* Autor: Caio Peccinato
  * Consulta externa com prazo limite e cache; indisponibilidade não libera datas sem validação.
  */
 export interface Holiday { date: string; name: string; type: string; }
