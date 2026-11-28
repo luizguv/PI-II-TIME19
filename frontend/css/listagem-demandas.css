@@ -1,10 +1,10 @@
-/* 
+/*
   Autor: Leonardo Gambaroni Alves
   Componente: Projeto Integrador II - PUC-Campinas
-  Descrição: Estilos específicos da tela de listagem 
+  Descrição: Estilos específicos da tela de listagem de demandas
 */
 
-/* Estilo do cabeçalho/menu topo */
+/* Estilo do cabeçalho e menu de navegação superior */
 .topo-site {
     background-color: var(--prussian-blue);
     color: var(--white);
@@ -28,7 +28,7 @@
     font-size: 14px;
 }
 
-.topo-site nav a.ativo, 
+.topo-site nav a.ativo,
 .topo-site nav a:hover {
     color: var(--tropical-teal);
     font-weight: bold;
@@ -39,6 +39,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 16px;
     margin-bottom: 20px;
 }
 
@@ -52,21 +53,64 @@
     font-size: 14px;
 }
 
-/* Área de filtros lado a lado */
+/* Grid responsivo de filtros e busca */
 .caixa-filtros {
-    display: flex;
-    gap: 15px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    align-items: start;
     margin-bottom: 20px;
 }
 
 .grupo-filtro {
-    flex: 1;
+    min-width: 0;
 }
 
-/* Estilização básica da tabela */
+@media (min-width: 769px) {
+    .grupo-busca {
+        grid-column: span 2;
+    }
+}
+
+/* Linha inferior dos filtros com checkbox e botão limpar */
+.acoes-filtros {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding-top: 8px;
+    border-top: 1px solid var(--border-color);
+}
+
+.filtro-checkbox {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    cursor: pointer;
+}
+
+.filtro-checkbox input {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--dusk-blue);
+    cursor: pointer;
+}
+
+.btn-limpar {
+    min-height: 38px;
+    padding: 0 16px;
+    font-size: 14px;
+}
+
+/* Estilização da tabela de demandas */
 .tabela-card {
-    padding: 0; 
-    overflow-x: auto; 
+    padding: 0;
+    overflow-x: auto;
 }
 
 /* Estilos da tabela preenchida pela API. */
@@ -77,7 +121,7 @@
     font-size: 14px;
 }
 
-.tabela-demandas th, 
+.tabela-demandas th,
 .tabela-demandas td {
     padding: 12px 15px;
     border-bottom: 1px solid var(--border-color);
@@ -87,29 +131,31 @@
     background-color: var(--gray-100);
     color: var(--text-secondary);
     font-weight: 600;
+    white-space: nowrap;
 }
 
 .tabela-demandas td {
     color: var(--text-primary);
 }
 
-/* Botão menor usado dentro da tabela */
+/* Botão compacto de ação na linha da tabela */
 .btn-acao {
     min-height: 32px;
     padding: 0 10px;
     font-size: 13px;
 }
 
-/* Badges simples para colorir prioridades e status */
+/* Badges visuais para prioridades e status */
 .badge {
     padding: 4px 8px;
     border-radius: var(--radius-sm);
     font-size: 11px;
     font-weight: bold;
     display: inline-block;
+    white-space: nowrap;
 }
 
-/* Cores das Badges */
+/* Cores das badges de prioridade */
 .badge.critica {
     background-color: #FEE2E2;
     color: #991B1B;
@@ -120,6 +166,17 @@
     color: #92400E;
 }
 
+.badge.media {
+    background-color: #E0E7FF;
+    color: #3730A3;
+}
+
+.badge.baixa {
+    background-color: #F1F5F9;
+    color: #475569;
+}
+
+/* Cores das badges de status */
 .badge.aberta {
     background-color: #E0F2FE;
     color: #0369A1;
@@ -128,6 +185,21 @@
 .badge.andamento {
     background-color: #FEF9C3;
     color: #854D0E;
+}
+
+.badge.revisao {
+    background-color: #EDE9FE;
+    color: #6D28D9;
+}
+
+.badge.concluida {
+    background-color: #DCFCE7;
+    color: #166534;
+}
+
+.badge.cancelada {
+    background-color: #E2E8F0;
+    color: #475569;
 }
 
 /* Mensagem de validação do campo de busca */
@@ -139,4 +211,27 @@
 
 .field-error {
     color: #991B1B;
+}
+
+/* Ajustes responsivos para telas menores */
+@media (max-width: 768px) {
+    .menu-container {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .topo-site nav a {
+        margin-left: 0;
+        margin-right: 15px;
+    }
+
+    .cabecalho-pagina {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .caixa-filtros {
+        grid-template-columns: 1fr;
+    }
 }
