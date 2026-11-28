@@ -1,5 +1,5 @@
 -- Autor original: João Pedro Silveira de Souza
--- Sessões e compatibilidade entre versões: consultar docs/autoria-integracao.md
+-- A tabela de sessões guarda o hash do token e o prazo de expiração.
 -- Oracle: executar cada comando separado por uma linha contendo /.
 -- O inicializador ignora somente objetos já existentes; não apaga tabelas nem registros.
 CREATE TABLE usuarios (
@@ -16,6 +16,7 @@ CREATE TABLE projetos (
   nome VARCHAR2(100) NOT NULL
 )
 /
+-- Os vínculos definem quais projetos cada usuário pode acessar.
 CREATE TABLE projeto_usuarios (
   id_projeto NUMBER NOT NULL REFERENCES projetos(id_projeto),
   id_usuario NUMBER NOT NULL REFERENCES usuarios(id_usuario),
@@ -23,6 +24,7 @@ CREATE TABLE projeto_usuarios (
   CONSTRAINT pk_projeto_usuarios PRIMARY KEY (id_projeto,id_usuario)
 )
 /
+-- A demanda pertence a um projeto; prazo e responsável são opcionais.
 CREATE TABLE demandas (
   id_demanda NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   titulo VARCHAR2(150) NOT NULL,

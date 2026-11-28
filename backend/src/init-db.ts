@@ -1,4 +1,4 @@
-/* Autor: Vinicius Zorzetto — RA:24008052
+/* Autor: João Pedro Silveira de Souza
  * Criação e carga inicial reproduzível. Não exclui registros nem troca senhas existentes.
  */
 import fs from 'node:fs';
@@ -11,6 +11,7 @@ async function main() {
   await initPool();
   try { await connection(async c => {
     const sql = fs.readFileSync(path.resolve(__dirname,'../database/BD-PI2.sql'),'utf8');
+    // O separador / delimita também os blocos dos triggers.
     for (const statement of sql.split(/^\/\s*$/m).map(s=>s.trim()).filter(Boolean)) {
       try { await c.execute(statement); }
       catch (error: any) { if (error.errorNum !== 955) throw error; }
@@ -25,6 +26,7 @@ async function main() {
     const [column] = await rows(c,"SELECT data_length FROM user_tab_columns WHERE table_name='DEMANDAS' AND column_name='DESCRICAO'");
     if (!column) await c.execute('ALTER TABLE demandas ADD descricao VARCHAR2(2000)');
     else if (column.DATA_LENGTH < 2000) await c.execute('ALTER TABLE demandas MODIFY descricao VARCHAR2(2000)');
+    // Cria contas de demonstração apenas se ainda não existirem.
     const accounts = [
       {nome:'Administrador demonstração',email:'admin@pi2.local',perfil:ADMIN},
       {nome:'Líder demonstração',email:'lider@pi2.local',perfil:LEADER},
@@ -46,6 +48,7 @@ async function main() {
           ON (pu.id_projeto=src.p AND pu.id_usuario=src.u) WHEN NOT MATCHED THEN INSERT(id_projeto,id_usuario) VALUES(src.p,src.u)`,{projeto:project,usuario:user});
       }
     }
+    // A carga cobre prioridades e etapas diferentes do fluxo.
     const examples = [
       ['Validar autenticação integrada','Defeito','Crítica','Aberta'],
       ['Integrar indicadores do dashboard','Tarefa','Alta','Em Andamento'],

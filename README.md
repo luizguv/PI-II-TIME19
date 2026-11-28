@@ -5,11 +5,6 @@ Projeto Integrador II, Engenharia de Software, PUC-Campinas — 2º semestre de 
 Equipe: Caio Peccinato, João Pedro Silveira de Souza, Leonardo Gambaroni Alves,
 Luiz Gustavo Urias Vieira e Vinicius Davi Zorzetto de Matos. Professora: Renata Arantes.
 
-Login e sessão: **Vinicius Zorzetto — RA:24008052**.
-Detalhes, comentários e histórico: **João Pedro Silveira de Souza** (atualização da main).
-Dashboard: **Caio Peccinato**. Listagem: **Leonardo Gambaroni Alves**.
-A contribuição adicional desta branch e os ajustes de compatibilidade estão em `docs/autoria-integracao.md`.
-Os cabeçalhos mantêm a autoria original dos componentes compartilhados.
 
 ## Requisitos e execução
 
@@ -64,7 +59,7 @@ navegador. “Lembrar de mim”: até sete dias. Sair invalida a sessão no banc
 | GET | /feriados/:ano | Feriados nacionais obtidos da BrasilAPI |
 
 Cadastro recebe `titulo`, `descricao`, `tipo`, `prioridade`, `projetoId`,
-`responsavelId` (ou null) e `prazoFinalizacao` no formato AAAA-MM-DD.
+`responsavelId` (ou null) e `prazoFinalizacao` opcional, no formato AAAA-MM-DD ou null.
 Atualização permite os mesmos campos e `status`, preservando o projeto original.
 Ordenações aceitas: `dataCriacao`, `titulo`, `prioridade`, `status`, `prazoFinalizacao`.
 Erros de validação: 400; sessão inválida: 401; permissão: 403; inexistente: 404;
@@ -79,7 +74,7 @@ A implementação inicial usa a seguinte distribuição conservadora:
 | Ação | Administrador | Líder vinculado | Membro vinculado |
 |---|---|---|---|
 | Visualizar | Todos os projetos | Seus projetos | Seus projetos |
-| Cadastrar | Sim | Sim | Sim; atribuição apenas a si ou não atribuída |
+| Cadastrar | Sim | Sim | Sim, sem responsável (confirmar criação com a orientadora) |
 | Editar dados, responsável, prioridade e prazo | Sim | Sim | Não |
 | Iniciar / enviar para revisão | Sim | Sim | Apenas quando responsável |
 | Aprovar conclusão / devolver revisão | Sim | Sim | Não |
@@ -96,28 +91,3 @@ A BrasilAPI é consultada no servidor para prazo novo ou alterado; a tela també
 sobre feriados. Se a consulta falhar, salvar um prazo novo fica bloqueado com mensagem.
 Datas anteriores são rejeitadas no cadastro e na mudança de prazo. Manter o prazo
 existente não impede uma transição de status de demanda atrasada.
-
-## Roteiro da apresentação
-
-1. Conectar VPN, iniciar API e entrar com senha inválida para demonstrar o erro.
-2. Entrar com cada perfil; navegar e recarregar para demonstrar sessão.
-3. Mostrar indicadores, filtros, busca e ordenação, com dados da carga inicial.
-4. Cadastrar uma demanda com prazo em dia comum; abrir seus detalhes.
-5. Tentar prazo em 25/12 de um ano futuro e mostrar o bloqueio de feriado.
-6. Comentar, atualizar e recarregar para demonstrar persistência.
-7. Percorrer os status; mostrar bloqueio de conclusão direta e permissão do membro.
-8. Cancelar uma demanda não concluída e consultar seu histórico.
-9. Sair; conferir que as rotas deixam de aceitar a sessão.
-
-## Organização e entrega
-
-Desenvolver em branches e integrar por revisão. Esta integração usa
-`codex/integracao-reuniao-5`. Não atribuir trabalho dos colegas a outro autor.
-O checklist `docs/reuniao-5.md` separa evidências técnicas dos registros que cada
-integrante deve preencher no GitHub Projects com estimativa e esforço **real**.
-Não inventar horas. Após revisão do grupo e validação da versão final, criar a tag
-`1.0.0-final` no commit entregue e publicar a branch/tag conforme o fluxo da equipe.
-
-O repositório antigo rastreia arquivos em `backend/node_modules`: o `.gitignore`
-impede novos arquivos locais, mas não remove os que já fazem parte do histórico.
-A retirada desses arquivos do índice deve ser combinada com a equipe separadamente.

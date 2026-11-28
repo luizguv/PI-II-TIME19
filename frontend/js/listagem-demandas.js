@@ -14,7 +14,6 @@ const searchError = document.getElementById('buscaErro');
 const datalistSugestoes = document.getElementById('sugestoes-demandas');
 const filtroProjeto = document.getElementById('filtro-projeto');
 const filtroMinhas = document.getElementById('filtro-minhas');
-const btnNovaDemanda = document.getElementById('btnNovaDemanda');
 const btnLimparFiltros = document.getElementById('btnLimparFiltros');
 
 // Regras de validação do lado do cliente (Reunião 3)
@@ -234,11 +233,6 @@ function limparFiltros() {
 ready
   .then(async usuario => {
     usuarioAtual = usuario;
-
-    // Membro da Equipe não cria demandas pelo escopo (item 2.1.3), portanto oculta o botão de cadastro
-    if (usuario.perfil === 'Membro da Equipe' && btnNovaDemanda) {
-      btnNovaDemanda.hidden = true;
-    }
 
     // Preenche o select de projetos dinamicamente a partir dos projetos acessíveis na API
     const { projetos } = await request('/projetos');

@@ -40,6 +40,7 @@
 
         <section class="demand-card">
 
+            <!-- cadastrodemanda.js alterna entre cadastro e edição. -->
             <form id="demandForm">
 
                 <div class="form-section">
@@ -138,7 +139,7 @@
 
                     <div class="form-group">
                         <label class="label" for="deadline">
-                            Prazo de finalização
+                            Prazo de finalização (opcional)
                         </label>
 
                         <input
@@ -146,7 +147,6 @@
                             type="date"
                             id="deadline"
                             name="deadline"
-                            required
                         >
 
                         <small
@@ -169,6 +169,7 @@
                         Cancelar
                     </a>
 
+                    <!-- Envia o formulário após a validação dos campos. -->
                     <button type="submit" class="btn btn-primary">
                         <span id="submitText">Cadastrar demanda</span>
                     </button>

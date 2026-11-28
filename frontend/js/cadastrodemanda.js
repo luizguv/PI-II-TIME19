@@ -9,11 +9,13 @@ function options(select,items,label,placeholder) {
   select.replaceChildren(new Option(placeholder,''));
   items.forEach(item=>select.add(new Option(item[label],item.id)));
 }
+// Carrega responsáveis do projeto selecionado; membros não fazem atribuição.
 async function responsible() {
-  if(!field('project').value) {options(field('responsible'),[],'nome','Não atribuído'); return;}
+  if(user.perfil==='Membro da Equipe' || !field('project').value) {options(field('responsible'),[],'nome','Não atribuído'); return;}
   const {usuarios}=await PI2.request('/usuarios?projetoId='+field('project').value);
-  options(field('responsible'),user.perfil==='Membro da Equipe'?usuarios.filter(u=>u.id===user.id):usuarios,'nome','Não atribuído');
+  options(field('responsible'),usuarios,'nome','Não atribuído');
 }
+// Ignora respostas de consultas anteriores à última troca de prazo.
 async function checkHoliday() {
   const version=++holidayVersion,date=field('deadline').value;
   field('holidayMessage').textContent='';
@@ -28,7 +30,9 @@ async function checkHoliday() {
 const submit=form.querySelector('button[type=submit]');submit.disabled=true;
 PI2.ready.then(async usuario=>{
   user=usuario;
+  field('responsible').disabled=user.perfil==='Membro da Equipe';
   const {projetos}=await PI2.request('/projetos');options(field('project'),projetos,'nome','Selecione o projeto');
+  // O ID na URL abre o formulário no modo de edição.
   if(demandId) {
     current=await PI2.request('/demandas/'+encodeURIComponent(demandId));
     if(!current.podeEditar) throw new Error('Você não pode editar esta demanda ou ela já está encerrada.');
@@ -42,6 +46,7 @@ PI2.ready.then(async usuario=>{
 }).catch(error=>PI2.message(feedback,error.message));
 field('project').addEventListener('change',()=>responsible().catch(error=>PI2.message(feedback,error.message)));
 field('deadline').addEventListener('change',checkHoliday);
+// Salva com POST no cadastro ou PUT na edição.
 form.addEventListener('submit',async event=>{
   event.preventDefault();PI2.message(feedback,'');
   if(!form.reportValidity()) return;
@@ -49,12 +54,13 @@ form.addEventListener('submit',async event=>{
   if(title.length<3 || title.length>150) {PI2.message(feedback,'O título deve ter entre 3 e 150 caracteres.');return;}
   if(description.length<10 || description.length>2000) {PI2.message(feedback,'A descrição deve ter entre 10 e 2000 caracteres.');return;}
   const payload={titulo:title,descricao:description,tipo:field('type').value,prioridade:field('priority').value,
-    projetoId:Number(field('project').value),responsavelId:field('responsible').value?Number(field('responsible').value):null,prazoFinalizacao:field('deadline').value};
+    projetoId:Number(field('project').value),responsavelId:field('responsible').value?Number(field('responsible').value):null,prazoFinalizacao:field('deadline').value || null};
   if(current) payload.status=field('status').value;
-  if(!payload.projetoId || !payload.prazoFinalizacao) {PI2.message(feedback,'Selecione projeto e prazo.');return;}
+  if(current && user.perfil==='Membro da Equipe') delete payload.responsavelId;
+  if(!payload.projetoId) {PI2.message(feedback,'Selecione um projeto.');return;}
   // Não impede salvar uma mudança de status mantendo um prazo antigo já existente.
   const today=new Intl.DateTimeFormat('sv-SE',{timeZone:'America/Sao_Paulo'}).format(new Date());
-  if((!current || payload.prazoFinalizacao!==current.prazoFinalizacao) && payload.prazoFinalizacao<today) {PI2.message(feedback,'O prazo não pode ser uma data passada.');return;}
+  if(payload.prazoFinalizacao && (!current || payload.prazoFinalizacao!==current.prazoFinalizacao) && payload.prazoFinalizacao<today) {PI2.message(feedback,'O prazo não pode ser uma data passada.');return;}
   submit.disabled=true;
   try {
     const saved=await PI2.request('/demandas'+(demandId?'/'+encodeURIComponent(demandId):''),{method:demandId?'PUT':'POST',body:JSON.stringify(payload)});

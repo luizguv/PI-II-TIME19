@@ -1,7 +1,9 @@
-<!-- 
+<!--Autor: Caio Peccinato
   Componente: Projeto Integrador II - PUC-Campinas
-  Descrição: Tela de Dashboard - Sistema de Acompanhamento de Demandas
+  Descrição: Tela dashboard
 -->
+  
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -82,11 +84,22 @@
                 <h3 class="card-titulo">Distribuição de Status</h3>
                 <p class="card-texto" style="color: var(--text-secondary); margin-bottom: 15px;">Proporção atual das demandas</p>
                 
-                <div class="grafico-container"></div>
+                <div id="statusChart" class="grafico-container"></div>
             </div>
 
         </div>
 
+    <div class="demo-lists">
+        <section class="card card-grafico">
+            <h3 class="card-titulo">Demandas por prioridade</h3>
+            <div id="priorityChart" class="grafico-container"></div>
+        </section>
+        <section class="card card-grafico">
+            <h3 class="card-titulo">Demandas por tipo</h3>
+            <div id="typeChart" class="grafico-container"></div>
+        </section>
+    </div>
+    <!-- O JavaScript preenche as listas com demandas críticas e próximas do prazo. -->
     <div class="demo-lists"><section class="card"><h3>Críticas em aberto</h3><ul id="criticalList"></ul></section><section class="card"><h3>Prazos nos próximos 7 dias</h3><ul id="deadlineList"></ul></section></div></main>
 
 <script src="../js/dashboard.js" defer></script></body>

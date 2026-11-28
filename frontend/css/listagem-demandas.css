@@ -113,6 +113,7 @@
     overflow-x: auto;
 }
 
+/* Estilos da tabela preenchida pela API. */
 .tabela-demandas {
     width: 100%;
     border-collapse: collapse;

@@ -1,4 +1,4 @@
-/* Autor: Vinicius Zorzetto — RA:24008052
+/* Autor: João Pedro Silveira de Souza
  * Regras transacionais compartilhadas entre cadastro e os detalhes de João Pedro.
  * Mantém feriados, bloqueio concorrente e histórico detalhado na mesma transação.
  */
@@ -7,6 +7,7 @@ import {connection,rows} from './data/database';
 import {fail,id,text,choice} from './validation';
 import {User,ADMIN,MEMBER,transitions,validDate,today,types,priorities,statuses} from './rules';
 import {holidays} from './holidays';
+// Confere se o projeto existe e se o usuário pode acessá-lo.
 export async function projectAccess(c: Connection, projectId: number, user: User) {
   const [project] = await rows(c, 'SELECT id_projeto FROM projetos WHERE id_projeto = :id', {id: projectId});
   if (!project) fail(404, 'Projeto não encontrado.');
@@ -15,6 +16,7 @@ export async function projectAccess(c: Connection, projectId: number, user: User
     if (!links.length) fail(403, 'Você não participa deste projeto.');
   }
 }
+// Padroniza nomes de campos, datas e status para o frontend.
 export const demandSelect = `SELECT d.id_demanda "id", d.titulo "titulo", d.descricao "descricao", d.tipo_demanda "tipo",
   d.prioridade "prioridade", CASE d.status WHEN 'Em Andamento' THEN 'Em andamento' WHEN 'Em Revisão' THEN 'Em revisão' ELSE d.status END "status",
   d.id_projeto "projetoId", p.nome "projetoNome", d.id_responsavel "responsavelId", u.nome "responsavelNome",
@@ -36,7 +38,9 @@ export async function checkResponsible(c: Connection, responsible: number | null
   const links = await rows(c, 'SELECT id_usuario FROM projeto_usuarios WHERE id_projeto = :projeto AND id_usuario = :usuario', {projeto: project, usuario: responsible});
   if (!links.length) fail(400, 'O responsável precisa pertencer ao projeto.');
 }
+// Valida a data e consulta feriados quando o prazo é informado.
 export async function checkDeadline(value: unknown) {
+  if (value === null) return;
   if (!validDate(value)) fail(400, 'Informe um prazo válido (AAAA-MM-DD).');
   const date = value as string;
   if (date < today()) fail(400, 'O prazo não pode ser uma data passada.');
@@ -53,6 +57,7 @@ export async function updateDemand(user: User, demandIdValue: unknown, body: any
   return connection(async c => {
     const demandId = id(demandIdValue), before = await demand(c, demandId, user, true), b = body || {};
     if (!before.podeEditar) fail(403, 'Você não pode editar esta demanda ou ela já está encerrada.');
+    // Campos omitidos mantêm o valor atual; null pode limpar o prazo.
     const after = {...before,
       titulo: b.titulo === undefined ? before.titulo : text(b.titulo,'Título',3,150),
       descricao: b.descricao === undefined ? before.descricao : text(b.descricao,'Descrição',10,2000),
@@ -73,6 +78,7 @@ export async function updateDemand(user: User, demandIdValue: unknown, body: any
       id_responsavel=:responsavel, status=:status, prazo_finalizacao=TO_DATE(:prazo,'YYYY-MM-DD'), data_atualizacao=CURRENT_TIMESTAMP WHERE id_demanda=:id`,
       {titulo: after.titulo, descricao: after.descricao, tipo: after.tipo, prioridade: after.prioridade, responsavel: after.responsavelId,
         status: after.status === 'Em andamento' ? 'Em Andamento' : after.status === 'Em revisão' ? 'Em Revisão' : after.status, prazo: after.prazoFinalizacao, id: demandId});
+    // Registra o histórico por campo na mesma transação da atualização.
     for (const field of changed) await audit(c, demandId, user, field, before[field], after[field]);
     const result = await demand(c, demandId, user); await c.commit(); return result;
   });

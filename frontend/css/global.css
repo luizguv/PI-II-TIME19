@@ -134,6 +134,7 @@ a:hover {
 
 /* Botão principal */
 
+/* Cor compartilhada para a ação principal de cada tela. */
 .btn-primary {
 
     background-color: var(--tropical-teal);

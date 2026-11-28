@@ -1,7 +1,11 @@
-/* =====================================================
-   ESTILOS ESPECÍFICOS - DASHBOARD
-===================================================== */
+/*
+  Autor: Caio Peccinato
+  Componente: Projeto Integrador II - PUC-Campinas
+  Descrição: CSS Dashboard
+*/
 
+
+/* Cabeçalho com os links de navegação entre as telas. */
 .topo-site {
     background-color: var(--prussian-blue);
     color: var(--white);

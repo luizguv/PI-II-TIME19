@@ -5,9 +5,11 @@
 import {initPool,closePool} from './data/conexao';
 import {app} from './app';
 async function start() {
+  // Abre o pool Oracle antes de disponibilizar a aplicação.
   await initPool();
   const port = Number(process.env.PORT || 3000);
   const server = app.listen(port, '127.0.0.1', () => console.log(`Sistema disponível em http://localhost:${port}`));
+  // No encerramento, fecha primeiro o HTTP e depois o pool.
   const stop = () => server.close(() => {closePool().then(()=>process.exit(0)).catch(()=>process.exit(1));});
   process.on('SIGINT',stop); process.on('SIGTERM',stop);
   server.on('error', () => {console.error('Não foi possível abrir a porta do servidor.'); closePool().finally(()=>process.exit(1));});
